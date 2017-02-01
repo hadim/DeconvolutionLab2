@@ -1,0 +1,24 @@
+import java.io.File;
+
+import deconvolution.Deconvolution;
+import deconvolutionlab.Config;
+import deconvolutionlab.Lab;
+import deconvolutionlab.Platform;
+import deconvolutionlab.dialog.MainDialog;
+import ij.IJ;
+import ij.Macro;
+import ij.plugin.PlugIn;
+
+public class DeconvolutionLab2_Run implements PlugIn {
+
+	@Override
+	public void run(String arg) {
+		Lab.getInstance(Platform.IMAGEJ);
+		String config = IJ.getDirectory("plugins") + File.separator + "DeconvolutionLab2.config"; 
+		Config.getInstance(config);
+		if (Macro.getOptions() == null)
+			new MainDialog().setVisible(true);
+		else
+			new Deconvolution(Macro.getOptions()).deconvolve();
+	}
+}
