@@ -1,16 +1,18 @@
+package course;
 // Course Version 2
+
+import ij.plugin.PlugIn;
 
 import java.io.File;
 
 import javax.swing.filechooser.FileSystemView;
 
-import deconvolution.Deconvolution;
-import deconvolutionlab.Lab;
-import deconvolutionlab.monitor.Monitors;
-import ij.plugin.PlugIn;
 import signal.RealSignal;
 import signal.factory.Cube;
 import signal.factory.Gaussian;
+import deconvolution.Deconvolution;
+import deconvolutionlab.Lab;
+import deconvolutionlab.monitor.Monitors;
 
 public class DeconvolutionLab2_Course_Border implements PlugIn {
 
@@ -21,7 +23,7 @@ public class DeconvolutionLab2_Course_Border implements PlugIn {
 	public DeconvolutionLab2_Course_Border() {
 		
 		Monitors monitors = Monitors.createDefaultMonitor();
-				new File(res).mkdir();
+		new File(res).mkdir();
 		System.setProperty("user.dir", res);
 		
 		int nx = 200;
@@ -86,11 +88,11 @@ public class DeconvolutionLab2_Course_Border implements PlugIn {
 		
 		algo  = " -algorithm CONV -pad E2 E2 -out ortho PADpPower2FFTW rescaled byte (64,32,16) -out mip PADpPower2FFTW rescaled byte"; 
 		
-	/*	
+		
 		new Deconvolution(cst + psf + algo + " -fft FFTW2 ").deconvolve();
 		new Deconvolution(cst + psf + algo + " -fft Academic ").deconvolve();
 		new Deconvolution(cst + psf + algo+ " -fft JTransforms ").deconvolve();
-		*/
+		
 	}
 	
 	public static void main(String arg[]) {

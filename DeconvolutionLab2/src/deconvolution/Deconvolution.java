@@ -58,25 +58,25 @@ import fft.FFT;
 
 public class Deconvolution implements Runnable {
 
-	private AbstractAlgorithm	algo				= null;
+	private AbstractAlgorithm	algo	           = null;
 
-	private String				path;
-	private Monitors			monitors			= Monitors.createDefaultMonitor();
-	private Verbose				verbose				= Verbose.Log;
-	private Controller			controller;
+	private String	           path;
+	private Monitors	       monitors	           = Monitors.createDefaultMonitor();
+	private Verbose	           verbose	           = Verbose.Log;
+	private Controller	       controller;
 	private OutputCollection	outs;
 
-	private Padding				padding				= new Padding();
-	private Apodization			apodization			= new Apodization();
-	private double				factorNormalization	= 1.0;
+	private Padding	           padding	           = new Padding();
+	private Apodization	       apodization	       = new Apodization();
+	private double	           factorNormalization	= 1.0;
 	private AbstractFFTLibrary	fftlib;
 
-	private String				command				= "";
-	private boolean				live				= false;
+	private String	           command	           = "";
+	private boolean	           live	               = false;
 
-	private ArrayList<String>	results				= new ArrayList<String>();
+	private ArrayList<String>	results	           = new ArrayList<String>();
 
-	private String    name 		= "";
+	private String	           name	               = "";
 
 	public Deconvolution(String command) {
 		super();
@@ -101,10 +101,16 @@ public class Deconvolution implements Runnable {
 	}
 
 	public void deconvolve() {
-		/*
-		 * if (fftlib == null) { run(); return; } if
-		 * (!fftlib.isMultithreadable()) { run(); return; }
-		 */
+
+		if (fftlib == null) {
+			run();
+			return;
+		}
+		if (!fftlib.isMultithreadable()) {
+			run();
+			return;
+		}
+
 		Thread thread = new Thread(this);
 		thread.setPriority(Thread.MIN_PRIORITY);
 		thread.start();
@@ -186,7 +192,7 @@ public class Deconvolution implements Runnable {
 					outs.add(out);
 			}
 		}
-		
+
 		if (name.equals("") && algo != null)
 			name = algo.getShortname();
 	}
@@ -392,7 +398,6 @@ public class Deconvolution implements Runnable {
 		return lines;
 	}
 
-	
 	public ArrayList<String> checkPSF() {
 		ArrayList<String> lines = new ArrayList<String>();
 		RealSignal image = openImage();
@@ -454,7 +459,7 @@ public class Deconvolution implements Runnable {
 	public AbstractAlgorithm getAlgo() {
 		return algo;
 	}
-	
+
 	public String getPath() {
 		return path;
 	}

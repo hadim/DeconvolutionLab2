@@ -1,3 +1,4 @@
+package course;
 import java.io.File;
 
 import javax.swing.filechooser.FileSystemView;
@@ -18,9 +19,9 @@ public class DeconvolutionLab2_Course_Noise implements PlugIn {
 	public DeconvolutionLab2_Course_Noise() {
 
 		Monitors monitors = Monitors.createDefaultMonitor();
-				new File(res).mkdir();
+		new File(res).mkdir();
 		System.setProperty("user.dir", res);
-		
+				
 		int nx = 560;
 		int ny = 120;
 		int nz = 1;

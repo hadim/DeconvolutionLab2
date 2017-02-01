@@ -1,3 +1,4 @@
+package course;
 import java.io.File;
 
 import javax.swing.filechooser.FileSystemView;
@@ -20,7 +21,7 @@ public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 		Monitors monitors = Monitors.createDefaultMonitor();
 		new File(res).mkdir();
 		System.setProperty("user.dir", res);
-		
+					
 		new File(res + "RIF").mkdir();
 		new File(res + "LW").mkdir();
 		new File(res + "LW+").mkdir();
