@@ -31,8 +31,6 @@
 
 package deconvolutionlab.dialog;
 
-import ij.gui.GUI;
-
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -48,12 +46,13 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import lab.component.GridPanel;
-import lab.component.SpinnerRangeInteger;
 import deconvolutionlab.Output;
-import deconvolutionlab.PlatformImager;
 import deconvolutionlab.Output.Dynamic;
 import deconvolutionlab.Output.View;
+import deconvolutionlab.PlatformImager;
+import ij.gui.GUI;
+import lab.component.GridPanel;
+import lab.component.SpinnerRangeInteger;
 
 public class OutputDialog extends JDialog implements ActionListener, ChangeListener {
 

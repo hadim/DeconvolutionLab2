@@ -35,14 +35,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+import javax.swing.JTabbedPane;
 
-import lab.tools.NumFormat;
-import signal.RealSignal;
-import signal.apodization.AbstractApodization;
-import signal.apodization.Apodization;
-import signal.apodization.UniformApodization;
-import signal.factory.SignalFactory;
-import signal.padding.Padding;
 import deconvolution.algorithm.AbstractAlgorithm;
 import deconvolution.algorithm.Controller;
 import deconvolutionlab.Lab;
@@ -55,28 +49,36 @@ import deconvolutionlab.monitor.Verbose;
 import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 import fft.FFT;
+import lab.tools.NumFormat;
+import signal.RealSignal;
+import signal.apodization.AbstractApodization;
+import signal.apodization.Apodization;
+import signal.apodization.UniformApodization;
+import signal.factory.SignalFactory;
+import signal.padding.Padding;
 
 public class Deconvolution implements Runnable {
 
-	private AbstractAlgorithm	algo	           = null;
+	private AbstractAlgorithm	algo				= null;
 
-	private String	           path;
-	private Monitors	       monitors	           = Monitors.createDefaultMonitor();
-	private Verbose	           verbose	           = Verbose.Log;
-	private Controller	       controller;
+	private String				path;
+	private Monitors			monitors			= Monitors.createDefaultMonitor();
+	private Verbose				verbose				= Verbose.Log;
+	private Controller			controller;
 	private OutputCollection	outs;
 
-	private Padding	           padding	           = new Padding();
-	private Apodization	       apodization	       = new Apodization();
-	private double	           factorNormalization	= 1.0;
+	private Padding				padding				= new Padding();
+	private Apodization			apodization			= new Apodization();
+	private double				factorNormalization	= 1.0;
 	private AbstractFFTLibrary	fftlib;
 
-	private String	           command	           = "";
-	private boolean	           live	               = false;
+	private String				command				= "";
+	private boolean				live				= false;
 
-	private ArrayList<String>	results	           = new ArrayList<String>();
+	private ArrayList<String>	results				= new ArrayList<String>();
 
-	private String	           name	               = "";
+	private String				name				= "";
+	private boolean				exit				= false;
 
 	public Deconvolution(String command) {
 		super();
@@ -100,7 +102,24 @@ public class Deconvolution implements Runnable {
 		return monitors;
 	}
 
-	public void deconvolve() {
+	/**
+	 * This method runs the deconvolution without graphical user interface.
+	 * 
+	 * @param exit
+	 *            System.exit call is true
+	 */
+	public void deconvolve(boolean exit) {
+		this.exit = exit;
+		
+		for (AbstractMonitor monitor : monitors) {
+			if (monitor instanceof TableMonitor) {
+				String t = algo == null ? "Monitor " + name : name + " " + algo.getName();
+				JFrame frame = new JFrame(t);
+				frame.add(((TableMonitor) monitor).getPanel());
+				frame.pack();
+				frame.setVisible(true);
+			}
+		}
 
 		if (fftlib == null) {
 			run();
@@ -110,23 +129,29 @@ public class Deconvolution implements Runnable {
 			run();
 			return;
 		}
-
 		Thread thread = new Thread(this);
 		thread.setPriority(Thread.MIN_PRIORITY);
 		thread.start();
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void launch(String job) {
+	/**
+	 * This method runs the deconvolution with a graphical user interface.
+	 * 
+	 * @param job
+	 *            Name of the job of deconvolution
+	 * @param exit
+	 *            System.exit call is true
+	 */
+	public void launch(String job, boolean exit) {
 		this.name = job;
-		new DeconvolutionDialog(this);
-	}
-
-	public ArrayList<String> getDeconvolutionResults() {
-		return results;
+		this.exit = exit;
+		DeconvolutionDialog d = new DeconvolutionDialog(this);
+		for (AbstractMonitor monitor : monitors) {
+			if (monitor instanceof TableMonitor) {
+				String t = algo == null ? "Monitor " + name : name + " " + algo.getName();
+				d.addTableMonitor(t, ((TableMonitor) monitor));
+			}
+		}
 	}
 
 	public void decode() {
@@ -195,6 +220,7 @@ public class Deconvolution implements Runnable {
 
 		if (name.equals("") && algo != null)
 			name = algo.getShortname();
+
 	}
 
 	public void setApodization(ArrayList<AbstractApodization> apos) {
@@ -210,26 +236,18 @@ public class Deconvolution implements Runnable {
 	@Override
 	public void run() {
 		live = true;
-		ArrayList<JFrame> frames = new ArrayList<JFrame>();
-		if (monitors != null) {
+		if (monitors != null)
 			monitors.setVerbose(verbose);
-			for (AbstractMonitor monitor : monitors) {
-				if (monitor instanceof TableMonitor) {
-					JFrame frame = new JFrame("Monitor");
-					frame.add(((TableMonitor) monitor).getPanel());
-					frame.pack();
-					frame.setVisible(true);
-					frames.add(frame);
-				}
-			}
-		}
+		
 		results.add("Path: " + checkPath(path));
-
 		monitors.log("Path: " + checkPath(path));
+		
 		RealSignal image = openImage();
 
 		if (image == null) {
 			monitors.error("Image: Not valid " + command);
+			if (exit)
+				System.exit(-101);
 			return;
 		}
 		monitors.log("Image: " + image.nx + " x " + image.ny + " x " + image.nz);
@@ -238,6 +256,8 @@ public class Deconvolution implements Runnable {
 		RealSignal psf = openPSF();
 		if (psf == null) {
 			monitors.error("PSF: not valid");
+			if (exit)
+				System.exit(-102);
 			return;
 		}
 
@@ -247,16 +267,17 @@ public class Deconvolution implements Runnable {
 
 		if (algo == null) {
 			monitors.error("Algorithm: not valid");
+			if (exit)
+				System.exit(-103);
 			return;
 		}
 
 		if (controller == null) {
 			monitors.error("Controller: not valid");
+			if (exit)
+				System.exit(-104);
 			return;
 		}
-
-		for (JFrame frame : frames)
-			frame.setTitle(name + "  (" + algo.getName() + ") ");
 
 		AbstractFFT fft;
 		if (fftlib != null)
@@ -282,6 +303,12 @@ public class Deconvolution implements Runnable {
 			outs.executeFinal(monitors, result, controller);
 
 		live = false;
+
+		if (exit) {
+			System.out.println("End");
+			System.exit(0);
+		}
+
 	}
 
 	public ArrayList<String> recap() {
@@ -433,6 +460,14 @@ public class Deconvolution implements Runnable {
 		lines.add("Energy = " + e + " and after normalization=" + NumFormat.nice(h.getEnergy()));
 		Lab.show(monitors, h, "Padded and Normalized PSF");
 		return lines;
+	}
+
+	public ArrayList<String> getDeconvolutionResults() {
+		return results;
+	}
+
+	public String getName() {
+		return name;
 	}
 
 	public boolean isLive() {

@@ -31,8 +31,6 @@
 
 package deconvolutionlab.dialog;
 
-import ij.gui.GUI;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -47,38 +45,39 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import lab.component.GridPanel;
-import lab.component.HTMLPane;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolutionlab.modules.BatchModule;
+import ij.gui.GUI;
+import lab.component.GridPanel;
+import lab.component.HTMLPane;
 
 public class BatchDialog extends JDialog implements ActionListener, WindowListener {
 
-	private JTextField	txt	    = new JTextField("job", 10);
+	private JTextField	txt			= new JTextField("job", 10);
 	private HTMLPane	pnCommand;
 
-	private JButton	   bnAdd	= new JButton("Add Job");
-	private JButton	   bnCancel	= new JButton("Cancel");
+	private JButton		bnAdd		= new JButton("Add Job");
+	private JButton		bnCancel	= new JButton("Cancel");
 
 	private BatchModule	module;
 
 	public BatchDialog(BatchModule module) {
 		super(new JFrame(), "Batch");
-		
+
 		this.module = module;
-		
+
 		txt.setText("job" + module.getCountJob());
-		
+
 		Deconvolution deconvolution = new Deconvolution(Command.command());
 		pnCommand = new HTMLPane("Monaco", 300, 100);
 		pnCommand.append("p", deconvolution.getCommand());
 		pnCommand.setEditable(true);
-		
+
 		GridPanel pn = new GridPanel(true, 5);
 		pn.place(1, 0, "Job Name");
 		pn.place(1, 1, txt);
-	
+
 		GridPanel bn = new GridPanel(false);
 		bn.place(11, 0, bnCancel);
 		bn.place(11, 1, bnAdd);
@@ -92,21 +91,21 @@ public class BatchDialog extends JDialog implements ActionListener, WindowListen
 
 		bnAdd.addActionListener(this);
 		bnCancel.addActionListener(this);
-		
+
 		add(panel);
-		pack();	
+		pack();
 		addWindowListener(this);
 		GUI.center(this);
 		setModal(true);
 		setVisible(true);
 		setMinimumSize(new Dimension(400, 300));
-	
+
 	}
 
 	private void addJob() {
 		module.addJob(txt.getText(), pnCommand.getText());
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == bnAdd) {
@@ -154,5 +153,4 @@ public class BatchDialog extends JDialog implements ActionListener, WindowListen
 	public void windowDeactivated(WindowEvent e) {
 	}
 
-	
 }

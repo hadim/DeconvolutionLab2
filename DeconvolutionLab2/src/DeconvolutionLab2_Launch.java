@@ -4,7 +4,7 @@ import deconvolution.Deconvolution;
 import deconvolutionlab.Config;
 import deconvolutionlab.Lab;
 import deconvolutionlab.Platform;
-import deconvolutionlab.dialog.MainDialog;
+import deconvolutionlab.dialog.LabDialog;
 import ij.IJ;
 import ij.Macro;
 import ij.plugin.PlugIn;
@@ -17,8 +17,8 @@ public class DeconvolutionLab2_Launch implements PlugIn {
 		String config = IJ.getDirectory("plugins") + File.separator + "DeconvolutionLab2.config"; 
 		Config.getInstance(config);
 		if (Macro.getOptions() == null)
-			new MainDialog().setVisible(true);
+			new LabDialog().setVisible(true);
 		else
-			new Deconvolution(Macro.getOptions()).launch("");
+			new Deconvolution(Macro.getOptions()).launch("", false);
 	}
 }

@@ -34,6 +34,12 @@ package deconvolution.algorithm;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import deconvolution.Deconvolution;
+import deconvolutionlab.Lab;
+import deconvolutionlab.OutputCollection;
+import deconvolutionlab.monitor.Monitors;
+import fft.AbstractFFT;
+import fft.FFT;
 import lab.system.SystemUsage;
 import lab.tools.NumFormat;
 import signal.Assessment;
@@ -41,57 +47,51 @@ import signal.ComplexSignal;
 import signal.Constraint;
 import signal.RealSignal;
 import signal.Signal;
-import deconvolution.Deconvolution;
-import deconvolutionlab.Lab;
-import deconvolutionlab.OutputCollection;
-import deconvolutionlab.monitor.Monitors;
-import fft.AbstractFFT;
-import fft.FFT;
 
 public class Controller {
 
-	private int	             iterationsMax	    = 100;
-	private double	         timeMax	        = 1000;
-	private double	         residuMin	        = -1;
+	private int					iterationsMax		= 100;
+	private double				timeMax				= 1000;
+	private double				residuMin			= -1;
 
-	private boolean	         doResidu	        = false;
-	private boolean	         doTime	            = false;
-	private boolean	         doReference	    = false;
-	private boolean	         doConstraint	    = false;
-	private boolean	         doShowStats	    = false;
-	private boolean	         doSaveStats	    = false;
-	private boolean	         abort	            = false;
+	private boolean				doResidu			= false;
+	private boolean				doTime				= false;
+	private boolean				doReference			= false;
+	private boolean				doConstraint		= false;
+	private boolean				doShowStats			= false;
+	private boolean				doSaveStats			= false;
+	private boolean				abort				= false;
 
-	private int	             snapshotResidu	    = 0;
-	private int	             snapshotReference	= 0;
-	private int	             snapshotConstraint	= 0;
-	private int	             snapshotSaveStats	= 0;
-	private int	             snapshotShowStats	= 0;
+	private int					snapshotResidu		= 0;
+	private int					snapshotReference	= 0;
+	private int					snapshotConstraint	= 0;
+	private int					snapshotSaveStats	= 0;
+	private int					snapshotShowStats	= 0;
 
-	private double	         timeStarting	    = 0;
-	private double	         memoryStarting	    = 0;
-	private double	         residu	            = Double.MAX_VALUE;
-	private int	             iterations	        = 0;
-	private double	         memoryPeak	        = 0;
-	private double	         snr	            = 0;
-	private double	         psnr	            = 0;
+	private double				timeStarting		= 0;
+	private double				memoryStarting		= 0;
+	private double				residu				= Double.MAX_VALUE;
+	private int					iterations			= 0;
+	private double				memoryPeak			= 0;
+	private double				snr					= 0;
+	private double				psnr				= 0;
 
-	private Constraint.Mode	 constraint	        = Constraint.Mode.NO;
-	private OutputCollection	outs	        = null;
-	private String	         referenceName	    = "";
-	private String	         showstatsName	    = "";
-	private String	         savestatsName	    = "";
-	private RealSignal	     refImage;
-	private RealSignal	     prevImage;
-	private RealSignal	     x;
+	private Constraint.Mode		constraint			= Constraint.Mode.NO;
+	private OutputCollection	outs				= null;
+	private String				referenceName		= "";
+	private String				showstatsName		= "";
+	private String				savestatsName		= "";
+	private RealSignal			refImage;
+	private RealSignal			prevImage;
+	private RealSignal			x;
 
-	private Timer	         timer;
-	private AbstractFFT	     fft;
+	private Timer				timer;
+	private AbstractFFT			fft;
 
-	private String	         algo	            = "";
-	private float	         statsInput[];
+	private String				algo				= "";
+	private float				statsInput[];
 
-	private Monitors	     monitors	        = new Monitors();
+	private Monitors			monitors			= new Monitors();
 
 	public Controller() {
 		constraint = Constraint.Mode.NO;

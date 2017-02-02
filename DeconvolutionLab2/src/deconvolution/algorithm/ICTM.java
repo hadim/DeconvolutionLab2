@@ -40,10 +40,10 @@ import signal.RealSignal;
 import signal.factory.complex.ComplexSignalFactory;
 
 public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
-	
-	private double gamma = 1.0;
-	private double lambda = 1.0;
-	
+
+	private double	gamma	= 1.0;
+	private double	lambda	= 1.0;
+
 	public ICTM(int iter, double gamma, double lambda) {
 		super();
 		controller.setIterationMax(iter);
@@ -58,19 +58,19 @@ public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
 		ComplexSignal H = fft.transform(h);
 		ComplexSignal A = Operations.delta(gamma, H);
 		ComplexSignal L = ComplexSignalFactory.laplacian(Y.nx, Y.ny, Y.nz);
-		ComplexSignal L2 = Operations.multiplyConjugate(lambda*gamma, L, L);
+		ComplexSignal L2 = Operations.multiplyConjugate(lambda * gamma, L, L);
 		A.minus(L2);
 		ComplexSignal G = Operations.multiplyConjugate(gamma, H, Y);
 		ComplexSignal X = G.duplicate();
 		controller.setConstraint(1, Constraint.Mode.NONNEGATIVE);
-		while(!controller.ends(X)) {
+		while (!controller.ends(X)) {
 			X.times(A);
 			X.plus(G);
 		}
 		RealSignal x = fft.inverse(X);
 		return x;
 	}
-	
+
 	@Override
 	public String getName() {
 		return "Iterative Contraint Tikhonov-Miller";
@@ -85,50 +85,49 @@ public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
 	public boolean isRegularized() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean isStepControllable() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean isIterative() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean isWaveletsBased() {
 		return false;
 	}
-	
+
 	@Override
 	public void setParameters(double[] params) {
 		if (params == null)
 			return;
 		if (params.length > 0)
-			controller.setIterationMax((int)Math.round(params[0]));
+			controller.setIterationMax((int) Math.round(params[0]));
 		if (params.length > 1)
-			gamma = (float)params[1];
+			gamma = (float) params[1];
 		if (params.length > 2)
-			lambda = (float)params[2];
-	}
-	
-	@Override
-	public double[] getDefaultParameters() {
-		return new double[] {10, 1, 0.1};
-	}
-	
-	@Override
-	public double[] getParameters() {
-		return new double[] {controller.getIterationMax(), gamma, lambda};
+			lambda = (float) params[2];
 	}
 
-	
+	@Override
+	public double[] getDefaultParameters() {
+		return new double[] { 10, 1, 0.1 };
+	}
+
+	@Override
+	public double[] getParameters() {
+		return new double[] { controller.getIterationMax(), gamma, lambda };
+	}
+
 	@Override
 	public double getRegularizationFactor() {
 		return lambda;
 	}
-	
+
 	@Override
 	public double getStepFactor() {
 		return gamma;

@@ -37,11 +37,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import signal.Operations;
-import signal.RealSignal;
 import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFT;
 import fft.FFT;
+import signal.Operations;
+import signal.RealSignal;
 
 /**
  * This class is the common part of every algorithm of deconvolution.
@@ -51,27 +51,37 @@ import fft.FFT;
  */
 public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 
-	protected RealSignal	y	       = null;
-	protected RealSignal	h	       = null;
+	protected RealSignal	y			= null;
+	protected RealSignal	h			= null;
 	protected RealSignal	reference	= null;
 
 	protected Controller	controller	= null;
-	protected AbstractFFT	fft	       = null;
-	
+	protected AbstractFFT	fft			= null;
+
 	public AbstractAlgorithm() {
 		this.controller = new Controller();
 	}
 
 	public abstract String getName();
+
 	public abstract String getShortname();
+
 	public abstract boolean isRegularized();
+
 	public abstract boolean isStepControllable();
+
 	public abstract boolean isIterative();
+
 	public abstract boolean isWaveletsBased();
+
 	public abstract void setParameters(double[] params);
+
 	public abstract double getRegularizationFactor();
+
 	public abstract double getStepFactor();
+
 	public abstract double[] getParameters();
+
 	public abstract double[] getDefaultParameters();
 
 	public RealSignal run(Monitors monitors, RealSignal image, RealSignal psf, boolean threaded) {
@@ -88,7 +98,7 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		else
 			fft.init(monitors, y.nx, y.ny, y.nz);
 		monitors.log(getShortname() + " data ready");
-		
+
 		double params[] = getParameters();
 		if (params != null) {
 			if (params.length > 0) {
@@ -156,17 +166,16 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		return controller.getMemory();
 	}
 
-	public void setWavelets(String waveletsName) {		
+	public void setWavelets(String waveletsName) {
 	}
 
-	
 	@Override
 	public String toString() {
 		String s = "";
 		s += getName();
 		s += (isIterative() ? ", " + controller.getIterationMax() + " iterations" : " (direct)");
-		s += (isRegularized() ? ", &lambda=" + getRegularizationFactor() : "") ;
-		s += (isStepControllable() ? ", &gamma=" + getStepFactor() : "") ;
+		s += (isRegularized() ? ", &lambda=" + getRegularizationFactor() : "");
+		s += (isStepControllable() ? ", &gamma=" + getStepFactor() : "");
 		return s;
 	}
 }

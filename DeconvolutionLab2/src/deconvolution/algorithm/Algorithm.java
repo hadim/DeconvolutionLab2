@@ -36,7 +36,7 @@ import java.util.ArrayList;
 public class Algorithm {
 
 	private static ArrayList<AbstractAlgorithmPanel> list;
-	
+
 	static {
 		list = new ArrayList<AbstractAlgorithmPanel>();
 		list.add(new RegularizedInverseFilterPanel());
@@ -54,9 +54,9 @@ public class Algorithm {
 		list.add(new IdentityPanel());
 		list.add(new ConvolutionPanel());
 		list.add(new SimulationPanel());
-		list.add(new NonStabilizedDivisionPanel());		
+		list.add(new NonStabilizedDivisionPanel());
 	}
-	
+
 	public static ArrayList<AbstractAlgorithmPanel> getAvailableAlgorithms() {
 		return list;
 	}
@@ -64,13 +64,13 @@ public class Algorithm {
 	public static AbstractAlgorithm getDefaultAlgorithm() {
 		return new Identity();
 	}
-	
+
 	public static AbstractAlgorithm createAlgorithm(String name) {
 		if (name == null)
 			return getDefaultAlgorithm();
 		String n = name.trim().toLowerCase();
 		int i = 0;
-		
+
 		if (list.get(i++).isNamed(n))
 			return new RegularizedInverseFilter(0.1);
 		if (list.get(i++).isNamed(n))
@@ -106,18 +106,18 @@ public class Algorithm {
 		return getDefaultAlgorithm();
 	}
 
-	public static AbstractAlgorithmPanel getPanel(String name) { 
+	public static AbstractAlgorithmPanel getPanel(String name) {
 		for (AbstractAlgorithmPanel panel : getAvailableAlgorithms()) {
 			if (panel.getShortname().equals(name.trim()))
 				return panel;
 			if (panel.getName().equals(name.trim()))
 				return panel;
-			
+
 		}
 		return null;
 	}
 
-	public static ArrayList<String> getShortnames() { 
+	public static ArrayList<String> getShortnames() {
 		ArrayList<String> list = new ArrayList<String>();
 		for (AbstractAlgorithmPanel algo : getAvailableAlgorithms()) {
 			list.add(algo.getShortname());

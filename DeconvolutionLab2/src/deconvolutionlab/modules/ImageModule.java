@@ -53,11 +53,6 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import lab.component.CustomizedColumn;
-import lab.component.CustomizedTable;
-import lab.tools.Files;
-import signal.RealSignal;
-import signal.factory.SignalFactory;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolutionlab.Config;
@@ -68,6 +63,11 @@ import deconvolutionlab.PlatformImageSelector;
 import deconvolutionlab.dialog.PatternDialog;
 import deconvolutionlab.dialog.SyntheticDialog;
 import deconvolutionlab.monitor.Monitors;
+import lab.component.CustomizedColumn;
+import lab.component.CustomizedTable;
+import lab.tools.Files;
+import signal.RealSignal;
+import signal.factory.SignalFactory;
 
 public class ImageModule extends AbstractModule implements ActionListener, MouseListener {
 
@@ -78,7 +78,7 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 	private JButton			bnPlatform;
 
 	public ImageModule(boolean expanded) {
-		super("Image", "-image", "Open", "Show", expanded);
+		super("Image", "-image", "Select", "Show", expanded);
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 
 		table.setDropTarget(new LocalDropTarget());
 		getCollapsedPanel().setDropTarget(new LocalDropTarget());
-		
+
 		bnFile.addActionListener(this);
 		bnDirectory.addActionListener(this);
 		bnSynthetic.addActionListener(this);
@@ -145,7 +145,7 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 			setSynopsis(table.getCell(row, 0));
 			Command.command();
 		}
-		else 
+		else
 			setSynopsis("");
 		getAction2Button().setEnabled(table.getRowCount() > 0);
 	}
@@ -154,11 +154,11 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
 		if (e.getSource() == bnFile) {
-			Deconvolution deconvolution = new Deconvolution(Command.command());		
+			Deconvolution deconvolution = new Deconvolution(Command.command());
 			file(deconvolution.getPath());
 		}
 		else if (e.getSource() == bnDirectory) {
-			Deconvolution deconvolution = new Deconvolution(Command.command());		
+			Deconvolution deconvolution = new Deconvolution(Command.command());
 			dir(deconvolution.getPath());
 		}
 		else if (e.getSource() == bnSynthetic)
@@ -177,19 +177,19 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 		String name = selector.getSelectedImage();
 		if (name != null)
 			if (name != "")
-				table.insert(new String[] {name, "platform", name, "" });
+				table.insert(new String[] { name, "platform", name, "" });
 	}
-	
+
 	private void file(String path) {
 		File file = Files.browseFile(path);
-		if (file == null) 
+		if (file == null)
 			return;
 		table.insert(new String[] { file.getName(), "file", file.getAbsolutePath(), "" });
 	}
 
 	private void dir(String path) {
 		File file = Files.browseDirectory(path);
-		if (file == null) 
+		if (file == null)
 			return;
 		PatternDialog dlg = new PatternDialog(file);
 		dlg.setVisible(true);
@@ -220,18 +220,18 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 
 	private void edit() {
 		int row = table.getSelectedRow();
-		
+
 		if (row < 0)
 			return;
 		String name = table.getCell(row, 0).trim();
 		System.out.println("edit " + row + " " + name);
-		for(SignalFactory factory : SignalFactory.getAll()) {
+		for (SignalFactory factory : SignalFactory.getAll()) {
 			if (name.equals(factory.getName().trim()))
 				synthetic(true);
-				return;
+			return;
 		}
 		String filename = table.getCell(row, 1).trim();
-		System.out.println("edit " + row + " " + filename + " " + new File(filename).exists() + " " +new File(filename).isDirectory());
+		System.out.println("edit " + row + " " + filename + " " + new File(filename).exists() + " " + new File(filename).isDirectory());
 		File file = new File(filename);
 		if (!file.exists())
 			return;
@@ -301,7 +301,7 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 	}
 
 	public class LocalDropTarget extends DropTarget {
-		
+
 		@Override
 		public void drop(DropTargetDropEvent e) {
 			e.acceptDrop(DnDConstants.ACTION_COPY);

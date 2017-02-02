@@ -81,26 +81,26 @@ public class NonStabilizedDivision extends AbstractAlgorithm implements Callable
 	public boolean isWaveletsBased() {
 		return false;
 	}
-	
+
 	@Override
 	public void setParameters(double[] params) {
 	}
-	
+
 	@Override
 	public double[] getDefaultParameters() {
 		return new double[] {};
 	}
-	
+
 	@Override
 	public double[] getParameters() {
 		return new double[] {};
 	}
-		
+
 	@Override
 	public double getRegularizationFactor() {
 		return 0.0;
 	}
-	
+
 	@Override
 	public double getStepFactor() {
 		return 0;

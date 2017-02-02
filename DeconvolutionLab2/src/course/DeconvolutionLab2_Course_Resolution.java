@@ -44,26 +44,26 @@ public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 		String paramout = " intact float  (" + spacing + "," + spacing + "," + spacing + ")";
 		
 		algo  = " -algorithm CONV  -showstats @3 PR -out stack PR -out ortho PRo ";
-		new Deconvolution(ground + "-reference reference.tif -psf synthetic impulse 100 0 size 128 128 128 " + algo).deconvolve();
+		new Deconvolution(ground + "-reference reference.tif -psf synthetic impulse 100 0 size 128 128 128 " + algo).deconvolve(false);
 
 		algo  = " -algorithm SIM 0 0.1 0  -showstats @3 SIM -out stack SIGNAL -out ortho SIGNALo ";
-		new Deconvolution(ground + psf + algo).deconvolve();
+		new Deconvolution(ground + psf + algo).deconvolve(false);
 
 		algo  = " -algorithm NIF -out ortho NIF " + paramout;
-		new Deconvolution(signal + psf + algo).deconvolve();
+		new Deconvolution(signal + psf + algo).deconvolve(false);
 
 		algo  = " -algorithm LW+ 17 1 -showstats @3 LW  -out ortho @10 LW+/LW+" + paramout;
-		new Deconvolution(signal + psf + algo).deconvolve();
+		new Deconvolution(signal + psf + algo).deconvolve(false);
 
 		for(int i=0; i<=15; i++) {
 			double p = Math.pow(10, i-15);
 			algo  = " -algorithm RIF " + p + " -out ortho RIF/RIF" + String.format("%02d", i) + paramout;
-			new Deconvolution(signal + psf + algo).deconvolve();
+			new Deconvolution(signal + psf + algo).deconvolve(false);
 		}
 	
 		
 		algo  = " -algorithm LW 11 1 -showstats @3 LW  -out ortho @10 LW/LW" + paramout;
-		new Deconvolution(signal + psf + algo).deconvolve();
+		new Deconvolution(signal + psf + algo).deconvolve(false);
 		
 	
 	}

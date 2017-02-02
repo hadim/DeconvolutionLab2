@@ -46,18 +46,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JProgressBar;
 import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import lab.component.PanelImage;
-import lab.system.SystemPanel;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolutionlab.Config;
@@ -80,10 +74,10 @@ import deconvolutionlab.modules.LicenceModule;
 import deconvolutionlab.modules.MonitoringModule;
 import deconvolutionlab.modules.OutputModule;
 import deconvolutionlab.modules.PSFModule;
-import deconvolutionlab.monitor.AbstractMonitor;
-import deconvolutionlab.monitor.StatusMonitor;
+import lab.component.PanelImage;
+import lab.system.SystemPanel;
 
-public class MainDialog extends JDialog implements ComponentListener, ActionListener, ChangeListener, WindowListener {
+public class LabDialog extends JDialog implements ComponentListener, ActionListener, ChangeListener, WindowListener {
 
 	private JTabbedPane			tab			= new JTabbedPane();
 	private JButton				bnHelp		= new JButton("Help");
@@ -114,11 +108,9 @@ public class MainDialog extends JDialog implements ComponentListener, ActionList
 	private GroupedModulePanel	panelAdvanc;
 	private GroupedModulePanel	panelProgra;
 	private GroupedModulePanel	panelAbout;
-	//private JProgressBar		status		= new JProgressBar();
-
 	private AbstractModule		modules[];
 
-	public MainDialog() {
+	public LabDialog() {
 		super(new JFrame(), Constants.name);
 		image = new ImageModule(false);
 		psf = new PSFModule(false);
@@ -144,7 +136,7 @@ public class MainDialog extends JDialog implements ComponentListener, ActionList
 		addWindowListener(this);
 		addComponentListener(this);
 		((GroupedModulePanel) tab.getSelectedComponent()).organize();
-		setMinimumSize(new Dimension(400, 400));
+		setMinimumSize(new Dimension(500, 500));
 		Config.registerFrame("DeconvolutionLab", "MainDialog", this);
 
 		pack();
@@ -175,17 +167,6 @@ public class MainDialog extends JDialog implements ComponentListener, ActionList
 		bottom.add(bnBatch);
 		bottom.add(bnRun);
 		bottom.add(bnLaunch);
-		/*
-		status.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-		status.setBorder(BorderFactory.createLoweredBevelBorder());
-		JToolBar statusBar = new JToolBar();
-		statusBar.setBorder(BorderFactory.createEmptyBorder());
-		statusBar.setFloatable(false);
-		statusBar.setLayout(new BorderLayout());
-		statusBar.add(bnHelp, BorderLayout.WEST);
-		statusBar.add(status, BorderLayout.CENTER);
-		statusBar.add(bnQuit, BorderLayout.EAST);
-		 */
 		
 		tab.add("Deconvolution", panelDeconv);
 		tab.add("Advanced", panelAdvanc);
@@ -234,10 +215,10 @@ public class MainDialog extends JDialog implements ComponentListener, ActionList
 			new BatchDialog(batch);
 		}
 		else if (e.getSource() == bnLaunch) {
-			new Deconvolution(Command.command()).launch("");
+			new Deconvolution(Command.command()).launch("", false);
 		}
 		else if (e.getSource() == bnRun) {
-			new Deconvolution(Command.command()).deconvolve();
+			new Deconvolution(Command.command()).deconvolve(false);
 		}
 	}
 

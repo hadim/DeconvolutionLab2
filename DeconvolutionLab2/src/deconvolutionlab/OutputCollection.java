@@ -33,40 +33,40 @@ package deconvolutionlab;
 
 import java.util.ArrayList;
 
-import signal.RealSignal;
 import deconvolution.algorithm.Controller;
 import deconvolutionlab.monitor.Monitors;
+import signal.RealSignal;
 
 public class OutputCollection {
-	
+
 	private ArrayList<Output> list = new ArrayList<Output>();
-	
+
 	public void setPath(String path) {
-		for(Output out : list)
+		for (Output out : list)
 			out.setPath1(path);
 	}
-	
+
 	public void add(Output out) {
 		if (out != null) {
 			list.add(out);
 		}
 	}
-	
+
 	public boolean hasShow(int iterations) {
 		boolean flag = false;
 		for (Output out : list)
 			flag = flag | out.is(iterations);
 		return flag;
 	}
-	
+
 	public void executeFinal(Monitors monitors, RealSignal signal, Controller controller) {
-		for(Output out : list)
+		for (Output out : list)
 			if (out != null)
 				out.execute(monitors, signal, controller, false);
 	}
-	
+
 	public void executeIterative(Monitors monitors, RealSignal signal, Controller controller) {
-		for(Output out : list)
+		for (Output out : list)
 			if (out != null)
 				out.execute(monitors, signal, controller, true);
 	}
@@ -82,5 +82,5 @@ public class OutputCollection {
 		return lines;
 
 	}
-	
+
 }

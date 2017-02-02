@@ -61,15 +61,15 @@ import fft.FFT;
 
 public class FFTModule extends AbstractModule implements ActionListener, ChangeListener {
 
-	private HTMLPane	        info;
+	private HTMLPane			info;
 
 	private JComboBox<String>	cmbFFT;
 	private JComboBox<String>	cmbType;
 	private JComboBox<String>	cmbSep;
 	private JComboBox<String>	cmbEpsilon;
-	
+
 	private CustomizedTable		table;
-	
+
 	public FFTModule(boolean expanded) {
 		super("Fourier", "", "", "Default", expanded);
 	}
@@ -84,19 +84,19 @@ public class FFTModule extends AbstractModule implements ActionListener, ChangeL
 
 	@Override
 	public JPanel buildExpandedPanel() {
-		
+
 		ArrayList<CustomizedColumn> columns = new ArrayList<CustomizedColumn>();
 		columns.add(new CustomizedColumn("Name", String.class, 120, false));
 		columns.add(new CustomizedColumn("Installed", String.class, 120, false));
 		columns.add(new CustomizedColumn("Location", String.class, Constants.widthGUI, false));
 		table = new CustomizedTable(columns, true);
 		table.setRowSelectionAllowed(false);
-		
+
 		info = new HTMLPane(100, 100);
 		cmbFFT = new JComboBox<String>(FFT.getLibrariesAsArray());
 		cmbType = new JComboBox<String>(new String[] { "float" });
 		cmbSep = new JComboBox<String>(new String[] { "XYZ" });
-		cmbEpsilon = new JComboBox<String>(new String[] { "1E-0", "1E-1", "1E-2", "1E-3", "1E-4", "1E-5", "1E-6", "1E-7", "1E-8", "1E-9", "1E-10", "1E-11", "1E-12"});
+		cmbEpsilon = new JComboBox<String>(new String[] { "1E-0", "1E-1", "1E-2", "1E-3", "1E-4", "1E-5", "1E-6", "1E-7", "1E-8", "1E-9", "1E-10", "1E-11", "1E-12" });
 		cmbEpsilon.setSelectedItem("1E-6");
 
 		GridPanel pnNumeric = new GridPanel(false, 3);
@@ -117,7 +117,7 @@ public class FFTModule extends AbstractModule implements ActionListener, ChangeL
 		JPanel control = new JPanel(new BorderLayout());
 		Border b1 = BorderFactory.createEtchedBorder();
 		Border b2 = BorderFactory.createEmptyBorder(10, 10, 10, 10);
-		
+
 		control.setBorder(BorderFactory.createCompoundBorder(b1, b2));
 		control.add(scroll2, BorderLayout.NORTH);
 		control.add(info.getPane(), BorderLayout.CENTER);
@@ -125,7 +125,7 @@ public class FFTModule extends AbstractModule implements ActionListener, ChangeL
 
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(control, BorderLayout.CENTER);
-	
+
 		Config.register(getName(), "epsilon", cmbEpsilon, "1E-6");
 		Config.register(getName(), "fft", cmbFFT, Algorithm.getDefaultAlgorithm());
 		Config.register(getName(), "dim", cmbSep, "XYZ");
@@ -141,20 +141,22 @@ public class FFTModule extends AbstractModule implements ActionListener, ChangeL
 	}
 
 	private void fillInstallation() {
-		
+
 		ArrayList<AbstractFFTLibrary> libs = FFT.getLibraries();
-		for(AbstractFFTLibrary lib : libs) {
+		for (AbstractFFTLibrary lib : libs) {
 			String name = lib.getLibraryName();
 			String installed = lib.isInstalled() ? " Yes" : "No";
 			String location = lib.getLocation();
-			table.append(new String[] {name, installed, location});
+			table.append(new String[] { name, installed, location });
 		}
+		AbstractFFTLibrary fftlib = FFT.getLibraryByName((String) cmbFFT.getSelectedItem());
+		info.clear();
+		info.append("p", fftlib.getLicence());
 	}
-	
+
 	private void update() {
 		setCommand(getCommand());
-		Signal.epsilon =  NumFormat.parseNumber( (String) cmbEpsilon.getSelectedItem(), 1e-6);
-
+		Signal.epsilon = NumFormat.parseNumber((String) cmbEpsilon.getSelectedItem(), 1e-6);
 		Command.command();
 	}
 
@@ -171,7 +173,7 @@ public class FFTModule extends AbstractModule implements ActionListener, ChangeL
 			info.clear();
 			info.append("p", fftlib.getLicence());
 		}
-	
+
 		if (e.getSource() == getAction1Button()) {
 			cmbFFT.removeActionListener(this);
 			cmbType.removeActionListener(this);

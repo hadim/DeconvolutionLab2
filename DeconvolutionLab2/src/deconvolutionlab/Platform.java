@@ -31,17 +31,15 @@
 
 package deconvolutionlab;
 
-import imagej.IJImager;
-
 import java.util.ArrayList;
 
+import imagej.IJImager;
 import plugins.sage.deconvolutionlab.IcyImager;
-import deconvolutionlab.monitor.Monitors;
 
 public enum Platform {
-	
+
 	IMAGEJ, ICY, STANDALONE, MATLAB;
-	
+
 	public static ArrayList<PlatformImager> getImagers() {
 		ArrayList<PlatformImager> imagers = new ArrayList<PlatformImager>();
 		try {
@@ -50,7 +48,7 @@ public enum Platform {
 				imagers.add(imager);
 			}
 		}
-		catch(NoClassDefFoundError ex) {
+		catch (NoClassDefFoundError ex) {
 		}
 
 		try {
@@ -59,17 +57,17 @@ public enum Platform {
 				imagers.add(imager);
 			}
 		}
-		catch(NoClassDefFoundError ex) {
+		catch (NoClassDefFoundError ex) {
 		}
-		
+
 		imagers.add(new LabImager());
 		return imagers;
 	}
-	
+
 	public static ArrayList<String> getNameImagers() {
 		ArrayList<PlatformImager> imagers = getImagers();
 		ArrayList<String> names = new ArrayList<String>();
-		for(PlatformImager imager : imagers)
+		for (PlatformImager imager : imagers)
 			names.add(imager.getName());
 		return names;
 	}

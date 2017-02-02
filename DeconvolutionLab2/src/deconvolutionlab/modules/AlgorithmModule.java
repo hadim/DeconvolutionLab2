@@ -85,7 +85,7 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 		doc = new HTMLPane(100, 1000);
 		cards = new JPanel(new CardLayout());
 		ArrayList<AbstractAlgorithmPanel> panels = Algorithm.getAvailableAlgorithms();
-		for (AbstractAlgorithmPanel panel : panels) {		
+		for (AbstractAlgorithmPanel panel : panels) {
 			JScrollPane scroll = new JScrollPane(panel.getPanelParameters());
 			scroll.setBorder(BorderFactory.createEmptyBorder());
 			scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -101,19 +101,19 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 		control.setBorder(BorderFactory.createCompoundBorder(b1, b2));
 		control.add(cmb);
 		control.add(cards);
-		
+
 		doc.append("h1", "Documentation");
-		
+
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(control, BorderLayout.NORTH);
 		panel.add(doc.getPane(), BorderLayout.CENTER);
-		//cmb.addActionListener(this);
+		// cmb.addActionListener(this);
 
 		Config.register(getName(), "algorithm", cmb, Algorithm.getDefaultAlgorithm());
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		return panel;
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);

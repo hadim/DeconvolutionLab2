@@ -45,10 +45,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import lab.component.CustomizedColumn;
-import lab.component.CustomizedTable;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
+import lab.component.CustomizedColumn;
+import lab.component.CustomizedTable;
 public class ConfigModule extends AbstractModule implements ActionListener {
 
 	private JButton	 bnLoad;

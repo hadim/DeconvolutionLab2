@@ -75,51 +75,51 @@ public class DeconvolutionLab2_Course_SpectralAnaylsis implements PlugIn {
 		
 		// Simulation
 		String algo  = " -algorithm CONV " + out("CONV");
-		new Deconvolution(psf + image + algo).deconvolve();
+		new Deconvolution(psf + image + algo).deconvolve(false);
 	
 		algo  = " -algorithm CONV " + out("CONV-PERTURBATED");
-		new Deconvolution(psf + image + algo).deconvolve();
+		new Deconvolution(psf + image + algo).deconvolve(false);
 		ComplexSignal H = fft.transform(h);
 		ComplexSignal H2 = Operations.multiply(H, H);
 		ComplexSignal LP  = ComplexSignalFactory.laplacian(nx, ny, nz);
 
 		algo  = " -algorithm SIM " + (6*noise) + " " + noise + " " + poisson + " " + out("SIM");
-		new Deconvolution(psf + image + algo).deconvolve();
+		new Deconvolution(psf + image + algo).deconvolve(false);
 
 		algo  = " -algorithm SIM " + (6*noise) + " " + noise + " " + poisson + " " + out("NOISE");
-		new Deconvolution(impulse + constant + algo).deconvolve();
+		new Deconvolution(impulse + constant + algo).deconvolve(false);
 
 		// No Noise
 		String nonoise = " -image file CONV.tif -psf file psfPerturbated.tif";
-		new Deconvolution(nonoise + " -algorithm TRIF " + wiener + out("NOISELESS/WIF")).deconvolve();
-		new Deconvolution(nonoise + " -algorithm NIF -epsilon 1E0 " + out("NOISELESS/NIF0")).deconvolve();
-		new Deconvolution(nonoise + " -algorithm NIF -epsilon 1E-3  " + out("NOISELESS/NIF-1")).deconvolve();
-		new Deconvolution(nonoise + " -algorithm NIF -epsilon 1E-6  " + out("NOISELESS/NIF-6")).deconvolve();
-		new Deconvolution(nonoise + " -algorithm NIF -epsilon 1E-9  " + out("NOISELESS/NIF-9")).deconvolve();
-		new Deconvolution(nonoise + " -algorithm NIF -epsilon 1E-12  " + out("NOISELESS/NIF-12")).deconvolve();
-		new Deconvolution(nonoise + " -algorithm DIV " + out("NOISELESS/DIV")).deconvolve();
+		new Deconvolution(nonoise + " -algorithm TRIF " + wiener + out("NOISELESS/WIF")).deconvolve(false);
+		new Deconvolution(nonoise + " -algorithm NIF -epsilon 1E0 " + out("NOISELESS/NIF0")).deconvolve(false);
+		new Deconvolution(nonoise + " -algorithm NIF -epsilon 1E-3  " + out("NOISELESS/NIF-1")).deconvolve(false);
+		new Deconvolution(nonoise + " -algorithm NIF -epsilon 1E-6  " + out("NOISELESS/NIF-6")).deconvolve(false);
+		new Deconvolution(nonoise + " -algorithm NIF -epsilon 1E-9  " + out("NOISELESS/NIF-9")).deconvolve(false);
+		new Deconvolution(nonoise + " -algorithm NIF -epsilon 1E-12  " + out("NOISELESS/NIF-12")).deconvolve(false);
+		new Deconvolution(nonoise + " -algorithm DIV " + out("NOISELESS/DIV")).deconvolve(false);
 
 		// Pertubatation
 		String pertubation = " -image file CONV.tif  -psf file psfPerturbated.tif";
-		new Deconvolution(pertubation + " -algorithm TRIF " + wiener + out("PERTURBATION/WIF")).deconvolve();
-		new Deconvolution(pertubation + " -algorithm NIF " + out("PERTURBATION/NIF")).deconvolve();
-		new Deconvolution(pertubation + " -algorithm DIV " + out("PERTURBATION/DIV")).deconvolve();
+		new Deconvolution(pertubation + " -algorithm TRIF " + wiener + out("PERTURBATION/WIF")).deconvolve(false);
+		new Deconvolution(pertubation + " -algorithm NIF " + out("PERTURBATION/NIF")).deconvolve(false);
+		new Deconvolution(pertubation + " -algorithm DIV " + out("PERTURBATION/DIV")).deconvolve(false);
 		
 		// Noisy
 		String simulation = " -image file SIM.tif " + psf;
 
-		new Deconvolution(simulation + " -algorithm TRIF " + wiener + out("SIMULATION/WIF")).deconvolve();
-		new Deconvolution(simulation + " -algorithm NIF "+ out("SIMULATION/NIF")).deconvolve();
-		new Deconvolution(simulation + " -algorithm DIV" + out("SIMULATION/DIV")).deconvolve();
+		new Deconvolution(simulation + " -algorithm TRIF " + wiener + out("SIMULATION/WIF")).deconvolve(false);
+		new Deconvolution(simulation + " -algorithm NIF "+ out("SIMULATION/NIF")).deconvolve(false);
+		new Deconvolution(simulation + " -algorithm DIV" + out("SIMULATION/DIV")).deconvolve(false);
 
 		algo  = " -algorithm LW+ 100 0.5 -out mip @1 LW+-ITER/I ";
-		new Deconvolution(simulation  + algo + out("LW+/LW+")).deconvolve();
+		new Deconvolution(simulation  + algo + out("LW+/LW+")).deconvolve(false);
 		new File(res + "LW+-ITER/I.tif").delete();
 		
 		for(int i=0; i<=20; i++) {
 			double p = Math.pow(5, i-12);
 			String name = "RIF/RIF" + String.format("%02d", i);
-			new Deconvolution(simulation + " -algorithm RIF " + p + out(name)).deconvolve();
+			new Deconvolution(simulation + " -algorithm RIF " + p + out(name)).deconvolve(false);
 			RealSignal fa = fft.inverse(Operations.add(H2, Operations.multiply(p, LP, LP))).circular();
 			Lab.save(monitors, fa, res + "RIF-FILTER/RIF" + String.format("%02d", i) + ".tif");
 		}
@@ -127,18 +127,18 @@ public class DeconvolutionLab2_Course_SpectralAnaylsis implements PlugIn {
 		for(int i=0; i<=20; i++) {
 			double p = Math.pow(5, i-12);
 			String name = "TRIF/TRIF" + String.format("%02d", i);
-			new Deconvolution(simulation + " -algorithm TRIF " + p + out(name)).deconvolve();
+			new Deconvolution(simulation + " -algorithm TRIF " + p + out(name)).deconvolve(false);
 			RealSignal fa = fft.inverse(Operations.add(H2, Operations.multiply(p, LP, LP))).circular();
 			Lab.save(monitors, fa, res + "TRIF-FILTER/RIF" + String.format("%02d", i) + ".tif");
 		}
 
 
 		algo  = " -algorithm RL 100 -out mip @1 RL-ITER/I  ";
-		new Deconvolution(simulation  + algo + out("RL/RL")).deconvolve();
+		new Deconvolution(simulation  + algo + out("RL/RL")).deconvolve(false);
 		new File(res + "RL-ITER/I.tif").delete();
 		
 		algo  = " -algorithm ICTM 100 1.5 0.001 -out mip @1 ICTM-ITER/I  ";
-		new Deconvolution(simulation  + algo + out("ICTM/ICTM")).deconvolve();
+		new Deconvolution(simulation  + algo + out("ICTM/ICTM")).deconvolve(false);
 		new File(res + "ICTM-ITER/I.tif").delete();
 	}
 

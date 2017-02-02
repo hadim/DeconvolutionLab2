@@ -87,7 +87,7 @@ public class TableMonitor implements AbstractMonitor, ActionListener {
 
 		JScrollPane scroll = new JScrollPane(table);
 		scroll.setPreferredSize(new Dimension(width, height));
-
+		/*
 		JToolBar tool = new JToolBar();
 		tool.setFloatable(false);
 		tool.setLayout(new GridLayout(1, 3));
@@ -98,10 +98,10 @@ public class TableMonitor implements AbstractMonitor, ActionListener {
 		tool.add(bnVerbose);
 		tool.add(bnQuiet);
 		tool.add(bnMute);
-
+		*/
 		JPanel main = new JPanel(new BorderLayout());
 
-		main.add(tool, BorderLayout.NORTH);
+		//main.add(tool, BorderLayout.NORTH);
 		main.add(scroll, BorderLayout.CENTER);
 		bnClear.addActionListener(this);
 		bnVerbose.addActionListener(this);

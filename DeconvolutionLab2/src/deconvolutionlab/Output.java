@@ -33,11 +33,11 @@ package deconvolutionlab;
 
 import java.io.File;
 
+import deconvolution.algorithm.Controller;
+import deconvolutionlab.monitor.Monitors;
 import lab.tools.NumFormat;
 import signal.Constraint;
 import signal.RealSignal;
-import deconvolution.algorithm.Controller;
-import deconvolutionlab.monitor.Monitors;
 
 public class Output {
 
@@ -63,8 +63,8 @@ public class Output {
 	private Dynamic				dynamic		= Dynamic.INTACT;
 
 	private int					frequency	= 0;
-	private String				path = "";
-	
+	private String				path		= "";
+
 	public Output(View view, int frequency, String param) {
 		String[] tokens = param.trim().split(" ");
 		this.view = view;
@@ -111,13 +111,17 @@ public class Output {
 			}
 			if (p.startsWith("(") && p.endsWith(")")) {
 				double pos[] = NumFormat.parseNumbers(p);
-				if (pos.length > 0) px = (int) Math.round(pos[0]);
-				if (pos.length > 1) py = (int) Math.round(pos[1]);
-				if (pos.length > 2) pz = (int) Math.round(pos[2]);
+				if (pos.length > 0)
+					px = (int) Math.round(pos[0]);
+				if (pos.length > 1)
+					py = (int) Math.round(pos[1]);
+				if (pos.length > 2)
+					pz = (int) Math.round(pos[2]);
 				found = true;
 				center = false;
 			}
-			if (!found) name += tokens[i] + " ";
+			if (!found)
+				name += tokens[i] + " ";
 			name = name.trim();
 		}
 	}
@@ -148,7 +152,8 @@ public class Output {
 	}
 
 	public boolean is(int iterations) {
-		if (frequency == 0) return false;
+		if (frequency == 0)
+			return false;
 		return iterations % frequency == 0;
 	}
 
@@ -159,14 +164,15 @@ public class Output {
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setPath1(String path) {
 		this.path = path;
 	}
 
 	public int extractFrequency(String param) {
 		String line = param.trim();
-		if (!line.startsWith("@")) line = "@0 " + line;
+		if (!line.startsWith("@"))
+			line = "@0 " + line;
 		String parts[] = line.split(" ");
 		if (parts.length >= 1) {
 			return (int) Math.round(NumFormat.parseNumber(parts[0], 0));
@@ -195,9 +201,9 @@ public class Output {
 		return new String[] { view.name().toLowerCase() + fr, name, d, t, k, sh, sa, "" };
 	}
 
-
 	public void execute(Monitors monitors, RealSignal signal, Controller controller, boolean live) {
-		if (signal == null) return;
+		if (signal == null)
+			return;
 		String title = name;
 		if (controller != null && live) {
 			if (controller.getIterations() > 0) {
@@ -214,12 +220,14 @@ public class Output {
 		case CLIPPED:
 			x = signal.duplicate();
 			float[] stats = controller.getStatsInput();
-			if (stats != null) constraint.clipped(x, stats[1], stats[2]);
+			if (stats != null)
+				constraint.clipped(x, stats[1], stats[2]);
 			break;
 		case NORMALIZED:
 			x = signal.duplicate();
 			float[] stats1 = controller.getStatsInput();
-			if (stats1 != null) constraint.normalized(x, stats1[0], stats1[3]);
+			if (stats1 != null)
+				constraint.normalized(x, stats1[0], stats1[3]);
 			break;
 		default:
 			x = signal;
@@ -228,14 +236,18 @@ public class Output {
 		String key = name + "-" + type.name() + "-" + view.name() + "-" + dynamic.name() + "-" + (px + py + pz);
 		switch (view) {
 		case STACK:
-			if (show && !live) Lab.show(monitors, x, title, type, (center ? x.nz / 2 : pz));
-			if (save && !live) Lab.save(monitors, x, filename, type);
+			if (show && !live)
+				Lab.show(monitors, x, title, type, (center ? x.nz / 2 : pz));
+			if (save && !live)
+				Lab.save(monitors, x, filename, type);
 			break;
 		case SERIES:
 			for (int k = 0; k < x.nz; k++) {
 				RealSignal slice = x.getSlice(k);
-				if (show && !live) Lab.show(monitors, slice, title, type);
-				if (save && !live) Lab.save(monitors, slice, filename, type);
+				if (show && !live)
+					Lab.show(monitors, slice, title, type);
+				if (save && !live)
+					Lab.save(monitors, slice, filename, type);
 			}
 			break;
 		case ORTHO:
@@ -257,9 +269,12 @@ public class Output {
 
 	private void mip(Monitors monitors, RealSignal signal, String title, String filename, boolean live, String key) {
 		RealSignal plane = signal.createMIP();
-		if (show && live) Lab.appendShowLive(monitors, key, plane, title, type);
-		if (show && !live) Lab.show(monitors, plane, title, type);
-		if (save) Lab.save(monitors, plane, filename, type);
+		if (show && live)
+			Lab.appendShowLive(monitors, key, plane, title, type);
+		if (show && !live)
+			Lab.show(monitors, plane, title, type);
+		if (save)
+			Lab.save(monitors, plane, filename, type);
 	}
 
 	private void orthoview(Monitors monitors, RealSignal signal, String title, String filename, boolean live, String key) {
@@ -272,9 +287,12 @@ public class Output {
 			cz = signal.nz / 2;
 		}
 		RealSignal plane = signal.createOrthoview(cx, cy, cz);
-		if (show && live) Lab.appendShowLive(monitors, key, plane, title, type);
-		if (show && !live) Lab.show(monitors, plane, title, type);
-		if (save) Lab.save(monitors, plane, filename, type);
+		if (show && live)
+			Lab.appendShowLive(monitors, key, plane, title, type);
+		if (show && !live)
+			Lab.show(monitors, plane, title, type);
+		if (save)
+			Lab.save(monitors, plane, filename, type);
 	}
 
 	private void figure(Monitors monitors, RealSignal signal, String title, String filename, boolean live, String key) {
@@ -287,16 +305,22 @@ public class Output {
 			cz = signal.nz / 2;
 		}
 		RealSignal plane = signal.createFigure(cx, cy, cz);
-		if (show && live) Lab.appendShowLive(monitors, key, plane, title, type);
-		if (show && !live) Lab.show(monitors, plane, title, type);
-		if (save) Lab.save(monitors, plane, filename, type);
+		if (show && live)
+			Lab.appendShowLive(monitors, key, plane, title, type);
+		if (show && !live)
+			Lab.show(monitors, plane, title, type);
+		if (save)
+			Lab.save(monitors, plane, filename, type);
 	}
 
 	private void planar(Monitors monitors, RealSignal signal, String title, String filename, boolean live, String key) {
 		RealSignal plane = signal.createMontage();
-		if (show && live) Lab.appendShowLive(monitors, key, plane, title, type);
-		if (show && !live) Lab.show(monitors, plane, title, type);
-		if (save) Lab.save(monitors, plane, filename, type);
+		if (show && live)
+			Lab.appendShowLive(monitors, key, plane, title, type);
+		if (show && !live)
+			Lab.show(monitors, plane, title, type);
+		if (save)
+			Lab.save(monitors, plane, filename, type);
 	}
 
 	@Override

@@ -45,6 +45,9 @@ import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import deconvolution.Command;
+import deconvolution.Deconvolution;
+import deconvolutionlab.Config;
 import lab.component.GridPanel;
 import lab.component.HTMLPane;
 import lab.component.SpinnerRangeInteger;
@@ -56,9 +59,6 @@ import signal.apodization.UniformApodization;
 import signal.padding.AbstractPadding;
 import signal.padding.NoPadding;
 import signal.padding.Padding;
-import deconvolution.Command;
-import deconvolution.Deconvolution;
-import deconvolutionlab.Config;
 
 public class BorderModule extends AbstractModule implements ActionListener, ChangeListener {
 

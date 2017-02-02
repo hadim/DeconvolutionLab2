@@ -50,7 +50,7 @@ public class AboutModule extends AbstractModule {
 	public String getCommand() {
 		return "DeconvolutionLab2 " + Constants.version;
 	}
-	
+
 	@Override
 	public JPanel buildExpandedPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
@@ -63,14 +63,14 @@ public class AboutModule extends AbstractModule {
 		getAction1Button().addActionListener(this);
 		return panel;
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
 		if (getAction1Button() == e.getSource())
 			Lab.help();
 	}
-	
+
 	@Override
 	public void close() {
 		getAction1Button().removeActionListener(this);

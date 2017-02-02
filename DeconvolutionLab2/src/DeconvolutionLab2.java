@@ -6,7 +6,7 @@ import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 import deconvolutionlab.Lab;
 import deconvolutionlab.Platform;
-import deconvolutionlab.dialog.MainDialog;
+import deconvolutionlab.dialog.LabDialog;
 import deconvolutionlab.monitor.Monitors;
 
 public class DeconvolutionLab2 {
@@ -24,35 +24,32 @@ public class DeconvolutionLab2 {
 		}
 
 		String flag = arg[0].trim().toLowerCase();
-		if (flag.equals("help")) {
+		if (flag.equalsIgnoreCase("help")) {
 			help();
 			return;
 		}
 
-		if (flag.toLowerCase().equals("lab")) {
+		if (flag.equalsIgnoreCase("lab")) {
 			lab(arg);
 		}
 
-		if (flag.toLowerCase().equals("fft")) {
+		if (flag.equalsIgnoreCase("fft")) {
 			Lab.checkFFT(Monitors.createDefaultMonitor());
 		}
 
-		if (flag.toLowerCase().equals("run")) {
+		if (flag.equalsIgnoreCase("run")) {
 			String cmd = "";
 			for (int i = 1; i < arg.length; i++)
 				cmd += arg[i] + " ";
-			new Deconvolution(cmd).deconvolve();
+			new Deconvolution(cmd).deconvolve(true);
 		}
 
-		if (flag.toLowerCase().equals("launch")) {
+		if (flag.equalsIgnoreCase("launch")) {
 			String cmd = "";
 			for (int i = 1; i < arg.length; i++)
 				cmd += arg[i] + " ";
-			new Deconvolution(cmd).launch("");
+			new Deconvolution(cmd).launch("", true);
 		}
-
-		System.exit(0);
-
 	}
 
 	private static void lab(String arg[]) {
@@ -66,7 +63,7 @@ public class DeconvolutionLab2 {
 						config = filename;
 		}
 		Config.getInstance(config);
-		MainDialog dialog = new MainDialog();
+		LabDialog dialog = new LabDialog();
 		dialog.setVisible(true);
 	}
 
@@ -91,6 +88,6 @@ public class DeconvolutionLab2 {
 		deconvolutionlab.Lab.getInstance(Platform.STANDALONE);
 		String config = System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config";
 		Config.getInstance(config);
-		new Deconvolution(cmd).deconvolve();
+		new Deconvolution(cmd).deconvolve(false);
 	}
 }

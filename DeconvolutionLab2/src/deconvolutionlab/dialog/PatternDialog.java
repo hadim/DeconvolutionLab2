@@ -31,8 +31,6 @@
 
 package deconvolutionlab.dialog;
 
-import ij.gui.GUI;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -51,24 +49,25 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import ij.gui.GUI;
 import lab.component.GridPanel;
 
 public class PatternDialog extends JDialog implements ActionListener, WindowListener, KeyListener {
 
-	private JTextField	txt	    = new JTextField("");
-	private JLabel	   lblDir	= new JLabel("");
-	private JLabel	   lbl1	    = new JLabel(".tif (only tif files)");
-	private JLabel	   lbl2	    = new JLabel("Empty to take all files");
-	private JLabel	   lblCount	= new JLabel("count files");
+	private JTextField	txt			= new JTextField("");
+	private JLabel		lblDir		= new JLabel("");
+	private JLabel		lbl1		= new JLabel(".tif (only tif files)");
+	private JLabel		lbl2		= new JLabel("Empty to take all files");
+	private JLabel		lblCount	= new JLabel("count files");
 
-	private JButton	   bnCount	= new JButton("Count");
-	private JButton	   bnOK	    = new JButton("OK");
-	private JButton	   bnCancel	= new JButton("Cancel");
-	private boolean	   cancel	= false;
+	private JButton		bnCount		= new JButton("Count");
+	private JButton		bnOK		= new JButton("OK");
+	private JButton		bnCancel	= new JButton("Cancel");
+	private boolean		cancel		= false;
 
-	private File	   file;
-	private String	   command	= "";
-	private String	   name	= "";
+	private File		file;
+	private String		command		= "";
+	private String		name		= "";
 
 	public PatternDialog(File file) {
 		super(new JFrame(), "Pattern");
@@ -107,11 +106,11 @@ public class PatternDialog extends JDialog implements ActionListener, WindowList
 		add(panel);
 		pack();
 		update();
-		
+
 		addWindowListener(this);
 		GUI.center(this);
 		setModal(true);
-		
+
 	}
 
 	private void update() {
@@ -133,8 +132,8 @@ public class PatternDialog extends JDialog implements ActionListener, WindowList
 			if (pattern.matcher(list[i]).find())
 				count++;
 		if (!regex.trim().equals(""))
-			command = file.getAbsolutePath() +  " pattern " + regex;
-		else 
+			command = file.getAbsolutePath() + " pattern " + regex;
+		else
 			command = file.getAbsolutePath();
 		name = file.getName();
 		lblCount.setText("" + n + " files in dir, " + count + " matched files");
@@ -154,7 +153,7 @@ public class PatternDialog extends JDialog implements ActionListener, WindowList
 			cancel = true;
 			command = "";
 			name = "";
-			
+
 			return;
 		}
 		else if (e.getSource() == bnOK) {
@@ -171,7 +170,7 @@ public class PatternDialog extends JDialog implements ActionListener, WindowList
 	public String getCommand() {
 		return command;
 	}
-	
+
 	public String getDirName() {
 		return name;
 	}
@@ -213,15 +212,15 @@ public class PatternDialog extends JDialog implements ActionListener, WindowList
 	}
 
 	@Override
-    public void keyTyped(KeyEvent e) {
-    }
+	public void keyTyped(KeyEvent e) {
+	}
 
 	@Override
-    public void keyPressed(KeyEvent e) {
-    }
+	public void keyPressed(KeyEvent e) {
+	}
 
 	@Override
-    public void keyReleased(KeyEvent e) {
-	    update(); 
-    }
+	public void keyReleased(KeyEvent e) {
+		update();
+	}
 }

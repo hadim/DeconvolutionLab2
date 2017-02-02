@@ -43,7 +43,7 @@ public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSi
 		super();
 		controller.setIterationMax(iter);
 	}
-		
+
 	// x(k+1) = x(k) *. Hconj * ( y /. H x(k))
 	@Override
 	public RealSignal call() {
@@ -52,7 +52,7 @@ public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSi
 		RealSignal x = y.duplicate();
 		RealSignal p = y.duplicate();
 		RealSignal u = y.duplicate();
-		while(!controller.ends(x)) {		
+		while (!controller.ends(x)) {
 			fft.transform(x, U);
 			U.times(H);
 			fft.inverse(U, u);
@@ -60,16 +60,16 @@ public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSi
 			fft.transform(p, U);
 			U.timesConjugate(H);
 			fft.inverse(U, u);
-			x.times(u); 
+			x.times(u);
 		}
 		return x;
 	}
-	
+
 	@Override
 	public String getName() {
 		return "Richardson-Lucy";
 	}
-	
+
 	@Override
 	public String getShortname() {
 		return "RL";
@@ -84,40 +84,40 @@ public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSi
 	public boolean isStepControllable() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean isIterative() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean isWaveletsBased() {
 		return false;
 	}
-	
+
 	@Override
 	public void setParameters(double[] params) {
 		if (params == null)
 			return;
 		if (params.length > 0)
-			controller.setIterationMax((int)Math.round(params[0]));
+			controller.setIterationMax((int) Math.round(params[0]));
 	}
-	
+
 	@Override
 	public double[] getDefaultParameters() {
-		return new double[] {10};
+		return new double[] { 10 };
 	}
-	
+
 	@Override
 	public double[] getParameters() {
-		return new double[] {controller.getIterationMax()};
+		return new double[] { controller.getIterationMax() };
 	}
-	
+
 	@Override
 	public double getRegularizationFactor() {
 		return 0.0;
 	}
-	
+
 	@Override
 	public double getStepFactor() {
 		return 0;

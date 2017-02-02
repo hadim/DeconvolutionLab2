@@ -40,12 +40,12 @@ import wavelets.AbstractWavelets;
 import wavelets.Wavelets;
 
 public class FISTA extends AbstractAlgorithm implements Callable<RealSignal> {
-	
-	private double gamma = 1.0;
-	private double lambda = 0.1;
-	private String waveletsName = "Haar";
-	private int scale = 3;
-	
+
+	private double	gamma			= 1.0;
+	private double	lambda			= 0.1;
+	private String	waveletsName	= "Haar";
+	private int		scale			= 3;
+
 	public FISTA(int iter, double gamma, double lambda, String waveletsName, int scale) {
 		super();
 		controller.setIterationMax(iter);
@@ -63,40 +63,40 @@ public class FISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 		ComplexSignal H = fft.transform(h);
 		ComplexSignal A = Operations.delta(gamma, H);
 		ComplexSignal G = Operations.multiplyConjugate(gamma, H, Y);
-	
+
 		ComplexSignal Z = G.duplicate();
-		RealSignal x  = fft.inverse(G);
+		RealSignal x = fft.inverse(G);
 		RealSignal s = x.duplicate();
 		RealSignal z = x.duplicate();
-		
-		RealSignal xprev  = fft.inverse(G);
+
+		RealSignal xprev = fft.inverse(G);
 		float pk1 = 1f;
 		float pk0 = 1f;
-		float threshold = (float)(lambda*gamma*0.5);
+		float threshold = (float) (lambda * gamma * 0.5);
 		RealSignal buffer = y.duplicate();
-		while(!controller.ends(x)) {
+		while (!controller.ends(x)) {
 			fft.transform(s, Z);
 			Z.times(A);
 			Z.plus(G);
 			fft.inverse(Z, z);
 			wavelets.shrinkage(threshold, z, x, buffer);
 			pk0 = pk1;
-			pk1 = (1f + (float) Math.sqrt(1f + 4f*pk0*pk0)) * 0.5f;	
-			update(xprev, x, (pk0-1f)/pk1, s);
+			pk1 = (1f + (float) Math.sqrt(1f + 4f * pk0 * pk0)) * 0.5f;
+			update(xprev, x, (pk0 - 1f) / pk1, s);
 		}
 		return x;
 	}
-	
+
 	public void update(RealSignal xprev, RealSignal x, double w, RealSignal s) {
 		int nxy = x.nx * x.ny;
-		for(int k=0; k<x.nz; k++)
-		for(int i=0; i< nxy; i++) {
-			float vx = x.data[k][i];
-			s.data[k][i] = (float)(vx + w*(vx - xprev.data[k][i]));
-			xprev.data[k][i] = vx;
-		}
+		for (int k = 0; k < x.nz; k++)
+			for (int i = 0; i < nxy; i++) {
+				float vx = x.data[k][i];
+				s.data[k][i] = (float) (vx + w * (vx - xprev.data[k][i]));
+				xprev.data[k][i] = vx;
+			}
 	}
-	
+
 	@Override
 	public String getName() {
 		return "FISTA";
@@ -111,56 +111,56 @@ public class FISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 	public boolean isRegularized() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean isStepControllable() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean isIterative() {
 		return true;
 	}
-	
+
 	@Override
 	public boolean isWaveletsBased() {
 		return true;
 	}
-	
+
 	@Override
-	public void setWavelets(String waveletsName) {		
+	public void setWavelets(String waveletsName) {
 		this.waveletsName = waveletsName;
 	}
-	
+
 	@Override
 	public void setParameters(double[] params) {
 		if (params == null)
 			return;
 		if (params.length > 0)
-			controller.setIterationMax((int)Math.round(params[0]));
+			controller.setIterationMax((int) Math.round(params[0]));
 		if (params.length > 1)
-			gamma = (float)params[1];
+			gamma = (float) params[1];
 		if (params.length > 2)
-			lambda = (float)params[2];
+			lambda = (float) params[2];
 		if (params.length > 3)
-			scale = (int)params[3];
+			scale = (int) params[3];
 	}
-	
+
 	@Override
 	public double[] getDefaultParameters() {
-		return new double[] {10, 1, 0.1};
+		return new double[] { 10, 1, 0.1 };
 	}
-	
+
 	@Override
 	public double[] getParameters() {
-		return new double[] {controller.getIterationMax(), gamma, lambda};
+		return new double[] { controller.getIterationMax(), gamma, lambda };
 	}
 
 	@Override
 	public double getRegularizationFactor() {
 		return lambda;
 	}
-	
+
 	@Override
 	public double getStepFactor() {
 		return gamma;

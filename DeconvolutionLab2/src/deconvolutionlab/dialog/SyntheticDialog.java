@@ -31,8 +31,6 @@
 
 package deconvolutionlab.dialog;
 
-import ij.gui.GUI;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -48,6 +46,7 @@ import javax.swing.JLabel;
 
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
+import ij.gui.GUI;
 import lab.component.GridPanel;
 import lab.component.SpinnerRangeDouble;
 import lab.component.SpinnerRangeInteger;
@@ -92,13 +91,13 @@ public class SyntheticDialog extends JDialog implements ActionListener, WindowLi
 			cmb[i] = list.get(i).getName();
 		}
 		cmbShapes = new JComboBox<String>(cmb);
-	
+
 		GridPanel pnIntensity = new GridPanel("Intensity", 3);
 		pnIntensity.place(1, 0, "Signal Intensity");
 		pnIntensity.place(1, 1, spnSignal);
 		pnIntensity.place(2, 0, "Background Intensity");
 		pnIntensity.place(2, 1, spnBackground);
-		
+
 		GridPanel pnSize = new GridPanel("Dimension", 3);
 		pnSize.place(1, 0, "Width [pixels] (nx)");
 		pnSize.place(1, 1, spnWidth);
@@ -123,7 +122,7 @@ public class SyntheticDialog extends JDialog implements ActionListener, WindowLi
 		pnParams.place(10, 0, lbl3);
 		pnParams.place(10, 1, spnParameter3);
 
-		GridPanel pn = new GridPanel(false);	
+		GridPanel pn = new GridPanel(false);
 		pn.place(0, 0, 3, 1, cmbShapes);
 		pn.place(1, 0, 3, 1, pnIntensity);
 		pn.place(2, 0, 3, 1, pnParams);
@@ -132,7 +131,7 @@ public class SyntheticDialog extends JDialog implements ActionListener, WindowLi
 		pn.place(11, 0, bnCancel);
 		pn.place(11, 1, bnShow);
 		pn.place(11, 2, bnOK);
-		
+
 		pn.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
 		bnShow.addActionListener(this);
@@ -148,7 +147,7 @@ public class SyntheticDialog extends JDialog implements ActionListener, WindowLi
 	}
 
 	private void updateInterface() {
-		SignalFactory factory = SignalFactory.get((String)cmbShapes.getSelectedItem());
+		SignalFactory factory = SignalFactory.get((String) cmbShapes.getSelectedItem());
 		String labels[] = factory.getParametersName();
 		lbl1.setVisible(false);
 		lbl2.setVisible(false);
@@ -182,13 +181,13 @@ public class SyntheticDialog extends JDialog implements ActionListener, WindowLi
 			spnParameter3.set(params[2]);
 		}
 		pack();
-		
+
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == bnShow) {
-			SignalFactory factory = SignalFactory.get((String)cmbShapes.getSelectedItem());
+			SignalFactory factory = SignalFactory.get((String) cmbShapes.getSelectedItem());
 			double params[] = factory.getParameters();
 			factory.setParameters(params);
 			factory.center(spnCenterX.get(), spnCenterX.get(), spnCenterX.get());
@@ -209,7 +208,7 @@ public class SyntheticDialog extends JDialog implements ActionListener, WindowLi
 			int nx = spnWidth.get();
 			int ny = spnHeight.get();
 			int nz = spnSlices.get();
-			shape = (String)cmbShapes.getSelectedItem();
+			shape = (String) cmbShapes.getSelectedItem();
 			command = shape + " " + spnSignal.get() + " " + spnBackground.get() + " ";
 			SignalFactory factory = SignalFactory.get(shape);
 			int n = factory.getParameters().length;
@@ -226,7 +225,7 @@ public class SyntheticDialog extends JDialog implements ActionListener, WindowLi
 				double cx = Math.round(spnCenterX.get() * 1000000) / 1000000.0;
 				double cy = Math.round(spnCenterY.get() * 1000000) / 1000000.0;
 				double cz = Math.round(spnCenterZ.get() * 1000000) / 1000000.0;
-				command += " center " + cx + " " + cy + " " + cz + " ";				
+				command += " center " + cx + " " + cy + " " + cz + " ";
 			}
 			dispose();
 			cancel = false;
@@ -244,28 +243,28 @@ public class SyntheticDialog extends JDialog implements ActionListener, WindowLi
 			spnSignal.set(params[0]);
 		if (params.length > 1)
 			spnBackground.set(params[1]);
-		if (params.length > 2+np)
-			spnWidth.set((int)params[2+np]);
-		if (params.length > 3+np)
-			spnHeight.set((int)params[3+np]);
-		if (params.length > 4+np)
-			spnSlices.set((int)params[4+np]);
-		if (params.length > 5+np)
-			spnCenterX.set(params[5+np]);
-		if (params.length > 6+np)
-			spnCenterY.set(params[6+np]);
-		if (params.length > 7+np)
-			spnCenterZ.set(params[7+np]);	
-		
-		if (np >= 1 && params.length > 2+np)
+		if (params.length > 2 + np)
+			spnWidth.set((int) params[2 + np]);
+		if (params.length > 3 + np)
+			spnHeight.set((int) params[3 + np]);
+		if (params.length > 4 + np)
+			spnSlices.set((int) params[4 + np]);
+		if (params.length > 5 + np)
+			spnCenterX.set(params[5 + np]);
+		if (params.length > 6 + np)
+			spnCenterY.set(params[6 + np]);
+		if (params.length > 7 + np)
+			spnCenterZ.set(params[7 + np]);
+
+		if (np >= 1 && params.length > 2 + np)
 			spnParameter1.set(params[2]);
-		if (np >= 2 && params.length > 3+np)
+		if (np >= 2 && params.length > 3 + np)
 			spnParameter2.set(params[3]);
-		if (np >= 3 && params.length > 4+np)
+		if (np >= 3 && params.length > 4 + np)
 			spnParameter3.set(params[4]);
 
 	}
-	
+
 	public String getShapeName() {
 		return shape;
 	}

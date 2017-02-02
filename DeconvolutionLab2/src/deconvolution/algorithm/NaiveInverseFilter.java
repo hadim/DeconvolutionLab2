@@ -42,7 +42,7 @@ public class NaiveInverseFilter extends AbstractAlgorithm implements Callable<Re
 	public NaiveInverseFilter() {
 		super();
 	}
-	
+
 	@Override
 	public RealSignal call() {
 		ComplexSignal Y = fft.transform(y);
@@ -51,7 +51,7 @@ public class NaiveInverseFilter extends AbstractAlgorithm implements Callable<Re
 		RealSignal x = fft.inverse(X);
 		return x;
 	}
-	
+
 	@Override
 	public String getShortname() {
 		return "NIF";
@@ -71,36 +71,36 @@ public class NaiveInverseFilter extends AbstractAlgorithm implements Callable<Re
 	public boolean isStepControllable() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean isIterative() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean isWaveletsBased() {
 		return false;
 	}
-	
+
 	@Override
 	public void setParameters(double[] params) {
 	}
-	
+
 	@Override
 	public double[] getDefaultParameters() {
 		return new double[] {};
 	}
-	
+
 	@Override
 	public double[] getParameters() {
 		return new double[] {};
 	}
-	
+
 	@Override
 	public double getRegularizationFactor() {
 		return 0.0;
 	}
-	
+
 	@Override
 	public double getStepFactor() {
 		return 0;

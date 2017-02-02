@@ -112,16 +112,17 @@ public class Landweber extends AbstractAlgorithm implements Callable<RealSignal>
 	public double[] getDefaultParameters() {
 		return new double[] { 10, 1 };
 	}
-	
+
 	@Override
 	public double[] getParameters() {
-		return new double[] {controller.getIterationMax(), gamma};
+		return new double[] { controller.getIterationMax(), gamma };
 	}
+
 	@Override
 	public double getRegularizationFactor() {
 		return 0.0;
 	}
-	
+
 	@Override
 	public double getStepFactor() {
 		return gamma;

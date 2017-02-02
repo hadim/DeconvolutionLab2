@@ -46,8 +46,8 @@ import javax.swing.SwingConstants;
 public abstract class AbstractModule extends JPanel implements ActionListener {
 	private JButton				bnTitle;
 	private JButton				bnSynopsis;
-	private JButton				bnAction1 = new JButton();
-	private JButton				bnAction2 = new JButton();
+	private JButton				bnAction1	= new JButton();
+	private JButton				bnAction2	= new JButton();
 	private JLabel				lblCommand;
 
 	private JButton				bnExpand;
@@ -69,7 +69,7 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 		this.expanded = expanded;
 		bnTitle = new JButton("<html><b>" + name + "</b></html>");
 		bnTitle.setHorizontalAlignment(SwingConstants.LEFT);
-		bnTitle.setPreferredSize(new Dimension(180, 20));
+		bnTitle.setPreferredSize(new Dimension(160, 20));
 		bnTitle.setMaximumSize(new Dimension(250, 20));
 		bnTitle.setMinimumSize(new Dimension(120, 20));
 		bnTitle.addActionListener(this);
@@ -108,9 +108,9 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 			toola.add(bnAction2, BorderLayout.EAST);
 		}
 
-		if (toola != null) 
+		if (toola != null)
 			tool0.add(toola, BorderLayout.EAST);
-		
+
 		space.add(pnExpanded, "expand");
 		space.add(pnCollapsed, "collapse");
 		add(tool0, BorderLayout.NORTH);
@@ -134,9 +134,11 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 	}
 
 	public abstract JPanel buildExpandedPanel();
+
 	public abstract String getCommand();
+
 	public abstract void close();
-	
+
 	public JButton getAction1Button() {
 		return bnAction1;
 	}
@@ -149,7 +151,7 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 	public String getName() {
 		return name;
 	}
-	
+
 	public String getKey() {
 		return key;
 	}
@@ -161,7 +163,7 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 	public void setCommand(String command) {
 		lblCommand.setText("<html><p style=\"font-family: monospace\"><small>" + command + "</small></p></html>");
 	}
-	
+
 	public void setSynopsis(String synopsis) {
 		bnSynopsis.setText(synopsis);
 	}

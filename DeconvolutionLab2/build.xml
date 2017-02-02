@@ -9,19 +9,18 @@
 		<copy todir="bin"><fileset dir="ij"></fileset></copy>
 		<copy file="plugins.config" toDir="bin" />
 			
-		<mkdir dir="dist"/>
-		<zip destfile="dist/DeconvolutionLab2-src.zip" basedir="src" />
-        <zip destfile="dist/DeconvolutionLab2-cls.zip" basedir="bin" />
-        <jar destfile="dist/DeconvolutionLab_2.jar" basedir="bin">
+		<zip destfile="../DeconvolutionLab2-src.zip" basedir="src" />
+        <zip destfile="../DeconvolutionLab2-cls.zip" basedir="bin" />
+        <jar destfile="../DeconvolutionLab_2.jar" basedir="bin">
 			<manifest>
 			<attribute name="Main-Class" value="DeconvolutionLab2"/>
 			<attribute name="Class-Path" value="ij.jar jtransforms.jar"/>
 			</manifest>
 		</jar>		
 		
-		<copy toDir="${fiji}" file="dist/DeconvolutionLab_2.jar" />
+		<copy toDir="${fiji}" file="../DeconvolutionLab_2.jar" />
 		
-		<copy toDir="${imagej}" file="dist/DeconvolutionLab_2.jar" />
+		<copy toDir="${imagej}" file="../DeconvolutionLab_2.jar" />
 
 	</target>
 </project>

@@ -31,8 +31,6 @@
 
 package deconvolution;
 
-import ij.gui.GUI;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -52,30 +50,33 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.text.BadLocationException;
 
-import lab.component.HTMLPane;
-import lab.system.SystemBar;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.StatusMonitor;
+import deconvolutionlab.monitor.TableMonitor;
+import ij.gui.GUI;
+import lab.component.HTMLPane;
+import lab.system.SystemBar;
 
 public class DeconvolutionDialog extends JDialog implements ActionListener, Runnable, KeyListener {
 
-	private JButton			bnStart		= new JButton("Run");
-	private JButton			bnQuit		= new JButton("Quit");
-	private JButton			bnRecap		= new JButton("Recap");
-	private JButton			bnImage		= new JButton("Check Image");
-	private JButton			bnPSF		= new JButton("Check PSF");
-	private JButton			bnAlgo		= new JButton("Check Algo");
-	private JButton			bnHelp		= new JButton("Help");
-	// private JTabbedPane tab = new JTabbedPane();
+	private JButton			bnStart	= new JButton("Run");
+	private JButton			bnQuit	= new JButton("Quit");
+	private JButton			bnRecap	= new JButton("Recap");
+	private JButton			bnImage	= new JButton("Check Image");
+	private JButton			bnPSF	= new JButton("Check PSF");
+	private JButton			bnAlgo	= new JButton("Check Algo");
+	private JButton			bnHelp	= new JButton("Help");
+	private JTabbedPane		tab		= new JTabbedPane();
 
 	private HTMLPane		pnCommand;
 	private HTMLPane		pnResume;
 
-	private JButton			job			= null;
-	private Thread			thread		= null;
+	private JButton			job		= null;
+	private Thread			thread	= null;
 
 	private Deconvolution	deconvolution;
 
@@ -89,6 +90,8 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		pnCommand = new HTMLPane("Monaco", 100, 100);
 		pnCommand.append("p", deconvolution.getCommand());
 		pnResume = new HTMLPane("Verdana", 600, 150);
+
+		tab.add("Resume", pnResume.getPane());
 
 		pnCommand.setEditable(true);
 		pnCommand.addKeyListener(this);
@@ -121,7 +124,7 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		panel.setLayout(new BorderLayout());
 		panel.add(pnCommand.getPane(), BorderLayout.NORTH);
 		panel.add(bottom, BorderLayout.SOUTH);
-		panel.add(pnResume.getPane(), BorderLayout.CENTER);
+		panel.add(tab, BorderLayout.CENTER);
 
 		add(panel);
 		bnQuit.addActionListener(this);
@@ -151,7 +154,8 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 				thread.start();
 			}
 			else {
-				if (deconvolution != null) deconvolution.abort();
+				if (deconvolution != null)
+					deconvolution.abort();
 			}
 		}
 		else if (e.getSource() == bnRecap) {
@@ -190,7 +194,8 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		else if (e.getSource() == bnQuit) {
 			dispose();
 		}
-		else if (e.getSource() == bnHelp) Lab.help();
+		else if (e.getSource() == bnHelp)
+			Lab.help();
 	}
 
 	@Override
@@ -201,28 +206,27 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		bnImage.setEnabled(false);
 		bnStart.setText("Stop");
 		String command = pnCommand.getText();
-		System.out.println(">>> " + command);
 		deconvolution.setCommand(command);
 		if (job == bnStart) {
-			// tab.setSelectedIndex(1);
+			// tab.setSelectedIndex(1);		
 			print(deconvolution.recap());
 			deconvolution.run();
 			print(deconvolution.getDeconvolutionResults());
 		}
 		else if (job == bnRecap) {
-			// tab.setSelectedIndex(0);
+			tab.setSelectedIndex(0);
 			print(deconvolution.recap());
 		}
 		else if (job == bnImage) {
-			// tab.setSelectedIndex(0);
+			tab.setSelectedIndex(0);
 			print(deconvolution.checkImage());
 		}
 		else if (job == bnPSF) {
-			// tab.setSelectedIndex(0);
+			tab.setSelectedIndex(0);
 			print(deconvolution.checkPSF());
 		}
 		else if (job == bnAlgo) {
-			// tab.setSelectedIndex(0);
+			tab.setSelectedIndex(0);
 			print(deconvolution.checkAlgo());
 		}
 		bnRecap.setEnabled(true);
@@ -239,6 +243,10 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 			pnResume.append("p", line);
 	}
 
+	public void addTableMonitor(String title, TableMonitor tm) {
+		tab.add(title, tm.getPanel());
+	}
+	
 	@Override
 	public void keyTyped(KeyEvent e) {
 	}
@@ -251,9 +259,7 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 	public void keyReleased(KeyEvent e) {
 		try {
 			int len = pnCommand.getDocument().getLength();
-			String command;
-			command = pnCommand.getDocument().getText(0, len);
-			System.out.println(">>> " + command);
+			String command = pnCommand.getDocument().getText(0, len);
 			deconvolution.setCommand(command);
 			print(deconvolution.recap());
 		}

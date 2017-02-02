@@ -41,7 +41,7 @@ import signal.factory.complex.ComplexSignalFactory;
 public class RegularizedInverseFilter extends AbstractAlgorithm implements Callable<RealSignal> {
 
 	private double lambda = 0.001;
-	
+
 	public RegularizedInverseFilter(double lambda) {
 		super();
 		this.lambda = lambda;
@@ -49,18 +49,18 @@ public class RegularizedInverseFilter extends AbstractAlgorithm implements Calla
 
 	@Override
 	public RealSignal call() {
-		ComplexSignal Y  = fft.transform(y);
-		ComplexSignal H  = fft.transform(h);
+		ComplexSignal Y = fft.transform(y);
+		ComplexSignal H = fft.transform(h);
 		ComplexSignal H2 = Operations.multiply(H, H);
-		ComplexSignal L  = ComplexSignalFactory.laplacian(Y.nx, Y.ny, Y.nz);
+		ComplexSignal L = ComplexSignalFactory.laplacian(Y.nx, Y.ny, Y.nz);
 		ComplexSignal L2 = Operations.multiply(lambda, L, L);
 		ComplexSignal FA = Operations.add(H2, L2);
-		ComplexSignal FT = Operations.divideStabilized(H, FA);		
-		ComplexSignal X  = Operations.multiply(Y, FT);
+		ComplexSignal FT = Operations.divideStabilized(H, FA);
+		ComplexSignal X = Operations.multiply(Y, FT);
 		RealSignal x = fft.inverse(X);
 		return x;
 	}
-	
+
 	@Override
 	public String getName() {
 		return "Regularized Inverse Filter";
@@ -70,7 +70,7 @@ public class RegularizedInverseFilter extends AbstractAlgorithm implements Calla
 	public String getShortname() {
 		return "RIF";
 	}
-	
+
 	@Override
 	public boolean isRegularized() {
 		return true;
@@ -85,39 +85,38 @@ public class RegularizedInverseFilter extends AbstractAlgorithm implements Calla
 	public boolean isIterative() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean isWaveletsBased() {
 		return false;
 	}
-	
+
 	@Override
 	public void setParameters(double[] params) {
 		if (params == null)
 			return;
 		if (params.length > 0)
-			lambda = (float)params[0];
+			lambda = (float) params[0];
 	}
-	
+
 	@Override
 	public double[] getDefaultParameters() {
-		return new double[] {0.1};
+		return new double[] { 0.1 };
 	}
-	
+
 	@Override
 	public double[] getParameters() {
-		return new double[] {lambda};
+		return new double[] { lambda };
 	}
-	
-	
+
 	@Override
 	public double getRegularizationFactor() {
 		return lambda;
 	}
-	
+
 	@Override
 	public double getStepFactor() {
 		return 0;
 	}
- 
+
 }

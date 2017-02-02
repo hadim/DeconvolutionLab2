@@ -35,7 +35,7 @@ import java.awt.Dimension;
 
 public class Constants {
 
-	public static String name = "DeconvolutionLab2";
+	public static String name = "DeconvolutionLab2 [Beta 1]";
 	public static String copyright = "\u00A9 2010-2017. Biomedical Imaging Group, EPFL.";
 	
 	public static String url = "http://bigwww.epfl.ch/deconvolution/";

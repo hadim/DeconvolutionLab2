@@ -1,9 +1,5 @@
 package deconvolutionlab;
 
-import ij.ImagePlus;
-import ij.WindowManager;
-import ij.gui.GUI;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -17,10 +13,15 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
+
+import ij.ImagePlus;
+import ij.WindowManager;
+import ij.gui.GUI;
 
 public class LabImageSelector extends PlatformImageSelector {
 
@@ -48,27 +49,33 @@ public class LabImageSelector extends PlatformImageSelector {
 
 		public Dialog() {
 			super(new JFrame(), "Image Selection");
+
+			JPanel bn = new JPanel(new GridLayout(1, 2));
+			bn.add(bnCancel);
+			bn.add(bnOK);
+
+			JPanel panel = new JPanel(new BorderLayout());
 			int[] ids = WindowManager.getIDList();
-			DefaultListModel listModel = new DefaultListModel();
-			if (list != null)
+			
+			if (ids != null) {
+				DefaultListModel listModel = new DefaultListModel();
+				list = new JList(listModel);
 				for (int id : ids) {
 					ImagePlus idp = WindowManager.getImage(id);
 					if (idp != null) {
 						((DefaultListModel) listModel).addElement(idp.getTitle());
 					}
 				}
-
-			list = new JList(listModel);
-			list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-			JScrollPane listScroller = new JScrollPane(list);
-			listScroller.setPreferredSize(new Dimension(250, 80));
-			JPanel bn = new JPanel(new GridLayout(1, 2));
-			bn.add(bnCancel);
-			bn.add(bnOK);
-			JPanel panel = new JPanel(new BorderLayout());
-			panel.add(listScroller, BorderLayout.CENTER);
+				list.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+				JScrollPane listScroller = new JScrollPane(list);
+				listScroller.setPreferredSize(new Dimension(250, 80));
+				panel.add(listScroller, BorderLayout.CENTER);
+			}
+			else {
+				panel.add(new JLabel("No open images."));
+			}
 			panel.add(bn, BorderLayout.SOUTH);
-			panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+			panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 			bnOK.addActionListener(this);
 			bnCancel.addActionListener(this);
 			add(panel);
