@@ -35,7 +35,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
-import javax.swing.JTabbedPane;
 
 import deconvolution.algorithm.AbstractAlgorithm;
 import deconvolution.algorithm.Controller;
@@ -43,6 +42,7 @@ import deconvolutionlab.Lab;
 import deconvolutionlab.Output;
 import deconvolutionlab.OutputCollection;
 import deconvolutionlab.monitor.AbstractMonitor;
+import deconvolutionlab.monitor.ConsoleMonitor;
 import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.monitor.TableMonitor;
 import deconvolutionlab.monitor.Verbose;
@@ -75,11 +75,18 @@ public class Deconvolution implements Runnable {
 	private String				command				= "";
 	private boolean				live				= false;
 
-	private ArrayList<String>	results				= new ArrayList<String>();
+	private ArrayList<String>	report				= new ArrayList<String>();
 
 	private String				name				= "";
 	private boolean				exit				= false;
 
+	private boolean				watcherMonitor				= true;
+	private boolean				watcherConsole				= true;
+	private boolean				watcherDisplay				= true;
+	private boolean				watcherMultithreading		= true;
+	
+	private ArrayList<DeconvolutionListener> listeners = new ArrayList<DeconvolutionListener>();
+	
 	public Deconvolution(String command) {
 		super();
 		monitors = Monitors.createDefaultMonitor();
@@ -111,14 +118,18 @@ public class Deconvolution implements Runnable {
 	public void deconvolve(boolean exit) {
 		this.exit = exit;
 		
-		for (AbstractMonitor monitor : monitors) {
-			if (monitor instanceof TableMonitor) {
-				String t = algo == null ? "Monitor " + name : name + " " + algo.getName();
-				JFrame frame = new JFrame(t);
-				frame.add(((TableMonitor) monitor).getPanel());
-				frame.pack();
-				frame.setVisible(true);
-			}
+		monitors = new Monitors();
+		if (watcherConsole)
+			monitors.add(new ConsoleMonitor());
+		
+		if (watcherMonitor) {
+			TableMonitor m = new TableMonitor(440, 440);
+			monitors.add(m);
+			String t = algo == null ? "Monitor " + name : name + " " + algo.getName();
+			JFrame frame = new JFrame(t);
+			frame.add(m.getPanel());
+			frame.pack();
+			frame.setVisible(true);
 		}
 
 		if (fftlib == null) {
@@ -129,9 +140,16 @@ public class Deconvolution implements Runnable {
 			run();
 			return;
 		}
-		Thread thread = new Thread(this);
-		thread.setPriority(Thread.MIN_PRIORITY);
-		thread.start();
+		
+		if (watcherMultithreading) {
+			Thread thread = new Thread(this);
+			thread.setPriority(Thread.MIN_PRIORITY);
+			thread.start();
+		}
+		else {
+			run();
+		}
+		
 	}
 
 	/**
@@ -146,12 +164,17 @@ public class Deconvolution implements Runnable {
 		this.name = job;
 		this.exit = exit;
 		DeconvolutionDialog d = new DeconvolutionDialog(this);
-		for (AbstractMonitor monitor : monitors) {
-			if (monitor instanceof TableMonitor) {
-				String t = algo == null ? "Monitor " + name : name + " " + algo.getName();
-				d.addTableMonitor(t, ((TableMonitor) monitor));
-			}
+		
+		monitors = new Monitors();
+		if (watcherConsole)
+			monitors.add(new ConsoleMonitor());
+		
+		if (watcherMonitor) {
+			TableMonitor m = new TableMonitor(440, 440);
+			monitors.add(m);
+			d.addTableMonitor("Monitor", m);
 		}
+
 	}
 
 	public void decode() {
@@ -159,7 +182,8 @@ public class Deconvolution implements Runnable {
 		algo = null;
 
 		path = System.getProperty("user.dir");
-		monitors = Monitors.createDefaultMonitor();
+		if (monitors==null)
+			monitors = Monitors.createDefaultMonitor();
 		verbose = Verbose.Log;
 
 		controller = new Controller();
@@ -172,15 +196,17 @@ public class Deconvolution implements Runnable {
 
 		live = false;
 
-		results = new ArrayList<String>();
-
 		ArrayList<Token> tokens = Command.parse(command);
 		for (Token token : tokens) {
 			if (token.keyword.equalsIgnoreCase("-algorithm"))
 				algo = Command.decodeAlgorithm(token, controller);
 
-			if (token.keyword.equalsIgnoreCase("-monitor"))
-				monitors = Command.decodeMonitors(token);
+			if (token.keyword.equalsIgnoreCase("-disable")) {
+				watcherMonitor = Command.decodeDisable(token, "monitor");
+				watcherConsole = Command.decodeDisable(token, "console");
+				watcherDisplay = Command.decodeDisable(token, "display");
+				watcherMultithreading = Command.decodeDisable(token, "multithreading");
+			}
 
 			if (token.keyword.equalsIgnoreCase("-verbose"))
 				verbose = Verbose.getByName(token.parameters);
@@ -235,31 +261,41 @@ public class Deconvolution implements Runnable {
 
 	@Override
 	public void run() {
+		double chrono = System.nanoTime();
+		
+		for(DeconvolutionListener listener : listeners)
+			listener.started();
+		
 		live = true;
 		if (monitors != null)
 			monitors.setVerbose(verbose);
 		
-		results.add("Path: " + checkPath(path));
+		report.add("Path: " + checkPath(path));
 		monitors.log("Path: " + checkPath(path));
 		
 		RealSignal image = openImage();
 
 		if (image == null) {
 			monitors.error("Image: Not valid " + command);
+			report.add("Image: Not valid");
 			if (exit)
 				System.exit(-101);
 			return;
 		}
+		report.add("Image: " + image.dimAsString());
+
 		monitors.log("Image: " + image.nx + " x " + image.ny + " x " + image.nz);
 		RealSignal y = padding.pad(monitors, getApodization().apodize(monitors, image));
 
 		RealSignal psf = openPSF();
 		if (psf == null) {
 			monitors.error("PSF: not valid");
+			report.add("PSF: Not valid");
 			if (exit)
 				System.exit(-102);
 			return;
 		}
+		report.add("PSF: " + psf.dimAsString());
 
 		monitors.log("PSF: " + psf.nx + " x " + psf.ny + " x " + psf.nz);
 		monitors.log("PSF: normalization " + (factorNormalization <= 0 ? "no" : factorNormalization));
@@ -284,6 +320,8 @@ public class Deconvolution implements Runnable {
 			fft = FFT.createFFT(monitors, fftlib, image.nx, image.ny, image.nz);
 		else
 			fft = FFT.createDefaultFFT(monitors, image.nx, image.ny, image.nz);
+		report.add("FFT: " + fft.getName());
+
 		algo.setFFT(fft);
 		controller.setFFT(fft);
 
@@ -294,6 +332,7 @@ public class Deconvolution implements Runnable {
 		}
 
 		monitors.log("Algorithm: " + algo.getName());
+		report.add("Algorithm: " + algo.getName());
 
 		RealSignal x = algo.run(monitors, y, h, true);
 
@@ -303,14 +342,26 @@ public class Deconvolution implements Runnable {
 			outs.executeFinal(monitors, result, controller);
 
 		live = false;
+		for(DeconvolutionListener listener : listeners)
+			listener.finish();
+		
+		report.add("End " + algo.getName() + " in " + NumFormat.time(System.nanoTime()-chrono));
+		
+		if (watcherDisplay)
+			Lab.show(monitors, result, "Result of " + algo.getShortname());
 
 		if (exit) {
 			System.out.println("End");
 			System.exit(0);
 		}
-
+	
 	}
 
+	/**
+	 * This methods make a recap of the deconvolution. Useful before starting the processing.
+	 * 
+	 * @return list of messages to print
+	 */
 	public ArrayList<String> recap() {
 		ArrayList<String> lines = new ArrayList<String>();
 		Token image = Command.extract(command, "-image");
@@ -348,11 +399,12 @@ public class Deconvolution implements Runnable {
 			for (AbstractMonitor monitor : monitors)
 				m += monitor.getName() + " ";
 		}
-		String v = "";
-		if (verbose != null)
-			v = "(" + verbose.name().toLowerCase() + ")";
-		lines.add("<b>Monitor</b>:" + m + " " + v);
-
+		lines.add("<b>Verbose</b>: " + verbose.name().toLowerCase());
+		lines.add("<b>Monitor</b>: " + (watcherMonitor ? "on" : "off"));
+		lines.add("<b>Console</b>: " + (watcherConsole ? "on" : "off"));
+		lines.add("<b>Final Display</b>: " + (watcherDisplay ? "on" : "off"));
+		lines.add("<b>Multithreading</b>: " + (watcherMultithreading ? "on" : "off"));
+	
 		if (outs == null)
 			lines.add("<b>Outputs</b>: not valid");
 		else
@@ -462,8 +514,8 @@ public class Deconvolution implements Runnable {
 		return lines;
 	}
 
-	public ArrayList<String> getDeconvolutionResults() {
-		return results;
+	public ArrayList<String> getDeconvolutionReports() {
+		return report;
 	}
 
 	public String getName() {
@@ -521,12 +573,16 @@ public class Deconvolution implements Runnable {
 		Token token = Command.extract(command, "-image");
 		if (token == null)
 			return null;
+		if (token.parameters.startsWith(">>>"))
+			return null;
 		return getImage(monitors, token);
 	}
 
 	public RealSignal openPSF() {
 		Token token = Command.extract(command, "-psf");
 		if (token == null)
+			return null;
+		if (token.parameters.startsWith(">>>"))
 			return null;
 		return getImage(monitors, token);
 	}
@@ -602,6 +658,10 @@ public class Deconvolution implements Runnable {
 		s += " min=" + NumFormat.nice(stats[3]);
 		s += " max=" + NumFormat.nice(stats[2]);
 		return s;
+	}
+	
+	public void addDeconvolutionListener(DeconvolutionListener listener) {
+		listeners.add(listener);
 	}
 
 }

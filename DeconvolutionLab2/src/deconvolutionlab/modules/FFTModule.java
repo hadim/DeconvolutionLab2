@@ -142,7 +142,7 @@ public class FFTModule extends AbstractModule implements ActionListener, ChangeL
 
 	private void fillInstallation() {
 
-		ArrayList<AbstractFFTLibrary> libs = FFT.getLibraries();
+		ArrayList<AbstractFFTLibrary> libs = FFT.getRegisteredLibraries();
 		for (AbstractFFTLibrary lib : libs) {
 			String name = lib.getLibraryName();
 			String installed = lib.isInstalled() ? " Yes" : "No";

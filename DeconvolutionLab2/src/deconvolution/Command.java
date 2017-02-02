@@ -61,19 +61,17 @@ public class Command {
 
 	public static String keywords[] = {
 			"-image", "-psf", "-algorithm", 
-			"-path", "-monitor", "-verbose", "-time",
+			"-path", "-disable", "-verbose", "-time",
 			"-constraint", "-residu", "-reference", "-savestats", "-showstats",
 			"-out", "-pad", "-apo", "-norm", "-fft"
 			};
 
 	private static AbstractModule	modules[];
 	private static CommandModule command;
-	private static LanguageModule language;
 
-	public static void active(AbstractModule[] m, CommandModule c, LanguageModule l) {
+	public static void active(AbstractModule[] m, CommandModule c) {
 		modules = m;
 		command = c;
-		language = l;
 	}
 
 	public static String command() {
@@ -85,10 +83,7 @@ public class Command {
 
 		if (command != null)
 			command.setCommand(cmd);
-
-		//if (language != null)
-		//	language.update();
-		
+	
 		return cmd;
 	}
 
@@ -246,19 +241,14 @@ public class Command {
 			return NumFormat.parseNumber(token.parameters, 1);	
 	}
 
-	public static Monitors decodeMonitors(Token token) {
+	public static boolean decodeDisable(Token token, String word) {
 		String p = token.parameters.toLowerCase();
-		Monitors monitors = new Monitors();
-		if (p.endsWith("no"))
-			return monitors;
 		String parts[] = p.split(" ");
 		for(String part : parts) {
-			if (part.trim().equals("console"))
-				monitors.add(new ConsoleMonitor());
-			if (part.trim().equals("table"))
-				monitors.add(new TableMonitor(400, 400));
+			if (part.trim().equals(word))
+				return false;
 		}
-		return monitors;	
+		return true;	
 	}
 
 	public static Padding decodePadding(Token token) {

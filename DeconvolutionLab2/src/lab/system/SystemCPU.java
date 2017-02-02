@@ -81,7 +81,7 @@ public class SystemCPU extends JLabel {
 		double maxi = 100;
 		peak = Math.max(used, peak);
 	    super.paintComponent(g);
-	    int w = Constants.widthGUI;
+	    int w = getWidth();
 	    g.setColor(new Color(10, 10, 10, 30));
 	    for(int i=0; i<w; i+=w/10)
 	    	g.drawLine(i, 0, i, 30);
@@ -94,6 +94,7 @@ public class SystemCPU extends JLabel {
    	    g.fillRect(0, 0, posu, 30);
    	    g.fillRect(0, 0, posp, 30);
    	    g.setColor(new Color(160, 10, 10));
-  	    g.drawString(u + "%", posu, 13);
+  	    g.drawString(u + "%", 10, 13);
+ 	    g.drawString("100%", w-50, 13);
 	}
 }

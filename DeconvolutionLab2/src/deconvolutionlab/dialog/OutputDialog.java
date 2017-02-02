@@ -81,12 +81,16 @@ public class OutputDialog extends JDialog implements ActionListener, ChangeListe
 	private View				view;
 	private GridPanel			pnOrtho;
 
+	private static int count	= 1;
+	
 	public OutputDialog(View view) {
-		super(new JFrame(), "Output");
+		super(new JFrame(), "Create a new output");
 		this.view = view;
 		lblBit.setBorder(BorderFactory.createEtchedBorder());
 		lblIter.setBorder(BorderFactory.createEtchedBorder());
 
+		txtName.setText(view.name().substring(0, 2) + (count++));
+		
 		GridPanel pn = new GridPanel(view.name());
 		pn.place(0, 0, "Name");
 		pn.place(0, 1, 2, 1, txtName);

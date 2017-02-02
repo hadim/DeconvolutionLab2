@@ -122,7 +122,7 @@ public class Lab {
 
 	public static void checkFFT(Monitors monitors) {
 
-		ArrayList<AbstractFFTLibrary> libraries = FFT.getLibraries();
+		ArrayList<AbstractFFTLibrary> libraries = FFT.getInstalledLibraries();
 		for (int k = 1; k <= 3; k++)
 			for (AbstractFFTLibrary library : libraries) {
 				RealSignal y = new Sphere(3, 1).generate(40, 30, 20);

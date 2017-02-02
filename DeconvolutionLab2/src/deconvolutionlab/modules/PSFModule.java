@@ -145,8 +145,10 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 			setSynopsis(table.getCell(row, 0));
 			Command.command();
 		}
-		else 
+		else {
 			setSynopsis("");
+			setCommand("Drag your image file, here");
+		}
 		getAction2Button().setEnabled(table.getRowCount() > 0);
 	}
 
@@ -251,7 +253,7 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 			@Override
 			public void run() {
 				int row = table.getSelectedRow();
-				RealSignal x = new Deconvolution(getCommand() + " -nodisplay -nomonitor").openImage();
+				RealSignal x = new Deconvolution(getCommand()).openPSF();
 				if (x != null)
 					Lab.show(Monitors.createDefaultMonitor(), x, table.getCell(row, 0));
 			}

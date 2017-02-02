@@ -53,8 +53,6 @@ public class SystemBar extends JToolBar {
 		load = new SystemCPU();
 		restart(refreshTime);
 		setLayout(new BorderLayout());
-		setFloatable(true);
-		setLayout(new BorderLayout());
 		add(heap, BorderLayout.CENTER);
 		add(load, BorderLayout.EAST);
 	}

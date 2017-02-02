@@ -31,6 +31,8 @@
 
 package deconvolution;
 
+import ij.gui.GUI;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -54,15 +56,16 @@ import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.text.BadLocationException;
 
+import lab.component.HTMLPane;
+import lab.system.SystemBar;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.StatusMonitor;
 import deconvolutionlab.monitor.TableMonitor;
-import ij.gui.GUI;
-import lab.component.HTMLPane;
-import lab.system.SystemBar;
 
-public class DeconvolutionDialog extends JDialog implements ActionListener, Runnable, KeyListener {
+public class DeconvolutionDialog extends JDialog implements ActionListener, Runnable, KeyListener, DeconvolutionListener {
 
+	public enum State {NOTDEFINED, READY, RUN, FINISH};
+	
 	private JButton			bnStart	= new JButton("Run");
 	private JButton			bnQuit	= new JButton("Quit");
 	private JButton			bnRecap	= new JButton("Recap");
@@ -79,6 +82,7 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 	private Thread			thread	= null;
 
 	private Deconvolution	deconvolution;
+	private State			state = State.NOTDEFINED;
 
 	public DeconvolutionDialog(Deconvolution deconvolution) {
 		super(new JFrame(), deconvolution.getName() + " " + new SimpleDateFormat("dd/MM/yy HH:m:s").format(new Date()));
@@ -134,26 +138,31 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		bnAlgo.addActionListener(this);
 		bnRecap.addActionListener(this);
 		bnHelp.addActionListener(this);
+		deconvolution.addDeconvolutionListener(this);
 
-		setMinimumSize(new Dimension(200, 400));
+		setMinimumSize(new Dimension(400, 200));
 		pack();
 		GUI.center(this);
 		setVisible(true);
 
 		print(deconvolution.recap());
+		state = State.READY;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
 		if (e.getSource() == bnStart) {
-			if (thread == null) {
+			if (state == State.FINISH) 
+				print(deconvolution.getDeconvolutionReports());
+			else if (thread == null) {
 				job = bnStart;
 				thread = new Thread(this);
 				thread.setPriority(Thread.MIN_PRIORITY);
 				thread.start();
 			}
 			else {
+				finish();
 				if (deconvolution != null)
 					deconvolution.abort();
 			}
@@ -200,18 +209,21 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 
 	@Override
 	public void run() {
+		
 		bnRecap.setEnabled(false);
 		bnAlgo.setEnabled(false);
 		bnPSF.setEnabled(false);
 		bnImage.setEnabled(false);
-		bnStart.setText("Stop");
+		bnStart.setEnabled(false);
 		String command = pnCommand.getText();
 		deconvolution.setCommand(command);
 		if (job == bnStart) {
-			// tab.setSelectedIndex(1);		
-			print(deconvolution.recap());
+			if (tab.getTabCount() > 1)
+				tab.setSelectedIndex(1);
+			else
+				print(deconvolution.recap());
 			deconvolution.run();
-			print(deconvolution.getDeconvolutionResults());
+			print(deconvolution.getDeconvolutionReports());
 		}
 		else if (job == bnRecap) {
 			tab.setSelectedIndex(0);
@@ -233,7 +245,7 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		bnAlgo.setEnabled(true);
 		bnPSF.setEnabled(true);
 		bnImage.setEnabled(true);
-		bnStart.setText("Start");
+		bnStart.setEnabled(true);
 		thread = null;
 	}
 
@@ -267,5 +279,21 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 			e1.printStackTrace();
 		}
 	}
+
+	@Override
+    public void started() {
+	    bnStart.setEnabled(true);
+	    bnStart.setText("Abort");
+	    state = State.RUN;
+	    tab.setSelectedIndex(0);
+    }
+
+	@Override
+    public void finish() {
+	    bnStart.setEnabled(true);
+	    bnStart.setText("Report");
+	    state = State.FINISH;
+	    tab.setSelectedIndex(0);
+    }
 
 }

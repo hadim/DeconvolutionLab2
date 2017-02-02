@@ -71,7 +71,7 @@ import deconvolutionlab.modules.GroupedModulePanel;
 import deconvolutionlab.modules.ImageModule;
 import deconvolutionlab.modules.LanguageModule;
 import deconvolutionlab.modules.LicenceModule;
-import deconvolutionlab.modules.MonitoringModule;
+import deconvolutionlab.modules.WatcherModule;
 import deconvolutionlab.modules.OutputModule;
 import deconvolutionlab.modules.PSFModule;
 import lab.component.PanelImage;
@@ -100,7 +100,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 	private BatchModule			batch;
 	private LanguageModule		language;
 	private CommandModule		command;
-	private MonitoringModule	monitoring;
+	private WatcherModule		watcher;
 
 	private ControllerModule	controller;
 
@@ -125,12 +125,12 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 		licence = new LicenceModule(false);
 		config = new ConfigModule(false);
 		command = new CommandModule();
-		monitoring = new MonitoringModule(false);
+		watcher = new WatcherModule(false);
 
 		doDialog();
-		modules = new AbstractModule[] { image, psf, algo, output, controller, border, fourier, monitoring };
+		modules = new AbstractModule[] { image, psf, algo, output, controller, border, fourier, watcher };
 	
-		Command.active(modules, command, language);
+		Command.active(modules, command);
 		Command.command();
 
 		addWindowListener(this);
@@ -233,7 +233,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 		list.add(image);
 		list.add(psf);
 		list.add(algo);
-		list.add(monitoring);
+		list.add(watcher);
 		return list;
 	}
 

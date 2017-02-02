@@ -44,6 +44,7 @@ import fft.jtransforms.JTransformsLibrary;
 public class FFT {
 
 	private static ArrayList<AbstractFFTLibrary>	libraries	= new ArrayList<AbstractFFTLibrary>();
+	private static ArrayList<AbstractFFTLibrary>	registers		= new ArrayList<AbstractFFTLibrary>();
 
 	static {
 		Monitors monitors = Monitors.createDefaultMonitor();
@@ -73,10 +74,18 @@ public class FFT {
 		else {
 			monitors.log("FFTW not found");
 		}
+		
+		registers.add(academic);
+		registers.add(jtransform);
+		registers.add(jfftw);
 
 	}
 
-	public static ArrayList<AbstractFFTLibrary> getLibraries() {
+	public static ArrayList<AbstractFFTLibrary> getRegisteredLibraries() {
+		return registers;
+	}
+
+	public static ArrayList<AbstractFFTLibrary> getInstalledLibraries() {
 		return libraries;
 	}
 
@@ -110,7 +119,7 @@ public class FFT {
 	}
 
 	public static AbstractFFTLibrary getLibraryByName(String name) {
-		for (AbstractFFTLibrary library : getLibraries())
+		for (AbstractFFTLibrary library : getInstalledLibraries())
 			if (library.getLibraryName().equals(name))
 				return library;
 		return new AcademicLibrary();
@@ -124,7 +133,7 @@ public class FFT {
 	}
 
 	public static String getLicence(String name) {
-		for (AbstractFFTLibrary lib : getLibraries()) {
+		for (AbstractFFTLibrary lib : getInstalledLibraries()) {
 			for (AbstractFFT fft : lib.getFFTs())
 				if (name.equals(fft.getName()))
 					return lib.getLicence();

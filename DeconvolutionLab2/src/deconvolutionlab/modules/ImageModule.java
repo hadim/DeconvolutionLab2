@@ -145,8 +145,10 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 			setSynopsis(table.getCell(row, 0));
 			Command.command();
 		}
-		else
+		else {
 			setSynopsis("");
+			setCommand("Drag your image file, here");
+		}
 		getAction2Button().setEnabled(table.getRowCount() > 0);
 	}
 

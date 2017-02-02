@@ -37,6 +37,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import lab.tools.NumFormat;
 import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFT;
 import fft.FFT;
@@ -174,8 +175,8 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		String s = "";
 		s += getName();
 		s += (isIterative() ? ", " + controller.getIterationMax() + " iterations" : " (direct)");
-		s += (isRegularized() ? ", &lambda=" + getRegularizationFactor() : "");
-		s += (isStepControllable() ? ", &gamma=" + getStepFactor() : "");
+		s += (isRegularized() ? ", &lambda=" + NumFormat.nice(getRegularizationFactor()) : "");
+		s += (isStepControllable() ? ", &gamma=" + NumFormat.nice(getStepFactor()) : "");
 		return s;
 	}
 }

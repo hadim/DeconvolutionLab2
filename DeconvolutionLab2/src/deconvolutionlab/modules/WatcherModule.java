@@ -49,7 +49,7 @@ import deconvolutionlab.Config;
 import lab.component.GridPanel;
 import lab.tools.Files;
 
-public class MonitoringModule extends AbstractModule implements ActionListener, KeyListener {
+public class WatcherModule extends AbstractModule implements ActionListener, KeyListener {
 
 	private JTextField			txtTime;
 	private JTextField			txtPath;
@@ -62,8 +62,8 @@ public class MonitoringModule extends AbstractModule implements ActionListener, 
 	private JCheckBox			chkDisableDisplay;
 	private JCheckBox			chkDisableMultithreading;
 
-	public MonitoringModule(boolean expanded) {
-		super("Monitor", "", "", "", expanded);
+	public WatcherModule(boolean expanded) {
+		super("Watcher", "", "Default", "", expanded);
 	}
 
 	@Override
@@ -93,10 +93,10 @@ public class MonitoringModule extends AbstractModule implements ActionListener, 
 		cmbTime = new JComboBox<String>(new String[] { "No time limitation", "Specify limit (s) ..." });
 		cmbPath = new JComboBox<String>(new String[] { "Current", "Specify ..." });
 		cmbVerbose = new JComboBox<String>(new String[] { "Verbose: log", "Verbose: quiet ", "Verbose: prolix", "Verbose: mute" });
-		chkDisableTable = new JCheckBox("Monitor");
-		chkDisableConsole = new JCheckBox("Console");
-		chkDisableDisplay = new JCheckBox("Display");
-		chkDisableMultithreading = new JCheckBox("Multithreading");
+		chkDisableTable = new JCheckBox("No Monitor");
+		chkDisableConsole = new JCheckBox("No Console");
+		chkDisableDisplay = new JCheckBox("No Display");
+		chkDisableMultithreading = new JCheckBox("No Multithreading");
 
 		txtTime = new JTextField("3600");
 		txtPath = new JTextField("...", 30);
@@ -108,21 +108,18 @@ public class MonitoringModule extends AbstractModule implements ActionListener, 
 		pn.place(1, 0, 4, 1, txtPath);
 
 		GridPanel pn2 = new GridPanel("Settings", 3);
-		pn2.place(2, 0, cmbTime);
-		pn2.place(2, 1, txtTime);
+		pn2.place(2, 0, 2, 1, cmbTime);
+		pn2.place(2, 2, txtTime);
 		pn2.place(2, 3, cmbVerbose);
-
-		GridPanel pn3 = new GridPanel("Disable", 3);
-		pn3.place(4, 0, chkDisableTable);
-		pn3.place(4, 1, chkDisableConsole);
-		pn3.place(4, 2, chkDisableDisplay);
-		pn3.place(4, 3, chkDisableMultithreading);
+		pn2.place(4, 0, chkDisableTable);
+		pn2.place(4, 1, chkDisableConsole);
+		pn2.place(4, 2, chkDisableDisplay);
+		pn2.place(4, 3, chkDisableMultithreading);
 		
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 		panel.add(pn);
 		panel.add(pn2);
-		panel.add(pn3);
 
 		Config.register(getName(), "verbose", cmbVerbose, cmbVerbose.getItemAt(0));
 		Config.register(getName(), "path", cmbPath, cmbPath.getItemAt(0));

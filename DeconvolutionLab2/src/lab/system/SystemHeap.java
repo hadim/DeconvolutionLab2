@@ -72,7 +72,6 @@ public class SystemHeap extends JLabel {
 	    
 	    int posu = (int)Math.round(w*used/maxi);
    	    int posp = (int)Math.round(w*peak/maxi);
-   	    int posm = w-40;
 		String u = NumFormat.bytes(used); 
 		String m = NumFormat.bytes(maxi);
 
@@ -80,8 +79,8 @@ public class SystemHeap extends JLabel {
    	    g.fillRect(0, 0, posu, 30);
    	    g.fillRect(0, 0, posp, 30);
    	    g.setColor(new Color(160, 10, 10));
-  	    g.drawString(u, posu, 13);
+  	    	g.drawString(u, 10, 13);
   	    //g.drawString(p, posp, 13);
-   	    g.drawString(m, posm, 13);
+   	    g.drawString(m, w-60, 13);
 	}
 }

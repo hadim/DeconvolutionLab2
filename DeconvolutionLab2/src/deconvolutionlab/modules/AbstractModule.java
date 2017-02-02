@@ -34,6 +34,7 @@ package deconvolutionlab.modules;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -60,6 +61,8 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 	private String				name;
 	private String				key;
 
+	private int					heightButton = 22;
+	
 	public AbstractModule(String name, String key, String action1, String action2, boolean expanded) {
 		this.name = name;
 		this.key = key;
@@ -69,20 +72,22 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 		this.expanded = expanded;
 		bnTitle = new JButton("<html><b>" + name + "</b></html>");
 		bnTitle.setHorizontalAlignment(SwingConstants.LEFT);
-		bnTitle.setPreferredSize(new Dimension(160, 20));
-		bnTitle.setMaximumSize(new Dimension(250, 20));
-		bnTitle.setMinimumSize(new Dimension(120, 20));
+		bnTitle.setPreferredSize(new Dimension(150, heightButton));
+		bnTitle.setMaximumSize(new Dimension(250, heightButton));
+		bnTitle.setMinimumSize(new Dimension(120, heightButton));
 		bnTitle.addActionListener(this);
 
 		bnSynopsis = new JButton("");
 		bnSynopsis.setHorizontalAlignment(SwingConstants.LEFT);
-		bnSynopsis.setPreferredSize(new Dimension(200, 20));
+		bnSynopsis.setPreferredSize(new Dimension(200, heightButton));
 		bnSynopsis.addActionListener(this);
 
 		bnExpand = new JButton("\u25BA");
-		bnExpand.setPreferredSize(new Dimension(40, 20));
-		bnExpand.setMaximumSize(new Dimension(40, 20));
-		bnExpand.setMinimumSize(new Dimension(40, 20));
+		Font font = bnExpand.getFont();
+		bnExpand.setFont(new Font(font.getFamily(), font.getStyle(), font.getSize()-3));
+		bnExpand.setPreferredSize(new Dimension(40, heightButton));
+		bnExpand.setMaximumSize(new Dimension(40, heightButton));
+		bnExpand.setMinimumSize(new Dimension(40, heightButton));
 		bnExpand.addActionListener(this);
 
 		JPanel tool0 = new JPanel(new BorderLayout());
@@ -95,14 +100,14 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 		JPanel toola = null;
 		if (!action1.equals("")) {
 			bnAction1.setText(action1);
-			bnAction1.setPreferredSize(new Dimension(50, 20));
+			bnAction1.setPreferredSize(new Dimension(70, heightButton));
 			if (toola == null)
 				toola = new JPanel(new BorderLayout());
 			toola.add(bnAction1, BorderLayout.WEST);
 		}
 		if (!action2.equals("")) {
 			bnAction2.setText(action2);
-			bnAction2.setPreferredSize(new Dimension(50, 20));
+			bnAction2.setPreferredSize(new Dimension(70, heightButton));
 			if (toola == null)
 				toola = new JPanel(new BorderLayout());
 			toola.add(bnAction2, BorderLayout.EAST);
@@ -128,8 +133,9 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 		lblCommand = new JLabel("");
 		lblCommand.setBorder(BorderFactory.createEtchedBorder());
 		lblCommand.setHorizontalAlignment(SwingConstants.LEFT);
-		lblCommand.setPreferredSize(new Dimension(500, 30));
+		lblCommand.setPreferredSize(new Dimension(500, 32));
 		panel.add(lblCommand, BorderLayout.NORTH);
+		lblCommand.setMinimumSize(new Dimension(500, 36));
 		return panel;
 	}
 
