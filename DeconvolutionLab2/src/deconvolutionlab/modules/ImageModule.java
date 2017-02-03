@@ -78,7 +78,7 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 	private JButton			bnPlatform;
 
 	public ImageModule(boolean expanded) {
-		super("Image", "-image", "Select", "Show", expanded);
+		super("Image", "-image", "Active", "Show", expanded);
 	}
 
 	@Override
@@ -167,8 +167,19 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 			synthetic(false);
 		else if (e.getSource() == bnPlatform)
 			platform();
-		else if (e.getSource() == getAction1Button())
-			platform();
+		else if (e.getSource() == getAction1Button()) {
+			int row = -1;
+			for(int i=0; i<table.getRowCount(); i++) {
+				if (table.getCell(i, 0).equalsIgnoreCase("active"))
+				if (table.getCell(i, 1).equalsIgnoreCase("platform"))
+				if (table.getCell(i, 2).equalsIgnoreCase("active"))
+					row = i;
+			}
+			if (row < 0) 
+				table.insert(new String[] { "active", "platform", "active", "" });
+			else
+				table.setRowSelectionInterval(row, row);
+		}
 		else if (e.getSource() == getAction2Button())
 			display();
 		update();

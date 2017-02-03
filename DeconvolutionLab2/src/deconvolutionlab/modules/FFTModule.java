@@ -88,6 +88,7 @@ public class FFTModule extends AbstractModule implements ActionListener, ChangeL
 		ArrayList<CustomizedColumn> columns = new ArrayList<CustomizedColumn>();
 		columns.add(new CustomizedColumn("Name", String.class, 120, false));
 		columns.add(new CustomizedColumn("Installed", String.class, 120, false));
+		columns.add(new CustomizedColumn("Multithreadable", String.class, 120, false));
 		columns.add(new CustomizedColumn("Location", String.class, Constants.widthGUI, false));
 		table = new CustomizedTable(columns, true);
 		table.setRowSelectionAllowed(false);
@@ -106,8 +107,6 @@ public class FFTModule extends AbstractModule implements ActionListener, ChangeL
 		pnNumeric.place(6, 1, cmbSep);
 		pnNumeric.place(7, 0, new JLabel("<html>Machine Epsilon &epsilon;</html>"));
 		pnNumeric.place(7, 1, cmbEpsilon);
-		pnNumeric.place(8, 0, new JLabel("Data Type"));
-		pnNumeric.place(8, 1, cmbType);
 
 		JScrollPane scroll2 = new JScrollPane(pnNumeric);
 		scroll2.setBorder(BorderFactory.createEmptyBorder());
@@ -146,8 +145,9 @@ public class FFTModule extends AbstractModule implements ActionListener, ChangeL
 		for (AbstractFFTLibrary lib : libs) {
 			String name = lib.getLibraryName();
 			String installed = lib.isInstalled() ? " Yes" : "No";
+			String multit = lib.isMultithreadable() ? " Yes" : "No";
 			String location = lib.getLocation();
-			table.append(new String[] { name, installed, location });
+			table.append(new String[] { name, installed, multit, location });
 		}
 		AbstractFFTLibrary fftlib = FFT.getLibraryByName((String) cmbFFT.getSelectedItem());
 		info.clear();

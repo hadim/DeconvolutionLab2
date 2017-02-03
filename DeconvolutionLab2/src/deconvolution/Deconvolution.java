@@ -394,11 +394,6 @@ public class Deconvolution implements Runnable {
 		}
 		lines.add("<b>Path</b>: " + path);
 
-		String m = "";
-		if (monitors != null) {
-			for (AbstractMonitor monitor : monitors)
-				m += monitor.getName() + " ";
-		}
 		lines.add("<b>Verbose</b>: " + verbose.name().toLowerCase());
 		lines.add("<b>Monitor</b>: " + (watcherMonitor ? "on" : "off"));
 		lines.add("<b>Console</b>: " + (watcherConsole ? "on" : "off"));

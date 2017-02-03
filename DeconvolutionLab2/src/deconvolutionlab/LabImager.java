@@ -63,7 +63,11 @@ public class LabImager extends PlatformImager {
 
 	@Override
 	public RealSignal create(String name) {
-		ImagePlus imp = WindowManager.getImage(name);
+		ImagePlus imp = null;
+		if (name.equalsIgnoreCase("active"))
+			imp = WindowManager.getCurrentImage();
+		else
+			imp = WindowManager.getImage(name);
 		if (imp == null)
 			imp = WindowManager.getCurrentImage();
 		return build(imp);

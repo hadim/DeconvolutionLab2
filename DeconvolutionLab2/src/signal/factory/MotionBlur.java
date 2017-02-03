@@ -32,26 +32,27 @@
 package signal.factory;
 
 import signal.RealSignal;
+import signal.Signal;
 
 public class MotionBlur extends SignalFactory {
 
-	private double sigma = 3.0;
-	private double direction = 30.0;
-	private double elongation = 3.0;
+	private double	sigma		= 3.0;
+	private double	direction	= 30.0;
+	private double	elongation	= 3.0;
 
 	public MotionBlur(double sigma, double direction, double elongation) {
-		super(new double[] {sigma, direction, elongation});
+		super(new double[] { sigma, direction, elongation });
 	}
 
 	@Override
 	public String getName() {
 		return "MotionBlur";
 	}
-	 
+
 	@Override
 	public String[] getParametersName() {
-		return new String[] {"Sigma", "Direction", "Elongation"};
-	}	
+		return new String[] { "Sigma", "Direction", "Elongation" };
+	}
 
 	@Override
 	public void setParameters(double[] parameters) {
@@ -65,25 +66,27 @@ public class MotionBlur extends SignalFactory {
 
 	@Override
 	public double[] getParameters() {
-		return new double[] {sigma, direction, elongation};
+		return new double[] { sigma, direction, elongation };
 	}
 
 	@Override
 	public void fill(RealSignal signal) {
-		double K1 = 0.5 / (sigma*sigma);
-		double K2 = 0.5 / (sigma*sigma*elongation*elongation);
+		double K1 = 0.5 / (sigma * sigma);
+		double K2 = 0.5 / (sigma * sigma * elongation * elongation);
 		double cosa = Math.cos(Math.toRadians(direction));
 		double sina = Math.sin(Math.toRadians(direction));
-		for(int x=0; x<nx; x++)
-		for(int y=0; y<ny; y++) {		
-			double dx = (x-xc);
-			double dy = (y-yc);
-			//double ps = (1.0 + (dx*cosa + dy*sina)/(dx*dx + dy*dy)) * 0.5;
-			double K = K1 + dx * K2 /(dx*dx + dy*dy);
-			double r2 = (x-xc)*(x-xc) + (y-yc)*(y-yc);
-			for(int z=0; z<nz; z++) {
-				signal.data[z][x+nx*y] = (float)((amplitude-background) * Math.exp(-r2*K) + background);
+		for (int x = 0; x < nx; x++)
+			for (int y = 0; y < ny; y++) {
+				double dx = (x - xc);
+				double dy = (y - yc);
+
+				double M = (dx * cosa + dy * sina) / Math.max(dx * dx + dy * dy, Signal.epsilon);
+				M = (1.0 - 1.0 / (1.0 + Math.exp(-M / elongation)));
+
+				double r2 = (x - xc) * (x - xc) + (y - yc) * (y - yc);
+				for (int z = 0; z < nz; z++) {
+					signal.data[z][x + nx * y] = (float) ((amplitude - background) * M * Math.exp(0) + background);
+				}
 			}
-		}
 	}
 }
