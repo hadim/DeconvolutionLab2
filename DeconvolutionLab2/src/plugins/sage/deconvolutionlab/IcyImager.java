@@ -179,18 +179,6 @@ public class IcyImager extends PlatformImager {
 	}
 
 	@Override
-	public void appendShowLive(String key, RealSignal signal, String title) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void appendShowLive(String key, RealSignal signal, String title, Type type) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void show(RealSignal signal, String title, Type type, int z) {
 		// TODO Auto-generated method stub	
 	}
@@ -198,6 +186,24 @@ public class IcyImager extends PlatformImager {
 	@Override
 	public void show(ComplexSignal signal, String title) {
 		// TODO Auto-generated method stub	
+	}
+
+	@Override
+	public ContainerImage createContainer(String title) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void append(ContainerImage container, RealSignal signal, String title) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void append(ContainerImage container, RealSignal signal, String title, Type type) {
+		// TODO Auto-generated method stub
+		
 	}
 
 

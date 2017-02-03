@@ -34,6 +34,7 @@ package imagej;
 import java.util.HashMap;
 
 import deconvolutionlab.PlatformImager;
+import deconvolutionlab.PlatformImager.ContainerImage;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.WindowManager;
@@ -46,9 +47,6 @@ import signal.ComplexSignal;
 import signal.RealSignal;
 
 public class IJImager extends PlatformImager {
-
-	private static HashMap<String, ImagePlus>	images	= new HashMap<String, ImagePlus>();
-	private static HashMap<String, ImageStack>	stacks	= new HashMap<String, ImageStack>();
 
 	public static RealSignal create(ImagePlus imp) {
 		int nx = imp.getWidth();
@@ -104,31 +102,30 @@ public class IJImager extends PlatformImager {
 		}
 	}
 
+	public ContainerImage createContainer(String title) {
+		return new ContainerImage();
+	}
+	
 	@Override
-	public void appendShowLive(String key, RealSignal signal, String title) {
-		appendShowLive(key, signal, title, PlatformImager.Type.FLOAT);
+	public void append(ContainerImage container, RealSignal signal, String title) {
+		append(container, signal, title, PlatformImager.Type.FLOAT);
 	}
 
 	@Override
-	public void appendShowLive(String key, RealSignal signal, String title, PlatformImager.Type type) {
-		ImagePlus imp = build(signal, type);
-		ImagePlus image = images.get(key);
-		ImageStack stack = stacks.get(key);
-		if (image == null || stack == null) {
-			stack = new ImageStack(signal.nx, signal.ny);
-			stack.addSlice(imp.getProcessor());
-			image = new ImagePlus(key, stack);
-			image.show();
-			images.put(key, image);
-			stacks.put(key, stack);
+	public void append(ContainerImage container, RealSignal signal, String title, PlatformImager.Type type) {		ImagePlus cont = (ImagePlus) container.object;
+		if (container.object == null) {
+			ImageStack stack = new ImageStack(signal.nx, signal.ny);
+			stack.addSlice(build(signal, type).getProcessor());
+			stack.addSlice(build(signal, type).getProcessor());
+			container.object = new ImagePlus(title, stack);
+			((ImagePlus)container.object).show();
 		}
 		else {
-			stack.addSlice(imp.getProcessor());
-			image.setStack(stack);
+			cont.getStack().addSlice(build(signal, type).getProcessor());
+			cont.setSlice(cont.getStack().getSize());
+			cont.updateAndDraw();
+			cont.getProcessor().resetMinAndMax();
 		}
-		image.updateAndDraw();
-		image.setSlice(image.getStack().getSize());
-		image.getProcessor().resetMinAndMax();
 	}
 
 	@Override

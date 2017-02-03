@@ -38,17 +38,11 @@ import ij.io.FileSaver;
 import ij.io.Opener;
 import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
-
-import java.util.HashMap;
-
 import signal.ComplexComponent;
 import signal.ComplexSignal;
 import signal.RealSignal;
 
 public class LabImager extends PlatformImager {
-
-	private static HashMap<String, ImageStack> stacks = new HashMap<String, ImageStack>();
-	private static HashMap<String, ImagePlus> images = new HashMap<String, ImagePlus>();
 
 	public static RealSignal create(ImagePlus imp) {
 		int nx = imp.getWidth();
@@ -60,7 +54,7 @@ public class LabImager extends PlatformImager {
 			signal.setXY(k, (float[]) ip.getPixels());
 		}
 		return signal;
-	}	
+	}
 
 	@Override
 	public RealSignal create() {
@@ -81,7 +75,7 @@ public class LabImager extends PlatformImager {
 		ImagePlus imp = opener.openImage(filename);
 		return build(imp);
 	}
-	
+
 	@Override
 	public void show(RealSignal signal, String title) {
 		show(signal, title, PlatformImager.Type.FLOAT);
@@ -89,7 +83,7 @@ public class LabImager extends PlatformImager {
 
 	@Override
 	public void show(RealSignal signal, String title, PlatformImager.Type type) {
-		show(signal, title, type, signal.nz/2);
+		show(signal, title, type, signal.nz / 2);
 	}
 
 	@Override
@@ -103,32 +97,31 @@ public class LabImager extends PlatformImager {
 			imp.getProcessor().resetMinAndMax();
 		}
 	}
-	
-	@Override
-	public void appendShowLive(String key, RealSignal signal, String title) {
-		appendShowLive(key, signal, title, PlatformImager.Type.FLOAT);
+
+	public ContainerImage createContainer(String title) {
+		return new ContainerImage();
 	}
 
 	@Override
-	public void appendShowLive(String key, RealSignal signal, String title, PlatformImager.Type type) {
-		ImagePlus imp = build(signal, type);
-		ImagePlus image = images.get(key);
-		ImageStack stack = stacks.get(key);
-		if (image == null || stack == null) {
-			stack = new ImageStack(signal.nx, signal.ny);
-			stack.addSlice(imp.getProcessor());
-			image = new ImagePlus(title, stack);
-			image.show();
-			images.put(key, image);
-			stacks.put(key, stack);
+	public void append(ContainerImage container, RealSignal signal, String title) {
+		append(container, signal, title, PlatformImager.Type.FLOAT);
+	}
+
+	@Override
+	public void append(ContainerImage container, RealSignal signal, String title, PlatformImager.Type type) {		ImagePlus cont = (ImagePlus) container.object;
+		if (container.object == null) {
+			ImageStack stack = new ImageStack(signal.nx, signal.ny);
+			stack.addSlice(build(signal, type).getProcessor());
+			stack.addSlice(build(signal, type).getProcessor());
+			container.object = new ImagePlus(title, stack);
+			((ImagePlus)container.object).show();
 		}
 		else {
-			stack.addSlice(imp.getProcessor());
-			image.setStack(stack);
+			cont.getStack().addSlice(build(signal, type).getProcessor());
+			cont.setSlice(cont.getStack().getSize());
+			cont.updateAndDraw();
+			cont.getProcessor().resetMinAndMax();
 		}
-		image.updateAndDraw();
-		image.setSlice(image.getStack().getSize());
-		image.getProcessor().resetMinAndMax();
 	}
 
 	@Override
@@ -150,26 +143,33 @@ public class LabImager extends PlatformImager {
 	}
 
 	@Override
-    public void show(ComplexSignal signal, String title) {
+	public void show(ComplexSignal signal, String title) {
 		show(signal, title, ComplexComponent.MODULE);
 	}
-	
+
 	@Override
-    public void show(ComplexSignal signal, String title, ComplexComponent complex) {
+	public void show(ComplexSignal signal, String title, ComplexComponent complex) {
 		ImageStack stack = new ImageStack(signal.nx, signal.ny);
 		for (int k = 0; k < signal.nz; k++) {
 			float[] plane = null;
-			switch(complex) {
-				case REAL: plane = signal.getRealXY(k); break;
-				case IMAGINARY: plane = signal.getImagXY(k); break;
-				case MODULE: plane = signal.getModuleXY(k); break;
-				default: plane = signal.getModuleXY_dB(k);
+			switch (complex) {
+			case REAL:
+				plane = signal.getRealXY(k);
+				break;
+			case IMAGINARY:
+				plane = signal.getImagXY(k);
+				break;
+			case MODULE:
+				plane = signal.getModuleXY(k);
+				break;
+			default:
+				plane = signal.getModuleXY_dB(k);
 			}
 			stack.addSlice(new FloatProcessor(signal.nx, signal.ny, plane));
 		}
 		new ImagePlus(title, stack).show();
 	}
-	
+
 	private RealSignal build(ImagePlus imp) {
 		if (imp == null)
 			return null;
@@ -183,30 +183,30 @@ public class LabImager extends PlatformImager {
 		}
 		return signal;
 	}
-	
+
 	private ImagePlus build(RealSignal signal, PlatformImager.Type type) {
 		if (signal == null)
 			return null;
-		
+
 		ImageStack stack = new ImageStack(signal.nx, signal.ny);
 		for (int k = 0; k < signal.nz; k++) {
 			ImageProcessor ip = new FloatProcessor(signal.nx, signal.ny, signal.getXY(k));
-			switch(type) {
-				case BYTE:
-					stack.addSlice(ip.convertToByteProcessor(false));
-					break;
-				case SHORT:
-					stack.addSlice(ip.convertToShortProcessor(false));
-					break;
-				case FLOAT:
-					stack.addSlice(ip);
-				default:
-					break;
+			switch (type) {
+			case BYTE:
+				stack.addSlice(ip.convertToByteProcessor(false));
+				break;
+			case SHORT:
+				stack.addSlice(ip.convertToShortProcessor(false));
+				break;
+			case FLOAT:
+				stack.addSlice(ip);
+			default:
+				break;
 			}
 		}
 		return new ImagePlus("", stack);
 	}
-	
+
 	@Override
 	public String getName() {
 		return "ImageJ";

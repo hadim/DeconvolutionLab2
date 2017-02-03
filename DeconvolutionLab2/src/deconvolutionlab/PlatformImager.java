@@ -38,16 +38,22 @@ import deconvolutionlab.monitor.Monitors;
 
 public abstract class PlatformImager {
 	
+	public class ContainerImage {	
+		public Object object;
+	}
+	
 	public enum Type {FLOAT, SHORT, BYTE};
 	
 	public abstract RealSignal create();
 	public abstract RealSignal create(String name);
 
+	public abstract ContainerImage createContainer(String title);
+	
 	public abstract void show(ComplexSignal signal, String title, ComplexComponent complex);
 	public abstract void show(ComplexSignal signal, String title);
 
-	public abstract void appendShowLive(String key, RealSignal signal, String title);
-	public abstract void appendShowLive(String key, RealSignal signal, String title, Type type);
+	public abstract void append(ContainerImage container, RealSignal signal, String title);
+	public abstract void append(ContainerImage container,  RealSignal signal, String title, Type type);
 
 	public abstract void show(RealSignal signal, String title);
 	public abstract void show(RealSignal signal, String title, Type type);

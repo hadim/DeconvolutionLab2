@@ -90,6 +90,7 @@ public abstract class SignalFactory {
 		list.add(new Gaussian(3, 3, 3));
 		list.add(new GridSpots(3, 1, 10));
 		list.add(new Impulse());
+		list.add(new MotionBlur(3, 30, 3));
 		list.add(new Ramp(1, 0, 0));
 		list.add(new RandomLines(3));
 		list.add(new Sinc(3, 3, 3));
@@ -124,6 +125,7 @@ public abstract class SignalFactory {
 		list.add(new DoG(3, 4));
 		list.add(new DoubleHelix(3, 10, 10));
 		list.add(new Gaussian(3, 3, 3));
+		list.add(new MotionBlur(3, 30, 3));
 		list.add(new Impulse());
  		list.add(new Sinc(3, 3, 3));
 		list.add(new Sphere(10, 1));

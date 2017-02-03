@@ -34,6 +34,7 @@ package deconvolutionlab;
 import java.io.File;
 
 import deconvolution.algorithm.Controller;
+import deconvolutionlab.PlatformImager.ContainerImage;
 import deconvolutionlab.monitor.Monitors;
 import lab.tools.NumFormat;
 import signal.Constraint;
@@ -49,6 +50,7 @@ public class Output {
 		INTACT, RESCALED, NORMALIZED, CLIPPED
 	};
 
+	private ContainerImage		container	= null;
 	private int					px			= 0;
 	private int					py			= 0;
 	private int					pz			= 0;
@@ -73,6 +75,7 @@ public class Output {
 		this.center = true;
 		this.save = true;
 		this.show = true;
+		this.container = Lab.createContainer(Monitors.createDefaultMonitor(), "");
 		for (int i = 0; i < tokens.length; i++) {
 			boolean found = false;
 			String p = tokens[i].trim().toLowerCase();
@@ -165,7 +168,7 @@ public class Output {
 		return name;
 	}
 
-	public void setPath1(String path) {
+	public void setPath(String path) {
 		this.path = path;
 	}
 
@@ -201,10 +204,14 @@ public class Output {
 		return new String[] { view.name().toLowerCase() + fr, name, d, t, k, sh, sa, "" };
 	}
 
-	public void execute(Monitors monitors, RealSignal signal, Controller controller, boolean live) {
+	public void execute(Monitors monitors, RealSignal signal, Controller controller, int iter, boolean live) {
 		if (signal == null)
 			return;
 		String title = name;
+		if (live)
+			if (!is(iter))
+				return;
+		
 		if (controller != null && live) {
 			if (controller.getIterations() > 0) {
 				title += "@" + controller.getIterations();
@@ -212,6 +219,7 @@ public class Output {
 		}
 		RealSignal x = null;
 		Constraint constraint = new Constraint(monitors);
+				
 		switch (dynamic) {
 		case RESCALED:
 			x = signal.duplicate();
@@ -233,7 +241,7 @@ public class Output {
 			x = signal;
 		}
 		String filename = path + File.separator + title + ".tif";
-		String key = name + "-" + type.name() + "-" + view.name() + "-" + dynamic.name() + "-" + (px + py + pz);
+		
 		switch (view) {
 		case STACK:
 			if (show && !live)
@@ -251,33 +259,34 @@ public class Output {
 			}
 			break;
 		case ORTHO:
-			orthoview(monitors, x, title, filename, live, key);
+			orthoview(monitors, x, title, filename, live);
 			break;
 		case FIGURE:
-			figure(monitors, x, title, filename, live, key);
+			figure(monitors, x, title, filename, live);
 			break;
 		case MIP:
-			mip(monitors, x, title, filename, live, key);
+			mip(monitors, x, title, filename, live);
 			break;
 		case PLANAR:
-			planar(monitors, x, title, filename, live, key);
+			planar(monitors, x, title, filename, live);
 			break;
 		default:
 			break;
 		}
 	}
 
-	private void mip(Monitors monitors, RealSignal signal, String title, String filename, boolean live, String key) {
+	private void mip(Monitors monitors, RealSignal signal, String title, String filename, boolean live) {
 		RealSignal plane = signal.createMIP();
-		if (show && live)
-			Lab.appendShowLive(monitors, key, plane, title, type);
+		if (show && live) {
+			Lab.append(monitors, container, plane, title, type);
+		}
 		if (show && !live)
 			Lab.show(monitors, plane, title, type);
 		if (save)
 			Lab.save(monitors, plane, filename, type);
 	}
 
-	private void orthoview(Monitors monitors, RealSignal signal, String title, String filename, boolean live, String key) {
+	private void orthoview(Monitors monitors, RealSignal signal, String title, String filename, boolean live) {
 		int cx = px;
 		int cy = py;
 		int cz = pz;
@@ -287,15 +296,18 @@ public class Output {
 			cz = signal.nz / 2;
 		}
 		RealSignal plane = signal.createOrthoview(cx, cy, cz);
-		if (show && live)
-			Lab.appendShowLive(monitors, key, plane, title, type);
+		if (show && live) {
+			if (container == null)
+				container = Lab.createContainer(monitors, title);
+			Lab.append(monitors, container, plane, title, type);
+		}
 		if (show && !live)
 			Lab.show(monitors, plane, title, type);
 		if (save)
 			Lab.save(monitors, plane, filename, type);
 	}
 
-	private void figure(Monitors monitors, RealSignal signal, String title, String filename, boolean live, String key) {
+	private void figure(Monitors monitors, RealSignal signal, String title, String filename, boolean live) {
 		int cx = px;
 		int cy = py;
 		int cz = pz;
@@ -305,18 +317,24 @@ public class Output {
 			cz = signal.nz / 2;
 		}
 		RealSignal plane = signal.createFigure(cx, cy, cz);
-		if (show && live)
-			Lab.appendShowLive(monitors, key, plane, title, type);
+		if (show && live) {
+			if (container == null)
+				container = Lab.createContainer(monitors, title);
+			Lab.append(monitors, container, plane, title, type);
+		}
 		if (show && !live)
 			Lab.show(monitors, plane, title, type);
 		if (save)
 			Lab.save(monitors, plane, filename, type);
 	}
 
-	private void planar(Monitors monitors, RealSignal signal, String title, String filename, boolean live, String key) {
+	private void planar(Monitors monitors, RealSignal signal, String title, String filename, boolean live) {
 		RealSignal plane = signal.createMontage();
-		if (show && live)
-			Lab.appendShowLive(monitors, key, plane, title, type);
+		if (show && live) {
+			if (container == null)
+				container = Lab.createContainer(monitors, title);
+			Lab.append(monitors, container, plane, title, type);
+		}
 		if (show && !live)
 			Lab.show(monitors, plane, title, type);
 		if (save)

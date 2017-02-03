@@ -94,7 +94,6 @@ public class OutputDialog extends JDialog implements ActionListener, ChangeListe
 		GridPanel pn = new GridPanel(view.name());
 		pn.place(0, 0, "Name");
 		pn.place(0, 1, 2, 1, txtName);
-	
 		pn.place(1, 0, "Dynamic");
 		pn.place(1, 1, cmbDynamic);
 		pn.place(2, 0, "Type");
@@ -115,7 +114,7 @@ public class OutputDialog extends JDialog implements ActionListener, ChangeListe
 		main.place(1, 0, 2, 1, pn);
 
 		if (view == View.ORTHO || view == View.FIGURE) {
-			pn.place(7, 0, 3, 1, chkCenter);
+			pn.place(8, 0, 3, 1, chkCenter);
 			pnOrtho = new GridPanel("Keypoint");
 			pnOrtho.place(4, 0, "Position in X");
 			pnOrtho.place(4, 1, spnX);

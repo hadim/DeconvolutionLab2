@@ -227,7 +227,7 @@ public class Controller {
 			Lab.nextStats(monitors, showstatsName, this, sav, shw);
 
 		if (outs != null)
-			outs.executeIterative(monitors, x, this);
+			outs.executeIterative(monitors, x, iterations, this);
 
 		iterations++;
 		double p = iterations * 100.0 / iterationsMax;

@@ -43,7 +43,7 @@ public class OutputCollection {
 
 	public void setPath(String path) {
 		for (Output out : list)
-			out.setPath1(path);
+			out.setPath(path);
 	}
 
 	public void add(Output out) {
@@ -62,13 +62,13 @@ public class OutputCollection {
 	public void executeFinal(Monitors monitors, RealSignal signal, Controller controller) {
 		for (Output out : list)
 			if (out != null)
-				out.execute(monitors, signal, controller, false);
+				out.execute(monitors, signal, controller, 0, false);
 	}
 
-	public void executeIterative(Monitors monitors, RealSignal signal, Controller controller) {
+	public void executeIterative(Monitors monitors, RealSignal signal, int iter, Controller controller) {
 		for (Output out : list)
 			if (out != null)
-				out.execute(monitors, signal, controller, true);
+				out.execute(monitors, signal, controller, iter, true);
 	}
 
 	public ArrayList<String> getInformation() {

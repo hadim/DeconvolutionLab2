@@ -31,14 +31,19 @@
 
 package deconvolutionlab;
 
-import imagej.IJImager;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
 
+import deconvolution.algorithm.Controller;
+import deconvolutionlab.PlatformImager.ContainerImage;
+import deconvolutionlab.monitor.Monitors;
+import fft.AbstractFFT;
+import fft.AbstractFFTLibrary;
+import fft.FFT;
+import imagej.IJImager;
 import lab.component.CustomizedColumn;
 import lab.component.CustomizedTable;
 import lab.tools.NumFormat;
@@ -48,12 +53,6 @@ import signal.ComplexComponent;
 import signal.ComplexSignal;
 import signal.RealSignal;
 import signal.factory.Sphere;
-import deconvolution.algorithm.Controller;
-import deconvolutionlab.monitor.ConsoleMonitor;
-import deconvolutionlab.monitor.Monitors;
-import fft.AbstractFFT;
-import fft.AbstractFFTLibrary;
-import fft.FFT;
 
 public class Lab {
 
@@ -137,13 +136,18 @@ public class Lab {
 			}
 	}
 	
-	public static void appendShowLive(Monitors monitors, String key, RealSignal signal, String title, String code) {
-		imager.appendShowLive(key, signal, title);
+	public static ContainerImage createContainer(Monitors monitors, String title) {
+		monitors.log("Create Live Real Signal " + title);
+		return imager.createContainer(title);
+	}
+
+	public static void append(Monitors monitors, ContainerImage container, RealSignal signal, String title) {
+		imager.append(container, signal, title);
 		monitors.log("Add Live Real Signal " + title);
 	}
 
-	public static void appendShowLive(Monitors monitors, String key, RealSignal signal, String title, PlatformImager.Type type) {
-		imager.appendShowLive(key, signal, title, type);
+	public static void append(Monitors monitors, ContainerImage container, RealSignal signal, String title, PlatformImager.Type type) {
+		imager.append(container, signal, title, type);
 		monitors.log("Add Live Real Signal " + title);
 	}
 
