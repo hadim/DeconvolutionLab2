@@ -34,6 +34,7 @@ package deconvolutionlab.dialog;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -54,6 +55,7 @@ import javax.swing.event.ChangeListener;
 
 import deconvolution.Command;
 import deconvolution.Deconvolution;
+import deconvolution.DeconvolutionDialog;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 import deconvolutionlab.Lab;
@@ -128,7 +130,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 		watcher = new WatcherModule(false);
 
 		doDialog();
-		modules = new AbstractModule[] { image, psf, algo, output, controller, border, fourier, watcher };
+		modules = new AbstractModule[] { image, psf, algo, output, controller, border, fourier, watcher, batch };
 	
 		Command.active(modules, command);
 		Command.command();
@@ -212,6 +214,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 		else if (e.getSource() == bnBatch) {
 			tab.setSelectedIndex(2);
 			batch.expand();
+			sizeModule();
 			new BatchDialog(batch);
 		}
 		else if (e.getSource() == bnLaunch) {
@@ -248,9 +251,9 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 
 	private ArrayList<AbstractModule> buildProgrammingPanel() {
 		ArrayList<AbstractModule> list = new ArrayList<AbstractModule>();
+		list.add(batch);
 		list.add(command);
 		list.add(language);
-		list.add(batch);
 		return list;
 	}
 
@@ -318,6 +321,9 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 
 	@Override
 	public void componentMoved(ComponentEvent e) {
+		Point p = this.getLocation();
+		p.x += this.getWidth();
+		DeconvolutionDialog.setLocationLaunch(p);
 	}
 
 	@Override

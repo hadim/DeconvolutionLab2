@@ -31,11 +31,11 @@
 
 package deconvolution;
 
-import ij.gui.GUI;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -83,17 +83,18 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 
 	private Deconvolution	deconvolution;
 	private State			state = State.NOTDEFINED;
-
+	private JProgressBar 	progress = new JProgressBar();
+	
+	public static Point		location = new Point(0, 0);
+	
 	public DeconvolutionDialog(Deconvolution deconvolution) {
 		super(new JFrame(), deconvolution.getName() + " " + new SimpleDateFormat("dd/MM/yy HH:m:s").format(new Date()));
 
 		this.deconvolution = deconvolution;
-		JProgressBar status = new JProgressBar();
-		deconvolution.getMonitors().add(new StatusMonitor(status));
 
 		pnCommand = new HTMLPane("Monaco", 100, 100);
 		pnCommand.append("p", deconvolution.getCommand());
-		pnResume = new HTMLPane("Verdana", 600, 150);
+		pnResume = new HTMLPane("Verdana", 450, 150);
 
 		tab.add("Resume", pnResume.getPane());
 
@@ -108,14 +109,14 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		bn.add(bnAlgo);
 		bn.add(bnStart);
 
-		status.setAlignmentX(JLabel.CENTER_ALIGNMENT);
-		status.setBorder(BorderFactory.createLoweredBevelBorder());
+		progress.setAlignmentX(JLabel.CENTER_ALIGNMENT);
+		progress.setBorder(BorderFactory.createLoweredBevelBorder());
 		JToolBar statusBar = new JToolBar();
 		statusBar.setBorder(BorderFactory.createLoweredBevelBorder());
 		statusBar.setFloatable(false);
 		statusBar.setLayout(new BorderLayout());
 		statusBar.add(bnHelp, BorderLayout.WEST);
-		statusBar.add(status, BorderLayout.CENTER);
+		statusBar.add(progress, BorderLayout.CENTER);
 		statusBar.add(bnQuit, BorderLayout.EAST);
 
 		JPanel bottom = new JPanel();
@@ -141,8 +142,20 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		deconvolution.addDeconvolutionListener(this);
 
 		setMinimumSize(new Dimension(400, 200));
+		setLocation(location);
+		
 		pack();
-		GUI.center(this);
+		location.x = location.x + 20;
+		location.y = location.y + 20;
+		
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		double width = screenSize.getWidth();
+		double height = screenSize.getHeight();
+		if (location.x + 400 > width)
+			location.x = 0;
+		if (location.y + 200 > height)
+			location.y = 0;
+		
 		setVisible(true);
 
 		print(deconvolution.recap());
@@ -285,7 +298,6 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 	    bnStart.setEnabled(true);
 	    bnStart.setText("Abort");
 	    state = State.RUN;
-	    tab.setSelectedIndex(0);
     }
 
 	@Override
@@ -295,5 +307,13 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 	    state = State.FINISH;
 	    tab.setSelectedIndex(0);
     }
+	
+	public JProgressBar getProgressBar() {
+		return progress;
+	}
+	
+	public static void setLocationLaunch(Point l) {
+		location = l;
+	}
 
 }

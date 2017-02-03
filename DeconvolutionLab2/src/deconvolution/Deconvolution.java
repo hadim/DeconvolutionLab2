@@ -44,6 +44,7 @@ import deconvolutionlab.OutputCollection;
 import deconvolutionlab.monitor.AbstractMonitor;
 import deconvolutionlab.monitor.ConsoleMonitor;
 import deconvolutionlab.monitor.Monitors;
+import deconvolutionlab.monitor.StatusMonitor;
 import deconvolutionlab.monitor.TableMonitor;
 import deconvolutionlab.monitor.Verbose;
 import fft.AbstractFFT;
@@ -164,8 +165,8 @@ public class Deconvolution implements Runnable {
 		this.name = job;
 		this.exit = exit;
 		DeconvolutionDialog d = new DeconvolutionDialog(this);
-		
 		monitors = new Monitors();
+		monitors.add(new StatusMonitor(d.getProgressBar()));
 		if (watcherConsole)
 			monitors.add(new ConsoleMonitor());
 		

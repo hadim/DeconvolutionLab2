@@ -113,6 +113,7 @@ public class BatchModule extends AbstractModule implements MouseListener, Action
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		super.actionPerformed(e);
 		if (e.getSource() == bnRunJob) {
 			int rows[] = table.getSelectedRows();
 			for (int row : rows) {
