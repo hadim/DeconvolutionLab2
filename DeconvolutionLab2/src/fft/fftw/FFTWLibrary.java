@@ -36,7 +36,6 @@ import java.security.CodeSource;
 
 import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFTLibrary;
-import fft.academic.AcademicLibrary;
 import jfftw.complex.nd.Plan;
 
 public class FFTWLibrary extends AbstractFFTLibrary {
@@ -149,7 +148,6 @@ public class FFTWLibrary extends AbstractFFTLibrary {
 		try {
 			String osname = System.getProperty("os.name");
 
-			System.out.println(" test " + osname + " " + path);
 			if (osname.startsWith("Windows")) {
 				String osarch = System.getProperty("os.arch");
 				if (osarch.contains("64")) {
@@ -178,7 +176,6 @@ public class FFTWLibrary extends AbstractFFTLibrary {
 
 	private static boolean existsWidsom(Monitors monitors, String path) {
 		boolean found = false;
-		System.out.println(" test " + path);
 		if (new File(path + "Wisdom").exists()) {
 			monitors.log("FFTW found in : " + path);
 			found = true;

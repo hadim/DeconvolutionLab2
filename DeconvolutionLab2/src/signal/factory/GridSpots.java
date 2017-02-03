@@ -82,7 +82,6 @@ public class GridSpots extends SignalFactory {
 		double deltaY = spacing / nr;
 		int np = (int) ((2 * (nz - spacing)) / spacing);
 		double deltaZ = spacing / np;
-		System.out.println(" " + spacing + " " + nr + " " + nc + " " + np + " " + deltaY + " " + deltaZ);
 		double y = 0;
 		double z = 0;
 		for (int j = 0; j < nr; j++) {

@@ -145,8 +145,12 @@ public class CustomizedTable extends JTable {
 		if (row >= 0) {
 			int ncol = getColumnCount();
 			String items = "";
-			for (int col = 0; col < ncol - 1; col++)
-				items += (String) getModel().getValueAt(row, col) + seperator;
+			for (int col = 0; col < ncol - 1; col++) {
+				if ((String) getModel().getValueAt(row, col) == null)
+					items += "" + seperator;
+				else 
+					items += (String) getModel().getValueAt(row, col) + seperator;
+			}
 			if (ncol >= 1)
 				items += (String) getModel().getValueAt(row, ncol - 1);
 			return items;

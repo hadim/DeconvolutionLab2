@@ -35,7 +35,6 @@ import java.util.ArrayList;
 
 import javax.swing.SwingWorker;
 
-import deconvolutionlab.monitor.Monitors;
 import signal.RealSignal;
 
 public abstract class SignalFactory {
@@ -52,7 +51,6 @@ public abstract class SignalFactory {
 	protected int		ny;
 	protected int		nz;
 
-	
 	public SignalFactory() {
 	}
 
@@ -205,7 +203,6 @@ public abstract class SignalFactory {
 		}
 
 		protected void done() {
-			System.out.println("Done");	
 			done = true;
 		}
 	

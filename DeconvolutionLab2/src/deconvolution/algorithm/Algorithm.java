@@ -60,6 +60,35 @@ public class Algorithm {
 	public static ArrayList<AbstractAlgorithmPanel> getAvailableAlgorithms() {
 		return list;
 	}
+	
+	public static ArrayList<AbstractAlgorithmPanel> getAvailableDeconvolutionAlgorithms() {
+		ArrayList<AbstractAlgorithmPanel> list = new ArrayList<AbstractAlgorithmPanel>();
+		list = new ArrayList<AbstractAlgorithmPanel>();
+		list.add(new RegularizedInverseFilterPanel());
+		list.add(new TikhonovRegularizationInverseFilterPanel());
+		list.add(new NaiveInverseFilterPanel());
+		list.add(new FISTAPanel());
+		list.add(new ISTAPanel());
+		list.add(new LandweberPanel());
+		list.add(new LandweberPositivityPanel());
+		list.add(new RichardsonLucyPanel());
+		list.add(new RichardsonLucyTVPanel());
+		list.add(new TikhonovMillerPanel());
+		list.add(new ICTMPanel());
+		list.add(new VanCittertPanel());
+		return list;
+	}
+	
+	public static ArrayList<AbstractAlgorithmPanel> getAvailableSimulationAlgorithms() {
+		ArrayList<AbstractAlgorithmPanel> list = new ArrayList<AbstractAlgorithmPanel>();
+		list.add(new IdentityPanel());
+		list.add(new ConvolutionPanel());
+		list.add(new SimulationPanel());
+		list.add(new NonStabilizedDivisionPanel());
+		return list;
+	}
+
+
 
 	public static AbstractAlgorithm getDefaultAlgorithm() {
 		return new Identity();

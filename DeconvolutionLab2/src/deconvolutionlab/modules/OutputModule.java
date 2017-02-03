@@ -160,7 +160,6 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-System.out.println("" + e);
 		super.actionPerformed(e);
 		View view = null;
 		if (e.getSource() == bnStack)

@@ -42,6 +42,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -60,8 +61,8 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 
 	public AlgorithmModule(boolean expanded) {
 		super("Algorithm", "-algorithm", "", "", expanded);
-		ArrayList<AbstractAlgorithmPanel> panels = Algorithm.getAvailableAlgorithms();
-		for (AbstractAlgorithmPanel panel : panels)
+		ArrayList<AbstractAlgorithmPanel> deconv = Algorithm.getAvailableAlgorithms();
+		for (AbstractAlgorithmPanel panel : deconv)
 			cmb.addItem(panel.getName());
 		cmb.addActionListener(this);
 	}
@@ -85,6 +86,7 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 		doc = new HTMLPane(100, 1000);
 		cards = new JPanel(new CardLayout());
 		ArrayList<AbstractAlgorithmPanel> panels = Algorithm.getAvailableAlgorithms();
+		
 		for (AbstractAlgorithmPanel panel : panels) {
 			JScrollPane scroll = new JScrollPane(panel.getPanelParameters());
 			scroll.setBorder(BorderFactory.createEmptyBorder());

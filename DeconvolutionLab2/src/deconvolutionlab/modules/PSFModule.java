@@ -228,14 +228,12 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 		if (row < 0)
 			return;
 		String name = table.getCell(row, 0).trim();
-		System.out.println("edit " + row + " " + name);
 		for(SignalFactory factory : SignalFactory.getAll()) {
 			if (name.equals(factory.getName().trim()))
 				synthetic(true);
 				return;
 		}
 		String filename = table.getCell(row, 1).trim();
-		System.out.println("edit " + row + " " + filename + " " + new File(filename).exists() + " " +new File(filename).isDirectory());
 		File file = new File(filename);
 		if (!file.exists())
 			return;
