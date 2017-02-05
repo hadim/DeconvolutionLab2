@@ -72,10 +72,10 @@ public class RandomLines extends SignalFactory {
 		for (int index = 0; index < number; index++) {
 			double x1 = -rand.nextDouble() * nx;
 			double x2 = nx + rand.nextDouble() * nx;
-			double y1 = 0.1 + rand.nextDouble() * ny * 0.8;
-			double y2 = 0.1 + rand.nextDouble() * ny * 0.8;
-			double z1 = 0.1 + rand.nextDouble() * nz * 0.8;
-			double z2 = 0.1 + rand.nextDouble() * nz * 0.8;
+			double y1 = (-0.1 + rand.nextDouble() * 1.2) * ny;
+			double y2 = (-0.1 + rand.nextDouble() * 1.2) * ny;
+			double z1 = (-0.1 + rand.nextDouble() * 1.2) * nz;
+			double z2 = (-0.1 + rand.nextDouble() * 1.2) * nz;
 			double d = (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2);
 			d = Math.sqrt(d);
 			int n = (int) (d / 0.3);
@@ -92,12 +92,12 @@ public class RandomLines extends SignalFactory {
 						double z = z1 + s * dz;
 						int k = (int) Math.round(z);
 						if (k >= 1 && k < nz-1) {
-							for(int ii=i-1; ii<=i+1; ii++)
-							for(int jj=j-1; jj<=j+1; jj++)
-							for(int kk=k-1; kk<=k+1; kk++) {
-								double p = Q - Math.sqrt((x - ii) * (x - ii) + (y - jj) * (y - jj) + (z - kk) * (z - kk));
-								signal.data[kk][ii + nx * jj] =  Math.max(signal.data[kk][ii + nx * jj], (float)(p*A));
-							}
+							//for(int ii=i-1; ii<=i+1; ii++)
+							//for(int jj=j-1; jj<=j+1; jj++)
+							//for(int kk=k-1; kk<=k+1; kk++) {
+								double p = Q - Math.sqrt((x - i) * (x - i) + (y - j) * (y - j) + (z - k) * (z - k));
+								signal.data[k][i + nx * j] =  Math.max(signal.data[k][i + nx * j], (float)(p*A));
+							//}
 						}
 					}
 				}

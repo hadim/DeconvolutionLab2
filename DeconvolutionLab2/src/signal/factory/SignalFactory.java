@@ -77,7 +77,7 @@ public abstract class SignalFactory {
 
 	public static ArrayList<SignalFactory> getAll() {
 		ArrayList<SignalFactory> list = new ArrayList<SignalFactory>();
-		list.add(new Airy(1));	
+		list.add(new AirySimulated(1));	
 		list.add(new Astigmatism(3, 0.2));	
 		list.add(new Constant());
 		list.add(new Cross(1, 1, 30));
@@ -115,7 +115,7 @@ public abstract class SignalFactory {
 
 	public static ArrayList<SignalFactory> getPSF() {
 		ArrayList<SignalFactory> list = new ArrayList<SignalFactory>();
-		list.add(new Airy(1));	
+		list.add(new AirySimulated(1));	
 		list.add(new Astigmatism(3, 0.2));	
 		list.add(new Cross(3, 1, 10));
 		list.add(new Cube(10, 1));

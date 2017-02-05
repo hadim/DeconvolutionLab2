@@ -40,6 +40,7 @@ public class Cube extends SignalFactory {
 
 	public Cube(double side, double slope) {
 		super(new double[] {side, slope});
+		setParameters(new double[] {side, slope});
 	}
 	
 	@Override

@@ -73,10 +73,10 @@ import deconvolutionlab.modules.GroupedModulePanel;
 import deconvolutionlab.modules.ImageModule;
 import deconvolutionlab.modules.LanguageModule;
 import deconvolutionlab.modules.LicenceModule;
-import deconvolutionlab.modules.WatcherModule;
 import deconvolutionlab.modules.OutputModule;
 import deconvolutionlab.modules.PSFModule;
-import lab.component.PanelImage;
+import deconvolutionlab.modules.WatcherModule;
+import lab.component.JPanelImage;
 import lab.system.SystemPanel;
 
 public class LabDialog extends JDialog implements ComponentListener, ActionListener, ChangeListener, WindowListener {
@@ -108,7 +108,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 
 	private GroupedModulePanel	panelDeconv;
 	private GroupedModulePanel	panelAdvanc;
-	private GroupedModulePanel	panelProgra;
+	private GroupedModulePanel	panelScript;
 	private GroupedModulePanel	panelAbout;
 	private AbstractModule		modules[];
 
@@ -155,9 +155,9 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 
 		panelDeconv = new GroupedModulePanel(buildDeconvolutionPanel(), this);
 		panelAdvanc = new GroupedModulePanel(buildAdvancedPanel(), this);
-		panelProgra = new GroupedModulePanel(buildProgrammingPanel(), this);
+		panelScript = new GroupedModulePanel(buildProgrammingPanel(), this);
 		panelAbout = new GroupedModulePanel(buildAboutPanel(), this);
-		PanelImage bottom = new PanelImage("celegans.jpg");
+		JPanelImage bottom = new JPanelImage("celegans.jpg");
 		bottom.setLayout(new GridLayout(1, 7));
 		Border b2 = BorderFactory.createEmptyBorder(10, 10, 10, 10);
 		bottom.setBorder(b2);
@@ -172,14 +172,16 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 		
 		tab.add("Deconvolution", panelDeconv);
 		tab.add("Advanced", panelAdvanc);
-		tab.add("Programming", panelProgra);
+		tab.add("Scripting", panelScript);
 		tab.add("About", panelAbout);
 		tab.addChangeListener(this);
 
 		JPanel base = new JPanel(new BorderLayout());
 		base.add(bottom, BorderLayout.CENTER);
 		//base.add(statusBar, BorderLayout.SOUTH);
-
+		//PanelImage pi = new PanelImage("logo.png", 380, 75);
+		//pi.setPreferredSize(new Dimension(400, 75));
+		//add(pi, BorderLayout.NORTH);
 		add(tab, BorderLayout.CENTER);
 		add(base, BorderLayout.SOUTH);
 
@@ -188,7 +190,6 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 		bnLaunch.addActionListener(this);
 		bnClose.addActionListener(this);
 		bnHelp.addActionListener(this);
-		bnQuit.addActionListener(this);
 		bnSystem.addActionListener(this);
 
 	}
@@ -204,11 +205,9 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 		}
 		else if (e.getSource() == bnClose) {
 			Config.store();
-			close();
 			dispose();
 		}
-		else if (e.getSource() == bnQuit) {
-			close();
+		else if (e.getSource() == bnClose) {
 			dispose();
 		}
 		else if (e.getSource() == bnBatch) {
@@ -272,7 +271,6 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 	@Override
 	public void windowClosing(WindowEvent e) {
 		Config.store();
-		close();
 		dispose();
 	}
 
@@ -304,7 +302,6 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 		bnBatch.removeActionListener(this);
 		bnClose.removeActionListener(this);
 		bnHelp.removeActionListener(this);
-		bnQuit.removeActionListener(this);
 		removeWindowListener(this);
 	}
 
@@ -338,7 +335,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 	public void sizeModule() {
 		if (tab.getSelectedIndex() == 0) sizePanel(panelDeconv);
 		if (tab.getSelectedIndex() == 1) sizePanel(panelAdvanc);
-		if (tab.getSelectedIndex() == 2) sizePanel(panelProgra);
+		if (tab.getSelectedIndex() == 2) sizePanel(panelScript);
 		if (tab.getSelectedIndex() == 3) sizePanel(panelAbout);
 	}
 

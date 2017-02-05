@@ -38,17 +38,17 @@ import signal.ComplexSignal;
 import signal.RealSignal;
 import signal.factory.complex.ComplexSignalFactory;
 
-public class Airy extends SignalFactory {
+public class AirySimulated extends SignalFactory {
 
 	private double mu = 1.0;
 
-	public Airy(double mu) {
+	public AirySimulated(double mu) {
 		super(new double[] {mu});
 	}
 
 	@Override
 	public String getName() {
-		return "Airy";
+		return "AirySimulated";
 	}
 	 
 	@Override
@@ -70,8 +70,9 @@ public class Airy extends SignalFactory {
 	@Override
 	public void fill(RealSignal signal) {
 		AbstractFFT fft = FFT.createDefaultFFT(Monitors.createDefaultMonitor(), nx, ny, nz);
-		ComplexSignal C = ComplexSignalFactory.airy(nx, ny, nz, mu);
+		ComplexSignal C = ComplexSignalFactory.airySimulated(nx, ny, nz, mu);
 		RealSignal s = fft.inverse(C).circular().times((float)amplitude);
+		s.times(s);
 		signal.copy(s);
 	}
 

@@ -70,9 +70,9 @@ public class DeconvolutionLab2 {
 	private static void help() {
 		System.out.println("More info:" + Constants.url);
 		System.out.println("Syntax:");
-		System.out.println("java -jar DeconvolutionLab_2.jar lab [config.txt]");
+		System.out.println("java -jar DeconvolutionLab_2.jar lab");
 		System.out.println("java -jar DeconvolutionLab_2.jar run {command} ...");
-		System.out.println("java -jar DeconvolutionLab_2.jar {command} ...");
+		System.out.println("java -jar DeconvolutionLab_2.jar launch {command} ...");
 		System.out.println("java -jar DeconvolutionLab_2.jar fft");
 		System.out.println("java -jar DeconvolutionLab_2.jar info");
 		System.out.println("java -jar DeconvolutionLab_2.jar help");

@@ -83,11 +83,11 @@ public class ComplexSignalFactory {
 		return createHermitian(nx, ny, nz, function);
 	}
 
-	public static ComplexSignal airy(int nx, int ny, int nz, double mu) {
+	public static ComplexSignal airySimulated(int nx, int ny, int nz, double mu) {
 		int xsize = nx / 2;
 		int ysize = ny / 2;
-		double K = ysize / 2.0;
 		int zsize = nz / 2;
+		double K = ysize/2;
 		float[][][] function = new float[xsize + 1][ysize + 1][zsize + 1];
 		double wx, wy, wz, wr;
 		for (int z = 0; z <= zsize; z++)
@@ -96,8 +96,11 @@ public class ComplexSignalFactory {
 					wx = Math.PI * x / xsize;
 					wy = Math.PI * y / ysize;
 					wz = Math.PI * z / ysize;
-					wr = Math.sqrt(wx * wx + wy * wy + wz * wz);
-					function[x][y][z] = (float) (1.0 - 1.0 / (1.0 + Math.exp(-K * (wr - mu))) + 1.0 / (1.0 + Math.exp(-K * (wr - 0.6 * mu))) - 1.0 / (1.0 + Math.exp(-K * (wr - 0.4 * mu))));
+					wr = Math.sqrt(wx * wx + wy * wy + wz*wz);
+					function[x][y][z] = 
+							(float) (1.0 - 1.0 / (1.0 + Math.exp(-K * (wr - mu)))
+							+ 1.0 / (1.0 + Math.exp(-K * (wr - 0.6 * mu))) 
+							- 1.0 / (1.0 + Math.exp(-K * (wr - 0.4 * mu))));
 				}
 		return createHermitian(nx, ny, nz, function);
 	}
