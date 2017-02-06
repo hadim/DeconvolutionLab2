@@ -69,7 +69,7 @@ public class DeconvolutionLab2_Course_Piecewise implements PlugIn {
 		  
 		algo = " -algorithm NIF -out ortho NIF " + paramout; 
 		new Deconvolution(signal + psf + algo).deconvolve(false);
-
+/*
 		algo = " -algorithm LW+ 15 1.5 -showstats @1 LW+  -out ortho @1 LW+/LW+" + paramout; 
 		new Deconvolution(signal + psf + algo).deconvolve(false);
 
@@ -78,8 +78,8 @@ public class DeconvolutionLab2_Course_Piecewise implements PlugIn {
 
 		algo = " -algorithm ISTA 15 1 1 -showstats @1 ISTA  -out ortho @1 ISTA/ISTA" + paramout; 
 		new Deconvolution(signal + psf + algo).deconvolve(false);
-
-		algo = " -algorithm RLTV 15 0.001 -showstats @1 RLTV  -out ortho @1 RLTV/RLTV" + paramout; 
+*/
+		algo = " -algorithm RLTV 15 0.01 -showstats @1 RLTV  -out ortho @1 RLTV/RLTV" + paramout; 
 		new Deconvolution(signal + psf + algo).deconvolve(false);
 		
 		 /* 
