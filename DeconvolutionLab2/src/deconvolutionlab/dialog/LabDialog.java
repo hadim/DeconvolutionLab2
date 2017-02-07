@@ -189,6 +189,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 		bnRun.addActionListener(this);
 		bnLaunch.addActionListener(this);
 		bnClose.addActionListener(this);
+		bnQuit.addActionListener(this);
 		bnHelp.addActionListener(this);
 		bnSystem.addActionListener(this);
 
@@ -207,7 +208,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 			Config.store();
 			dispose();
 		}
-		else if (e.getSource() == bnClose) {
+		else if (e.getSource() == bnQuit) {
 			dispose();
 		}
 		else if (e.getSource() == bnBatch) {

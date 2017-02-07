@@ -65,7 +65,7 @@ public class BatchModule extends AbstractModule implements MouseListener, Action
 
 	@Override
 	public String getCommand() {
-		return "DeconvolutionLab2 " + Constants.version;
+		return "";
 	}
 
 	@Override

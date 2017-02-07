@@ -59,15 +59,10 @@ import deconvolutionlab.monitor.TableMonitor;
 
 public class Command {
 
-	public static String keywords[] = {
-			"-image", "-psf", "-algorithm", 
-			"-path", "-disable", "-verbose", "-time",
-			"-constraint", "-residu", "-reference", "-savestats", "-showstats",
-			"-out", "-pad", "-apo", "-norm", "-fft"
-			};
+	public static String			keywords[]	= { "-image", "-psf", "-algorithm", "-path", "-disable", "-verbose", "-time", "-constraint", "-residu", "-reference", "-savestats", "-showstats", "-out", "-pad", "-apo", "-norm", "-fft" };
 
 	private static AbstractModule	modules[];
-	private static CommandModule command;
+	private static CommandModule	command;
 
 	public static void active(AbstractModule[] m, CommandModule c) {
 		modules = m;
@@ -83,40 +78,51 @@ public class Command {
 
 		if (command != null)
 			command.setCommand(cmd);
-	
+
 		return cmd;
 	}
 
 	/**
-	 * This methods first segments the command line, then create all the tokens of the command line
+	 * This methods first segments the command line, then create all the tokens
+	 * of the command line
 	 * 
-	 * @param command Command line
+	 * @param command
+	 *            Command line
 	 * @return the list of tokens extracted from the command line
 	 */
 	public static ArrayList<Token> parse(String command) {
-		
+
 		ArrayList<CommandSegment> segments = new ArrayList<CommandSegment>();
-		for (String keyword : keywords) {
+		for (String keyword : keywords)
 			segments.addAll(findSegment(command, keyword));
-		}
-		Collections.sort(segments);
-		
+
 		ArrayList<Token> tokens = new ArrayList<Token>();
+		for(int i=0; i<segments.size(); i++) {
+			String keyword = segments.get(i).keyword;
+			int begin = segments.get(i).index+keyword.length()+1;
+			int end = (i<segments.size()-1 ? segments.get(i+1).index : command.length());
+			Token token = new Token(keyword, command, begin, end);
+			tokens.add(token);
+		}
+
+		/*
 		for (int i = 0; i < segments.size(); i++) {
 			CommandSegment segment = segments.get(i);
 			String next = (i + 1 < segments.size() ? segments.get(i + 1).keyword : "");
 			int end = (i + 1 < segments.size() ? segments.get(i + 1).index - next.length() : command.length());
 			tokens.add(new Token(segment.keyword, command, segment.index, end));
 		}
+		*/
+		
 		return tokens;
 	}
 
 	public static Token extract(String command, String keyword) {
 		ArrayList<Token> tokens = parse(command);
-		for(Token token : tokens)
+		for (Token token : tokens)
 			if (token.keyword.equalsIgnoreCase(keyword))
 				return token;
-		return (Token)null;
+		return (Token) null;
 	}
 
 	public static double[] parseNumeric(String line) {
@@ -131,23 +137,30 @@ public class Command {
 			number[i] = Double.parseDouble(num.get(i));
 		return number;
 	}
-	
-	public static ArrayList<CommandSegment> findSegment(String command, String key) {
-		int index = -1;
+
+	public static ArrayList<CommandSegment> findSegment(String command, String keyword) {
 		ArrayList<CommandSegment> segments = new ArrayList<CommandSegment>();
-		do {
-			index = command.indexOf(key, index + 1);
-			if (index >= 0) {
-				segments.add(new CommandSegment(key, index + key.length()));
-			}
+		String regex = "(?<!\\w)" + keyword + "(?!\\w)";
+		Matcher matcher = Pattern.compile(regex).matcher(command);
+
+		while (matcher.find()) {
+			segments.add(new CommandSegment(keyword, matcher.start()));
+			System.out.println(" " + "," + matcher.end() + " " + matcher.group());
 		}
-		while (index >= 0);
+
+		Collections.sort(segments);
 		return segments;
 	}
-
+	/*
+	 * public static ArrayList<CommandSegment> findSegment(String command,
+	 * String key) { int index = -1; ArrayList<CommandSegment> segments = new
+	 * ArrayList<CommandSegment>(); do { index = command.indexOf(key, index +
+	 * 1); if (index >= 0) { segments.add(new CommandSegment(key, index +
+	 * key.length())); } } while (index >= 0); return segments; }
+	 */
 
 	public static AbstractAlgorithm decodeAlgorithm(Token token, Controller controller) {
-		
+
 		String option = token.option;
 
 		AbstractAlgorithm algo = Algorithm.createAlgorithm(option);
@@ -157,12 +170,12 @@ public class Command {
 			if (algo.isIterative())
 				controller.setIterationMax(algo.getController().getIterationMax());
 		}
-		
+
 		if (algo.isWaveletsBased()) {
-			for(String wavelet : Wavelets.getWaveletsAsArray()) {
+			for (String wavelet : Wavelets.getWaveletsAsArray()) {
 				int pos = token.parameters.toLowerCase().indexOf(wavelet.toLowerCase());
 				if (pos >= 0)
-					algo.setWavelets(wavelet);	
+					algo.setWavelets(wavelet);
 			}
 		}
 		return algo;
@@ -172,9 +185,9 @@ public class Command {
 		int freq = 0;
 		String line = token.parameters;
 		String parts[] = token.parameters.split(" ");
-		for(int i=0; i<Math.min(2, parts.length); i++) {
+		for (int i = 0; i < Math.min(2, parts.length); i++) {
 			if (parts[i].startsWith("@"))
-				freq = (int)NumFormat.parseNumber(parts[i], 0);
+				freq = (int) NumFormat.parseNumber(parts[i], 0);
 		}
 
 		String p = token.parameters.toLowerCase();
@@ -191,18 +204,18 @@ public class Command {
 			out = new Output(View.FIGURE, freq, line.substring("figure".length(), line.length()));
 		if (p.startsWith("planar"))
 			out = new Output(View.PLANAR, freq, line.substring("planar".length(), line.length()));
-		
+
 		return out;
 	}
 
 	public static void decodeController(Token token, Controller controller) {
-		
+
 		int freq = 1;
 		String line = token.parameters;
 		if (token.parameters.startsWith("@")) {
 			String parts[] = token.parameters.split(" ");
 			if (parts.length >= 1) {
-				freq = (int)NumFormat.parseNumber(parts[0], 1);
+				freq = (int) NumFormat.parseNumber(parts[0], 1);
 				line = token.parameters.substring(parts[0].length(), token.parameters.length()).trim();
 			}
 		}
@@ -210,12 +223,12 @@ public class Command {
 		if (token.keyword.equals("-constraint")) {
 			controller.setConstraint(freq, Constraint.getByName(line.trim()));
 		}
-		
+
 		else if (token.keyword.equals("-residu")) {
 			double stop = NumFormat.parseNumber(line, -1);
-			controller.setResiduStop(freq, stop);		
+			controller.setResiduStop(freq, stop);
 		}
-		
+
 		else if (token.keyword.equals("-reference")) {
 			controller.setReference(freq, line);
 		}
@@ -233,22 +246,22 @@ public class Command {
 			controller.setTimeStop(stop);
 		}
 	}
-	
+
 	public static double decodeNormalization(Token token) {
-			if (token.parameters.toLowerCase().endsWith("no"))
+		if (token.parameters.toLowerCase().endsWith("no"))
 			return 0;
 		else
-			return NumFormat.parseNumber(token.parameters, 1);	
+			return NumFormat.parseNumber(token.parameters, 1);
 	}
 
 	public static boolean decodeDisable(Token token, String word) {
 		String p = token.parameters.toLowerCase();
 		String parts[] = p.split(" ");
-		for(String part : parts) {
+		for (String part : parts) {
 			if (part.trim().equals(word))
 				return false;
 		}
-		return true;	
+		return true;
 	}
 
 	public static Padding decodePadding(Token token) {
@@ -256,7 +269,7 @@ public class Command {
 		AbstractPadding padZ = new NoPadding();
 		int extXY = 0;
 		int extZ = 0;
-	
+
 		String param = token.parameters.trim();
 		String[] parts = param.split(" ");
 		if (parts.length > 0)
@@ -265,9 +278,9 @@ public class Command {
 			padZ = Padding.getByShortname(parts[1].trim());
 		double[] ext = NumFormat.parseNumbers(param);
 		if (ext.length > 0)
-			extXY = (int)Math.round(ext[0]);
+			extXY = (int) Math.round(ext[0]);
 		if (ext.length > 1)
-			extZ = (int)Math.round(ext[1]);
+			extZ = (int) Math.round(ext[1]);
 
 		return new Padding(padXY, padXY, padZ, extXY, extXY, extZ);
 	}
