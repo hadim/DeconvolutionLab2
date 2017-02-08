@@ -147,8 +147,19 @@ public class FFTWLibrary extends AbstractFFTLibrary {
 	private static void loadLibraries(Monitors monitors, String path) {
 		try {
 			String osname = System.getProperty("os.name");
-
-			if (osname.startsWith("Windows")) {
+			
+			if (osname.startsWith("Linux")) {
+                String osarch = System.getProperty("os.arch");
+                if (osarch.contains("64")) {
+                    System.load(path + "libFFTWJNI64.so");
+                    monitors.log("Loading library FFTW for " + osarch + " " + osname + " " + path + "libFFTWJNI64.so");
+                }
+                else {
+                    System.load(path + "libFFTWJNI32.so");
+                    monitors.log("Loading library FFTW for " + osarch + " " + osname + " " + path + "libFFTWJNI32.so");
+                }
+			}
+			else if (osname.startsWith("Windows")) {
 				String osarch = System.getProperty("os.arch");
 				if (osarch.contains("64")) {
 					System.load(path + "FFTWJNIWin64.dll");

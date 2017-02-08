@@ -35,6 +35,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -75,11 +76,13 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 		bnTitle.setPreferredSize(new Dimension(150, heightButton));
 		bnTitle.setMaximumSize(new Dimension(250, heightButton));
 		bnTitle.setMinimumSize(new Dimension(120, heightButton));
+		bnTitle.setMargin(new Insets(1, 1, 1, 1));
 		bnTitle.addActionListener(this);
 
 		bnSynopsis = new JButton("");
 		bnSynopsis.setHorizontalAlignment(SwingConstants.LEFT);
 		bnSynopsis.setPreferredSize(new Dimension(200, heightButton));
+		bnSynopsis.setMargin(new Insets(1, 1, 1, 1));
 		bnSynopsis.addActionListener(this);
 
 		bnExpand = new JButton("\u25BA");
@@ -88,6 +91,7 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 		bnExpand.setPreferredSize(new Dimension(40, heightButton));
 		bnExpand.setMaximumSize(new Dimension(40, heightButton));
 		bnExpand.setMinimumSize(new Dimension(40, heightButton));
+		bnExpand.setMargin(new Insets(1, 1, 1, 1));
 		bnExpand.addActionListener(this);
 
 		JPanel tool0 = new JPanel(new BorderLayout());
@@ -101,6 +105,7 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 		if (!action1.equals("")) {
 			bnAction1.setText(action1);
 			bnAction1.setPreferredSize(new Dimension(70, heightButton));
+			bnAction1.setMargin(new Insets(1, 1, 1, 1));
 			if (toola == null)
 				toola = new JPanel(new BorderLayout());
 			toola.add(bnAction1, BorderLayout.WEST);
@@ -108,6 +113,7 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 		if (!action2.equals("")) {
 			bnAction2.setText(action2);
 			bnAction2.setPreferredSize(new Dimension(70, heightButton));
+			bnAction2.setMargin(new Insets(1, 1, 1, 1));
 			if (toola == null)
 				toola = new JPanel(new BorderLayout());
 			toola.add(bnAction2, BorderLayout.EAST);

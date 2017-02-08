@@ -164,7 +164,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 
 		bottom.add(bnHelp);
 		bottom.add(bnSystem);
-		bottom.add(bnQuit);
+		//bottom.add(bnQuit);
 		bottom.add(bnClose);
 		bottom.add(bnBatch);
 		bottom.add(bnRun);
