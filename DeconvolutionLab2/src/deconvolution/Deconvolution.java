@@ -41,7 +41,6 @@ import deconvolution.algorithm.Controller;
 import deconvolutionlab.Lab;
 import deconvolutionlab.Output;
 import deconvolutionlab.OutputCollection;
-import deconvolutionlab.monitor.AbstractMonitor;
 import deconvolutionlab.monitor.ConsoleMonitor;
 import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.monitor.StatusMonitor;
@@ -275,7 +274,6 @@ public class Deconvolution implements Runnable {
 		monitors.log("Path: " + checkPath(path));
 		
 		RealSignal image = openImage();
-
 		if (image == null) {
 			monitors.error("Image: Not valid " + command);
 			report.add("Image: Not valid");
@@ -283,9 +281,9 @@ public class Deconvolution implements Runnable {
 				System.exit(-101);
 			return;
 		}
-		report.add("Image: " + image.dimAsString());
-
-		monitors.log("Image: " + image.nx + " x " + image.ny + " x " + image.nz);
+		report.add(  "Image: " + image.dimAsString());
+		monitors.log("Image: " + image.dimAsString());
+		
 		RealSignal y = padding.pad(monitors, getApodization().apodize(monitors, image));
 
 		RealSignal psf = openPSF();
@@ -296,9 +294,9 @@ public class Deconvolution implements Runnable {
 				System.exit(-102);
 			return;
 		}
-		report.add("PSF: " + psf.dimAsString());
-
-		monitors.log("PSF: " + psf.nx + " x " + psf.ny + " x " + psf.nz);
+		report.add(  "PSF: " + psf.dimAsString());
+		monitors.log("PSF: " + psf.dimAsString());
+		
 		monitors.log("PSF: normalization " + (factorNormalization <= 0 ? "no" : factorNormalization));
 		RealSignal h = psf.changeSizeAs(y).normalize(factorNormalization);
 
@@ -355,7 +353,6 @@ public class Deconvolution implements Runnable {
 			System.out.println("End");
 			System.exit(0);
 		}
-	
 	}
 
 	/**

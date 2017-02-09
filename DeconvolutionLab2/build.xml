@@ -3,6 +3,7 @@
 
 	<property name="imagej"		location="../../ImageJ/plugins"/>		
 	<property name="fiji"		location="../../Fiji-deconv.app/plugins"/>		
+	<property name="matlab"		location="/Applications/MATLAB_R2014b.app/java/"/>		
 
 	<target name="build">
 		<mkdir dir="bin"/>
@@ -19,6 +20,7 @@
 		</jar>		
 		
 		<copy toDir="${fiji}" file="../DeconvolutionLab_2.jar" />
+		<copy toDir="${matlab}" file="../DeconvolutionLab_2.jar" />
 		
 		<copy toDir="${imagej}" file="../DeconvolutionLab_2.jar" />
 

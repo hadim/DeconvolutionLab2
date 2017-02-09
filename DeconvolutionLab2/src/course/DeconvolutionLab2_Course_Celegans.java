@@ -26,8 +26,18 @@ public class DeconvolutionLab2_Course_Celegans implements PlugIn {
 		new File(res).mkdir();
 		System.setProperty("user.dir", res);
 		
-		run(" -algorithm I ", "IN_");
-		run(" -algorithm RIF 0.001 ", "RIF_");
+		run(" -algorithm RIF 0.000001 ", "RIF6_");
+		run(" -algorithm RIF 0.0000001 ", "RIF7_");
+	//run(" -algorithm RL 100  ", "RL_");
+		run(" -algorithm LW+ 200 1 ", "LW+_");
+		//run(" -algorithm I ", "IN_");
+		//run(" -algorithm RIF 0.001 ", "RIF3_");
+		//run(" -algorithm RIF 0.0001 ", "RIF4_");
+		//run(" -algorithm RIF 0.00001 ", "RIF5_");
+		//run(" -algorithm VC 100 ", "VC");
+		//run(" -algorithm RLTV 10 0.1 ", "RLTV");
+		//run(" -algorithm FISTA 50 1 0.1 ", "FISTA");
+		//run(" -algorithm ISTA 50 1 0.1 ", "ISTA");
 	}
 	
 	private void run(String a, String name) {

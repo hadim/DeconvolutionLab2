@@ -1,3 +1,14 @@
+import ij.ImagePlus;
+import ij.WindowManager;
+
+import java.io.File;
+
+import matlab.Converter;
+import deconvolution.Deconvolution;
+import deconvolutionlab.Config;
+import deconvolutionlab.Lab;
+import deconvolutionlab.dialog.LabDialog;
+
 /*
  * DeconvolutionLab2
  * 
@@ -29,15 +40,45 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ij.plugin.PlugIn;
-import deconvolutionlab.Lab;
-import deconvolutionlab.Platform;
+/**
+ * This class is dedicated to the Matlab interface for DeconvolutionLab2
+ * @author sage
+ *
+ */
+public class DL2 {
 
-public class DeconvolutionLab2_Help implements PlugIn {
+	public static void lab() {
+		String config = System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config";
+		Config.getInstance(config);
+		LabDialog dialog = new LabDialog();
+		dialog.setVisible(true);
+	}
 
-	@Override
-	public void run(String arg) {
-		Lab.getInstance(Platform.IMAGEJ);
+	public static void run(String command) {
+		return;
+	}	
+	
+	public static void launch(String command) {
+		return;
+	}	
+
+	public static Object get(String image) {
+		ImagePlus imp = WindowManager.getCurrentImage();
+		if (imp != null)
+			return Converter.get(imp);
+		return null;
+	}	
+
+	public static void run(Object image, Object psf, String algo) {
+		Converter.createImage("input", image, true);
+		Converter.createImage("psf", psf, true);
+		String cmd = " -image platform input -psf platform psf -algorithm " + algo;
+		Deconvolution d = new Deconvolution(cmd);
+		d.deconvolve(false);
+	}
+	
+	public static void help() {
 		Lab.help();
 	}
+
 }
