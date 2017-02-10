@@ -37,7 +37,9 @@ public abstract class AbstractFFTLibrary {
 
 	protected boolean installed = false;
 	protected ArrayList<AbstractFFT> ffts = new ArrayList<AbstractFFT>();
-	
+
+	public abstract AbstractFFT getDefaultFFT();
+
 	public abstract String getLibraryName();
 	public abstract String getCredit();
 	public abstract String getLicence();

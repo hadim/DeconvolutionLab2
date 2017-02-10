@@ -31,18 +31,21 @@
 
 package fft.jtransforms;
 
+import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 
 public class JTransformsLibrary extends AbstractFFTLibrary {
 
 	public JTransformsLibrary() {
+		System.out.println("JTransformsLibrary");
 		try {
-			Class.forName("edu.emory.mathcs.jtransforms.fft.FloatFFT_3D");
-			Class.forName("edu.emory.mathcs.jtransforms.fft.FloatFFT_1D");
-			Class.forName("edu.emory.mathcs.jtransforms.fft.FloatFFT_2D");
+			Class.forName("org.jtransforms.fft.FloatFFT_3D");
+			Class.forName("org.jtransforms.fft.FloatFFT_1D");
+			Class.forName("org.jtransforms.fft.FloatFFT_2D");
 			installed = true;
 		}
 		catch (ClassNotFoundException ex) {
+			System.out.println("" + ex);
 			installed = false;
 		}
 		if (installed) {
@@ -75,5 +78,10 @@ public class JTransformsLibrary extends AbstractFFTLibrary {
 	@Override
 	public String getLicence() {
 		return "<h1>JTransforms of Piotr Wendykier</h1>" + "<p>https://sites.google.com/site/piotrwendykier/software/jtransforms" + "<p>JTransforms is distributed under the terms of the BSD-2-Clause license." + "<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS " + "AS IS AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT " + "LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS" + "FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT " + "HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, " + "SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED " + "TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; " + "OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, " + "WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR " + "OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED " + "OF THE POSSIBILITY OF SUCH DAMAGE.";
+	}
+
+	@Override
+	public AbstractFFT getDefaultFFT() {
+		return new JTransforms();
 	}
 }

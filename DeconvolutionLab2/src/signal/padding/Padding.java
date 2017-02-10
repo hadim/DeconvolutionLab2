@@ -161,7 +161,7 @@ public class Padding {
 		if (padX instanceof NoPadding && padY instanceof NoPadding && 
 			padZ instanceof NoPadding && (minExtensionX + minExtensionY + minExtensionZ == 0)) {
 			nx = ny = nz = -1;
-			return input;
+			return input.duplicate();
 		}
 		nx = input.nx;
 		ny = input.ny;
@@ -174,7 +174,7 @@ public class Padding {
 		if (lx == nx)
 		if (ly == ny)
 		if (lz == nz)
-			return input;
+			return input.duplicate();
 		
 		int ox = (lx - nx) / 2;
 		int oy = (ly - ny) / 2;

@@ -126,7 +126,8 @@ public class Lab {
 			for (AbstractFFTLibrary library : libraries) {
 				RealSignal y = new Sphere(3, 1).generate(40, 30, 20);
 				double chrono = System.nanoTime();
-				AbstractFFT fft = FFT.createDefaultFFT(monitors, y.nx, y.ny, y.nz);
+				AbstractFFT fft = library.getDefaultFFT();
+				fft.init(monitors, y.nx, y.ny, y.nz);
 				RealSignal x = fft.inverse(fft.transform(y));
 				chrono = System.nanoTime() - chrono;
 				double residu = y.getEnergy() - x.getEnergy();

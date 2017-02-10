@@ -95,6 +95,7 @@ public class Command {
 		ArrayList<CommandSegment> segments = new ArrayList<CommandSegment>();
 		for (String keyword : keywords)
 			segments.addAll(findSegment(command, keyword));
+		Collections.sort(segments);
 
 		ArrayList<Token> tokens = new ArrayList<Token>();
 		for(int i=0; i<segments.size(); i++) {
@@ -104,7 +105,6 @@ public class Command {
 			Token token = new Token(keyword, command, begin, end);
 			tokens.add(token);
 		}
-
 		/*
 		for (int i = 0; i < segments.size(); i++) {
 			CommandSegment segment = segments.get(i);
@@ -145,19 +145,10 @@ public class Command {
 
 		while (matcher.find()) {
 			segments.add(new CommandSegment(keyword, matcher.start()));
-			System.out.println(" " + "," + matcher.end() + " " + matcher.group());
 		}
 
-		Collections.sort(segments);
 		return segments;
 	}
-	/*
-	 * public static ArrayList<CommandSegment> findSegment(String command,
-	 * String key) { int index = -1; ArrayList<CommandSegment> segments = new
-	 * ArrayList<CommandSegment>(); do { index = command.indexOf(key, index +
-	 * 1); if (index >= 0) { segments.add(new CommandSegment(key, index +
-	 * key.length())); } } while (index >= 0); return segments; }
-	 */
 
 	public static AbstractAlgorithm decodeAlgorithm(Token token, Controller controller) {
 

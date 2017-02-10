@@ -35,6 +35,7 @@ import java.io.File;
 import java.security.CodeSource;
 
 import deconvolutionlab.monitor.Monitors;
+import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 import jfftw.complex.nd.Plan;
 
@@ -196,6 +197,11 @@ public class FFTWLibrary extends AbstractFFTLibrary {
 			found = false;
 		}
 		return found;
+	}
+	
+	@Override
+	public AbstractFFT getDefaultFFT() {
+		return new FFTW3D();
 	}
 
 }

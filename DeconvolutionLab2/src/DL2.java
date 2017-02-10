@@ -1,4 +1,5 @@
 import ij.ImagePlus;
+import ij.Macro;
 import ij.WindowManager;
 
 import java.io.File;
@@ -55,11 +56,11 @@ public class DL2 {
 	}
 
 	public static void run(String command) {
-		return;
+		new Deconvolution(Macro.getOptions()).deconvolve(false);
 	}	
 	
 	public static void launch(String command) {
-		return;
+		new Deconvolution(Macro.getOptions()).launch("matlab", false);
 	}	
 
 	public static Object get(String image) {
@@ -79,6 +80,15 @@ public class DL2 {
 	
 	public static void help() {
 		Lab.help();
+	}
+	
+	public static void clear() {
+		int ids[] = WindowManager.getIDList();
+		for(int id : ids) {
+			ImagePlus imp = WindowManager.getImage(id);
+			if (imp != null)
+				imp.close();
+		}
 	}
 
 }

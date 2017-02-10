@@ -67,10 +67,10 @@ public class Deconvolution implements Runnable {
 	private Controller			controller;
 	private OutputCollection	outs;
 
-	private Padding				padding				= new Padding();
-	private Apodization			apodization			= new Apodization();
-	private double				factorNormalization	= 1.0;
-	private AbstractFFTLibrary	fftlib;
+	private Padding				pad				= new Padding();
+	private Apodization			apo				= new Apodization();
+	private double				norm			= 1.0;
+	private AbstractFFTLibrary	fft;
 
 	private String				command				= "";
 	private boolean				live				= false;
@@ -132,11 +132,11 @@ public class Deconvolution implements Runnable {
 			frame.setVisible(true);
 		}
 
-		if (fftlib == null) {
+		if (fft == null) {
 			run();
 			return;
 		}
-		if (!fftlib.isMultithreadable()) {
+		if (!fft.isMultithreadable()) {
 			run();
 			return;
 		}
@@ -174,7 +174,6 @@ public class Deconvolution implements Runnable {
 			monitors.add(m);
 			d.addTableMonitor("Monitor", m);
 		}
-
 	}
 
 	public void decode() {
@@ -189,10 +188,10 @@ public class Deconvolution implements Runnable {
 		controller = new Controller();
 		outs = new OutputCollection();
 
-		padding = new Padding();
-		apodization = new Apodization();
-		factorNormalization = 1.0;
-		fftlib = FFT.getLibraryByName("Academic");
+		pad = new Padding();
+		apo = new Apodization();
+		norm = 1.0;
+		fft = FFT.getLibraryByName("Academic");
 
 		live = false;
 
@@ -216,14 +215,14 @@ public class Deconvolution implements Runnable {
 			}
 
 			if (token.keyword.equalsIgnoreCase("-fft"))
-				fftlib = FFT.getLibraryByName(token.parameters);
+				fft = FFT.getLibraryByName(token.parameters);
 
 			if (token.keyword.equalsIgnoreCase("-pad"))
-				padding = Command.decodePadding(token);
+				pad = Command.decodePadding(token);
 			if (token.keyword.equalsIgnoreCase("-apo"))
-				apodization = Command.decodeApodization(token);
+				apo = Command.decodeApodization(token);
 			if (token.keyword.equalsIgnoreCase("-norm"))
-				factorNormalization = Command.decodeNormalization(token);
+				norm = Command.decodeNormalization(token);
 			if (token.keyword.equalsIgnoreCase("-constraint"))
 				Command.decodeController(token, controller);
 			if (token.keyword.equalsIgnoreCase("-time"))
@@ -256,7 +255,7 @@ public class Deconvolution implements Runnable {
 			apoXY = apos.get(0);
 		if (apos.size() >= 2)
 			apoZ = apos.get(1);
-		this.apodization = new Apodization(apoXY, apoXY, apoZ);
+		this.apo = new Apodization(apoXY, apoXY, apoZ);
 	}
 
 	@Override
@@ -284,8 +283,6 @@ public class Deconvolution implements Runnable {
 		report.add(  "Image: " + image.dimAsString());
 		monitors.log("Image: " + image.dimAsString());
 		
-		RealSignal y = padding.pad(monitors, getApodization().apodize(monitors, image));
-
 		RealSignal psf = openPSF();
 		if (psf == null) {
 			monitors.error("PSF: not valid");
@@ -297,8 +294,6 @@ public class Deconvolution implements Runnable {
 		report.add(  "PSF: " + psf.dimAsString());
 		monitors.log("PSF: " + psf.dimAsString());
 		
-		monitors.log("PSF: normalization " + (factorNormalization <= 0 ? "no" : factorNormalization));
-		RealSignal h = psf.changeSizeAs(y).normalize(factorNormalization);
 
 		if (algo == null) {
 			monitors.error("Algorithm: not valid");
@@ -313,16 +308,7 @@ public class Deconvolution implements Runnable {
 				System.exit(-104);
 			return;
 		}
-
-		AbstractFFT fft;
-		if (fftlib != null)
-			fft = FFT.createFFT(monitors, fftlib, image.nx, image.ny, image.nz);
-		else
-			fft = FFT.createDefaultFFT(monitors, image.nx, image.ny, image.nz);
-		report.add("FFT: " + fft.getName());
-
-		algo.setFFT(fft);
-		controller.setFFT(fft);
+		report.add("FFT: " + fft.getLibraryName());
 
 		algo.setController(controller);
 		if (outs != null) {
@@ -333,9 +319,7 @@ public class Deconvolution implements Runnable {
 		monitors.log("Algorithm: " + algo.getName());
 		report.add("Algorithm: " + algo.getName());
 
-		RealSignal x = algo.run(monitors, y, h, true);
-
-		RealSignal result = padding.crop(monitors, x);
+		RealSignal result = algo.run(monitors, image, psf, fft, pad, apo, norm, true);
 
 		if (outs != null)
 			outs.executeFinal(monitors, result, controller);
@@ -368,12 +352,12 @@ public class Deconvolution implements Runnable {
 		else
 			lines.add("<b>Image</b>: " + image.parameters);
 
-		String norm = (factorNormalization < 0 ? " (no normalization)" : " (normalization to " + factorNormalization + ")");
+		String normf = (norm < 0 ? " (no normalization)" : " (normalization to " + norm + ")");
 		Token psf = Command.extract(command, "-psf");
 		if (psf == null)
 			lines.add("<b>PSF</b>: <span color=\"red\">keyword -psf not found</span>");
 		else
-			lines.add("<b>PSF</b>: " + psf.parameters + norm);
+			lines.add("<b>PSF</b>: " + psf.parameters + normf);
 
 		if (algo == null) {
 			lines.add("<b>Algorithm</b>:  <span color=\"red\">not valid</span>");
@@ -385,8 +369,8 @@ public class Deconvolution implements Runnable {
 			lines.add("<b>Stopping Criteria</b>: " + controller.getStoppingCriteria(algo));
 			lines.add("<b>Reference</b>: " + controller.getReference());
 			lines.add("<b>Stats</b>: " + controller.getShowStats() + " " + controller.getSaveStats());
-			lines.add("<b>Padding</b>: " + padding.toString());
-			lines.add("<b>Apodization</b>: " + apodization.toString());
+			lines.add("<b>Padding</b>: " + pad.toString());
+			lines.add("<b>Apodization</b>: " + apo.toString());
 			if (algo.getFFT() != null)
 				lines.add("<b>FFT</b>: " + algo.getFFT().getName());
 		}
@@ -412,11 +396,11 @@ public class Deconvolution implements Runnable {
 			lines.add("No valid input image");
 			return lines;
 		}
-		if (padding == null) {
+		if (pad == null) {
 			lines.add("No valid padding");
 			return lines;
 		}
-		if (apodization == null) {
+		if (apo == null) {
 			lines.add("No valid apodization");
 			return lines;
 		}
@@ -431,12 +415,10 @@ public class Deconvolution implements Runnable {
 		}
 
 		Controller controller = algo.getController();
-		RealSignal y = padding.pad(monitors, getApodization().apodize(monitors, image));
-		RealSignal h = psf.changeSizeAs(y).normalize(factorNormalization);
 
 		int iter = controller.getIterationMax();
 		algo.getController().setIterationMax(1);
-		RealSignal x = algo.run(monitors, y, h, true);
+		RealSignal x = algo.run(monitors, image, psf, fft, pad, apo, norm, true);
 		Lab.show(monitors, x, "Estimate after 1 iteration");
 		lines.add("Time: " + NumFormat.seconds(controller.getTimeNano()));
 		lines.add("Peak Memory: " + controller.getMemoryAsString());
@@ -451,16 +433,16 @@ public class Deconvolution implements Runnable {
 			lines.add("No valid input image");
 			return lines;
 		}
-		if (padding == null) {
+		if (pad == null) {
 			lines.add("No valid padding");
 			return lines;
 		}
-		if (apodization == null) {
+		if (apo == null) {
 			lines.add("No valid apodization");
 			return lines;
 		}
 
-		RealSignal signal = padding.pad(monitors, getApodization().apodize(monitors, image));
+		RealSignal signal = pad.pad(monitors, getApodization().apodize(monitors, image));
 		lines.add("<b>Image</b>");
 		lines.add("Original size " + image.dimAsString() + " padded to " + signal.dimAsString());
 		lines.add("Original: " + formatStats(image));
@@ -477,11 +459,11 @@ public class Deconvolution implements Runnable {
 			lines.add("No valid input image");
 			return lines;
 		}
-		if (padding == null) {
+		if (pad == null) {
 			lines.add("No valid padding");
 			return lines;
 		}
-		if (apodization == null) {
+		if (apo == null) {
 			lines.add("No valid apodization");
 			return lines;
 		}
@@ -492,14 +474,14 @@ public class Deconvolution implements Runnable {
 			return lines;
 		}
 
-		RealSignal signal = padding.pad(monitors, getApodization().apodize(monitors, image));
+		RealSignal signal = pad.pad(monitors, getApodization().apodize(monitors, image));
 		RealSignal h = psf.changeSizeAs(signal);
 		lines.add("<b>PSF</b>");
 		lines.add("Original size " + psf.dimAsString() + " padded to " + h.dimAsString());
 
 		String e = NumFormat.nice(h.getEnergy());
 
-		h.normalize(factorNormalization);
+		h.normalize(norm);
 		lines.add("Original: " + formatStats(psf));
 		lines.add("Preprocessing: " + formatStats(h));
 		lines.add("Energy = " + e + " and after normalization=" + NumFormat.nice(h.getEnergy()));
@@ -524,12 +506,12 @@ public class Deconvolution implements Runnable {
 		algo.getController().abort();
 	}
 
-	public Padding getPadding1() {
-		return padding;
+	public Padding getPadding() {
+		return pad;
 	}
 
 	public Apodization getApodization() {
-		return apodization;
+		return apo;
 	}
 
 	public OutputCollection getOuts() {

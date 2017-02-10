@@ -31,6 +31,7 @@
 
 package fft.academic;
 
+import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 
 public class AcademicLibrary extends AbstractFFTLibrary {
@@ -71,6 +72,11 @@ public class AcademicLibrary extends AbstractFFTLibrary {
 	@Override
 	public String getLibraryName() {
 		return "Academic";
+	}
+	
+	@Override
+	public AbstractFFT getDefaultFFT() {
+		return new Academic();
 	}
 
 }

@@ -31,7 +31,6 @@
 
 import java.io.File;
 
-import matlab.Converter;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolutionlab.Config;
@@ -51,37 +50,46 @@ public class DeconvolutionLab2 {
 		Lab.getInstance(Platform.STANDALONE);
 
 		if (arg.length == 0) {
+			System.out.println("Starting lab");
 			lab(arg);
 			return;
 		}
 
 		String flag = arg[0].trim().toLowerCase();
 		if (flag.equalsIgnoreCase("help")) {
+			System.out.println("Starting help");
 			help();
 			return;
 		}
 
-		if (flag.equalsIgnoreCase("lab")) {
+		else if (flag.equalsIgnoreCase("lab")) {
+			System.out.println("Starting lab");
 			lab(arg);
 		}
 
-		if (flag.equalsIgnoreCase("fft")) {
+		else if (flag.equalsIgnoreCase("fft")) {
+			System.out.println("Starting fft");
 			Lab.checkFFT(Monitors.createDefaultMonitor());
 		}
 
-		if (flag.equalsIgnoreCase("run")) {
+		else if (flag.equalsIgnoreCase("run")) {
+			System.out.println("Starting run");
 			String cmd = "";
 			for (int i = 1; i < arg.length; i++)
 				cmd += arg[i] + " ";
 			new Deconvolution(cmd).deconvolve(true);
 		}
 
-		if (flag.equalsIgnoreCase("launch")) {
+		else if (flag.equalsIgnoreCase("launch")) {
+			System.out.println("Starting launch");
 			String cmd = "";
 			for (int i = 1; i < arg.length; i++)
 				cmd += arg[i] + " ";
 			new Deconvolution(cmd).launch("", true);
 		}
+		else 
+			System.out.println("" + flag +  " command not found");
+			
 	}
 
 	private static void lab(String arg[]) {

@@ -37,12 +37,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import lab.tools.NumFormat;
 import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFT;
+import fft.AbstractFFTLibrary;
 import fft.FFT;
+import lab.tools.NumFormat;
 import signal.Operations;
 import signal.RealSignal;
+import signal.apodization.Apodization;
+import signal.padding.Padding;
 
 /**
  * This class is the common part of every algorithm of deconvolution.
@@ -54,8 +57,6 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 
 	protected RealSignal	y			= null;
 	protected RealSignal	h			= null;
-	protected RealSignal	reference	= null;
-
 	protected Controller	controller	= null;
 	protected AbstractFFT	fft			= null;
 
@@ -85,12 +86,32 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 
 	public abstract double[] getDefaultParameters();
 
-	public RealSignal run(Monitors monitors, RealSignal image, RealSignal psf, boolean threaded) {
+	public RealSignal run(Monitors monitors, 
+			RealSignal image, RealSignal psf, 
+			AbstractFFTLibrary fftlib, Padding pad, Apodization apo, double norm, boolean threaded) {
+
+		if (image == null)
+			return null;
+		if (psf == null)
+			return null;
+		
+		if (fftlib != null)
+			fft = FFT.createFFT(monitors, fftlib, image.nx, image.ny, image.nz);
+		else
+			fft = FFT.createDefaultFFT(monitors, image.nx, image.ny, image.nz);
+
+		controller.setFFT(fft);
+
+		y = (pad == null ? image.duplicate() : pad.pad(monitors, apo.apodize(monitors, image)));
+		monitors.log("Input: " + y.dimAsString());
+		
+		h = psf.changeSizeAs(y).normalize(norm);
+		monitors.log("PSF: " + h.dimAsString());
+
+		monitors.log("PSF: normalization " + (norm <= 0 ? "no" : norm));
 
 		String iterations = (isIterative() ? controller.getIterationMax() + " iterations" : "direct");
 		monitors.log(getShortname() + " is starting (" + iterations + ")");
-		y = image.duplicate();
-		h = psf.duplicate();
 		controller.setMonitors(monitors);
 		controller.start(y);
 		h = Operations.circularShift(h);
@@ -135,7 +156,10 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 
 		controller.finish(x);
 		monitors.log(getName() + " is finished");
-		return x;
+
+		RealSignal result = pad.crop(monitors, x);
+
+		return result;
 	}
 
 	public AbstractFFT getFFT() {

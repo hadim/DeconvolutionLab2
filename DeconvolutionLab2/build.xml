@@ -15,13 +15,12 @@
         <jar destfile="../DeconvolutionLab_2.jar" basedir="bin">
 			<manifest>
 			<attribute name="Main-Class" value="DeconvolutionLab2"/>
-			<attribute name="Class-Path" value="ij.jar jtransforms.jar"/>
+			<attribute name="Class-Path" value="."/>
 			</manifest>
 		</jar>		
 		
 		<copy toDir="${fiji}" file="../DeconvolutionLab_2.jar" />
 		<copy toDir="${matlab}" file="../DeconvolutionLab_2.jar" />
-		
 		<copy toDir="${imagej}" file="../DeconvolutionLab_2.jar" />
 
 	</target>

@@ -31,9 +31,10 @@
 
 package fft.jtransforms;
 
+import org.jtransforms.fft.FloatFFT_1D;
+import org.jtransforms.fft.FloatFFT_2D;
+
 import deconvolutionlab.monitor.Monitors;
-import edu.emory.mathcs.jtransforms.fft.FloatFFT_1D;
-import edu.emory.mathcs.jtransforms.fft.FloatFFT_2D;
 import fft.AbstractFFT;
 import fft.Separability;
 import signal.ComplexSignal;

@@ -91,12 +91,10 @@ public class LanguageModule extends AbstractModule implements ActionListener {
 	public void update() {
 		if (cmb.getSelectedIndex() == 0) {
 			language.clear();
-			String mode = "java -jar DeconvolutionLab_2.jar ";
-			if (gui.getSelectedIndex() == 0)
-				mode += " Run ";
-			else
-				mode += " Launch ";
-			language.append("p", mode + Command.command());
+			String run = gui.getSelectedIndex() == 0 ? " Run " : " Launch ";
+			language.append("p", "java -jar DeconvolutionLab_2.jar " + run + Command.command());
+			language.append("p", "");
+			language.append("p", "java -cp JTransforms.jar:DeconvolutionLab_2.jar DeconvolutionLab2 "+ run + Command.command());
 		}
 		else if (cmb.getSelectedIndex() == 1) {
 			language.clear();
