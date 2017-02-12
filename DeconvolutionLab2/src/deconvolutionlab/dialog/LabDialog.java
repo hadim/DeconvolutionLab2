@@ -41,6 +41,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -49,6 +50,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.JToolBar;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -75,9 +78,11 @@ import deconvolutionlab.modules.LanguageModule;
 import deconvolutionlab.modules.LicenceModule;
 import deconvolutionlab.modules.OutputModule;
 import deconvolutionlab.modules.PSFModule;
+import deconvolutionlab.modules.PathModule;
 import deconvolutionlab.modules.WatcherModule;
 import lab.component.JPanelImage;
 import lab.system.SystemPanel;
+import lab.tools.Files;
 
 public class LabDialog extends JDialog implements ComponentListener, ActionListener, ChangeListener, WindowListener {
 
@@ -88,8 +93,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 	private JButton				bnBatch		= new JButton("Batch");
 	private JButton				bnRun		= new JButton("Run");
 	private JButton				bnLaunch	= new JButton("Launch");
-	private JButton				bnSystem	= new JButton("System");
-
+	
 	private ImageModule			image;
 	private PSFModule			psf;
 	private AlgorithmModule		algo;
@@ -130,7 +134,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 		watcher = new WatcherModule(false);
 
 		doDialog();
-		modules = new AbstractModule[] { image, psf, algo, output, controller, border, fourier, watcher, batch };
+		modules = new AbstractModule[] {image, psf, algo, output, controller, border, fourier, watcher, batch };
 	
 		Command.active(modules, command);
 		Command.command();
@@ -157,14 +161,14 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 		panelAdvanc = new GroupedModulePanel(buildAdvancedPanel(), this);
 		panelScript = new GroupedModulePanel(buildProgrammingPanel(), this);
 		panelAbout = new GroupedModulePanel(buildAboutPanel(), this);
+		Border b2 = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 		JPanelImage bottom = new JPanelImage("celegans.jpg");
-		bottom.setLayout(new GridLayout(1, 7));
-		Border b2 = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+		bottom.setBorder(b2);
+	
+		bottom.setLayout(new GridLayout(1, 5));
 		bottom.setBorder(b2);
 
 		bottom.add(bnHelp);
-		bottom.add(bnSystem);
-		//bottom.add(bnQuit);
 		bottom.add(bnClose);
 		bottom.add(bnBatch);
 		bottom.add(bnRun);
@@ -176,23 +180,15 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 		tab.add("About", panelAbout);
 		tab.addChangeListener(this);
 
-		JPanel base = new JPanel(new BorderLayout());
-		base.add(bottom, BorderLayout.CENTER);
-		//base.add(statusBar, BorderLayout.SOUTH);
-		//PanelImage pi = new PanelImage("logo.png", 380, 75);
-		//pi.setPreferredSize(new Dimension(400, 75));
-		//add(pi, BorderLayout.NORTH);
 		add(tab, BorderLayout.CENTER);
-		add(base, BorderLayout.SOUTH);
-
+		add(bottom, BorderLayout.SOUTH);
+		
 		bnBatch.addActionListener(this);
 		bnRun.addActionListener(this);
 		bnLaunch.addActionListener(this);
 		bnClose.addActionListener(this);
 		bnQuit.addActionListener(this);
 		bnHelp.addActionListener(this);
-		bnSystem.addActionListener(this);
-
 	}
 
 	@Override
@@ -200,9 +196,6 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 
 		if (e.getSource() == bnHelp) {
 			Lab.help();
-		}
-		else if (e.getSource() == bnSystem) {
-			SystemPanel.show(400, 400);
 		}
 		else if (e.getSource() == bnClose) {
 			Config.store();
@@ -332,7 +325,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 	@Override
 	public void componentHidden(ComponentEvent e) {
 	}
-
+	
 	public void sizeModule() {
 		if (tab.getSelectedIndex() == 0) sizePanel(panelDeconv);
 		if (tab.getSelectedIndex() == 1) sizePanel(panelAdvanc);

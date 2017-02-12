@@ -58,15 +58,7 @@ public class Controller {
 	private boolean				doTime				= false;
 	private boolean				doReference			= false;
 	private boolean				doConstraint		= false;
-	private boolean				doShowStats			= false;
-	private boolean				doSaveStats			= false;
 	private boolean				abort				= false;
-
-	private int					snapshotResidu		= 0;
-	private int					snapshotReference	= 0;
-	private int					snapshotConstraint	= 0;
-	private int					snapshotSaveStats	= 0;
-	private int					snapshotShowStats	= 0;
 
 	private double				timeStarting		= 0;
 	private double				memoryStarting		= 0;
@@ -99,8 +91,6 @@ public class Controller {
 		doTime = false;
 		doReference = false;
 		doConstraint = false;
-		doShowStats = false;
-		doSaveStats = false;
 	}
 
 	public void setMonitors(Monitors monitors) {
@@ -132,36 +122,21 @@ public class Controller {
 		this.timeMax = timeMax * 1e9;
 	}
 
-	public void setResiduStop(int snapshot, double residuMin) {
+	public void setResiduStop(double residuMin) {
 		this.doResidu = true;
-		this.snapshotResidu = snapshot;
 		this.residuMin = residuMin;
 	}
 
-	public void setReference(int snapshot, String referenceName) {
+	public void setReference(String referenceName) {
 		this.doReference = true;
-		this.snapshotReference = snapshot;
 		this.referenceName = referenceName;
 	}
 
-	public void setConstraint(int snapshot, Constraint.Mode constraint) {
+	public void setConstraint(Constraint.Mode constraint) {
 		this.doConstraint = true;
-		this.snapshotConstraint = snapshot;
 		this.constraint = constraint;
 	}
-
-	public void setSaveStats(int snapshot, String name) {
-		this.doSaveStats = true;
-		this.snapshotSaveStats = snapshot;
-		this.savestatsName = name;
-	}
-
-	public void setShowStats(int snapshot, String name) {
-		this.doShowStats = true;
-		this.snapshotShowStats = snapshot;
-		this.showstatsName = name;
-	}
-
+	
 	public void setOutputs(OutputCollection outs) {
 		this.outs = outs;
 	}
@@ -179,7 +154,7 @@ public class Controller {
 		if (doConstraint && x != null)
 			Constraint.setModel(x);
 
-		if (doReference && snapshotReference >= 1) {
+		if (doReference) {
 			refImage = new Deconvolution("-image file " + referenceName).openImage();
 			if (refImage == null)
 				monitors.error("Impossible to load the reference image " + referenceName);
@@ -187,21 +162,15 @@ public class Controller {
 				monitors.log("Reference image loaded");
 		}
 
-		if (doShowStats || doSaveStats)
-			if (monitors != null)
-				Lab.firstStats(monitors, showstatsName, this, doShowStats, doSaveStats);
+		if (outs != null)
+			outs.executeStarting(monitors, x, this);
 		this.prevImage = x;
 	}
 
 	public boolean ends(ComplexSignal X) {
-		boolean res = doResidu && snapshotResidu >= 1 ? (iterations % snapshotResidu == 0) : false;
-		boolean con = doConstraint && snapshotConstraint >= 1 ? (iterations % snapshotConstraint == 0) : false;
-		boolean ref = doReference && snapshotReference >= 1 ? (iterations % snapshotReference == 0) : false;
-		boolean sav = doSaveStats && snapshotSaveStats >= 1 ? (iterations % snapshotSaveStats == 0) : false;
-		boolean shw = doShowStats && snapshotShowStats >= 1 ? (iterations % snapshotShowStats == 0) : false;
 		boolean out = outs == null ? false : outs.hasShow(iterations);
 
-		if (con || res || ref || sav || shw || out) {
+		if (doConstraint || doResidu || doReference || out) {
 			if (fft == null)
 				fft = FFT.createDefaultFFT(monitors, X.nx, X.ny, X.nz);
 			x = new RealSignal(X.nx, X.ny, X.nz, false);
@@ -214,20 +183,12 @@ public class Controller {
 
 	public boolean ends(RealSignal x) {
 		this.x = x;
-		boolean res = doResidu && snapshotResidu >= 1 ? (iterations % snapshotResidu == 0) : false;
-		boolean con = doConstraint && snapshotConstraint >= 1 ? (iterations % snapshotConstraint == 0) : false;
-		boolean ref = doReference && snapshotReference >= 1 ? (iterations % snapshotReference == 0) : false;
-		boolean sav = doSaveStats && snapshotSaveStats >= 1 ? (iterations % snapshotSaveStats == 0) : false;
-		boolean shw = doShowStats && snapshotShowStats >= 1 ? (iterations % snapshotShowStats == 0) : false;
 
-		if (con || res || ref)
-			compute(iterations, x, con, res, ref);
-
-		if (sav || shw)
-			Lab.nextStats(monitors, showstatsName, this, sav, shw);
+		if (doConstraint || doResidu || doReference)
+			compute(iterations, x, doConstraint, doResidu, doReference);
 
 		if (outs != null)
-			outs.executeIterative(monitors, x, iterations, this);
+			outs.executeIterative(monitors, x, this, iterations);
 
 		iterations++;
 		double p = iterations * 100.0 / iterationsMax;
@@ -260,8 +221,8 @@ public class Controller {
 		if (con || res || ref)
 			compute(iterations, x, con, res, ref);
 
-		if (doShowStats || doSaveStats)
-			Lab.lastStats(monitors, savestatsName, this, doShowStats, doSaveStats);
+		if (outs != null)
+			outs.executeFinal(monitors, x, this);
 
 		monitors.log("Time: " + NumFormat.seconds(getTimeNano()) + " Peak:" + getMemoryAsString());
 		if (timer != null)
@@ -324,29 +285,20 @@ public class Controller {
 		return constraint;
 	}
 
-	public String getConstraintAsString() {
-		if (!doConstraint)
-			return "no";
-		if (constraint == Constraint.Mode.NO)
-			return "no";
-		else
-			return constraint.name().toLowerCase();
-	}
-
 	public String getReference() {
 		return doReference ? referenceName : "no ground-truth";
 	}
 
-	public String getShowStats() {
-		return doShowStats ? showstatsName : "no stats";
+	public String getConstraintAsString() {
+		if (!doConstraint)
+			return "no";
+		if (constraint == null)
+			return "null";
+		return constraint.name().toLowerCase();
 	}
 
-	public String getSaveStats() {
-		return doSaveStats ? savestatsName : "no stats";
-	}
-
-	public String getStoppingCriteria(AbstractAlgorithm algo) {
-		String stop = algo.isIterative() ? " iterations limit=" + getIterationMax() + " " : ", ";
+	public String getStoppingCriteriaAsString(AbstractAlgorithm algo) {
+		String stop = algo.isIterative() ? " iterations limit=" + getIterationMax() + ", " : "direct, ";
 		stop += doTime ? ", time limit=" + NumFormat.nice(timeMax * 1e-9) : " no time limit" + ", ";
 		stop += doResidu ? ", residu limit=" + NumFormat.nice(residuMin) : " no residu limit";
 		return stop;

@@ -43,7 +43,7 @@ import signal.RealSignal;
 public class Output {
 
 	public enum View {
-		STACK, SERIES, ORTHO, MIP, PLANAR, FIGURE
+		STACK, SERIES, ORTHO, MIP, PLANAR, FIGURE, STATS, PROFILE
 	};
 
 	public enum Dynamic {
@@ -204,14 +204,28 @@ public class Output {
 		return new String[] { view.name().toLowerCase() + fr, name, d, t, k, sh, sa, "" };
 	}
 
-	public void execute(Monitors monitors, RealSignal signal, Controller controller, int iter, boolean live) {
+	public void executeStarting(Monitors monitors, RealSignal signal, Controller controller) {
+		execute(monitors, signal, controller, true, false, false, 0);
+	}
+	
+	public void executeFinal(Monitors monitors, RealSignal signal, Controller controller) {
+		execute(monitors, signal, controller, false, false, true, 0);
+	}
+
+
+	public void executeIterative(Monitors monitors, RealSignal signal, Controller controller, int iter) {
+		execute(monitors, signal, controller, false, true, false, iter);
+	}
+	
+	public void execute(Monitors monitors, RealSignal signal, Controller controller, boolean start, boolean live, boolean finish, int iter) {
 		if (signal == null)
 			return;
+
 		String title = name;
 		if (live)
 			if (!is(iter))
 				return;
-		
+
 		if (controller != null && live) {
 			if (controller.getIterations() > 0) {
 				title += "@" + controller.getIterations();
@@ -219,7 +233,7 @@ public class Output {
 		}
 		RealSignal x = null;
 		Constraint constraint = new Constraint(monitors);
-				
+
 		switch (dynamic) {
 		case RESCALED:
 			x = signal.duplicate();
@@ -243,6 +257,13 @@ public class Output {
 		String filename = path + File.separator + title + ".tif";
 		
 		switch (view) {
+		case STATS:
+			if (start)
+				Lab.firstStats(monitors, name, controller.stats(name), show, save);
+			Lab.nextStats(monitors, title, controller.stats(name), show, save);
+			if (finish)
+				Lab.lastStats(monitors, name, controller.stats(name), show, save);
+			break;
 		case STACK:
 			if (show && !live)
 				Lab.show(monitors, x, title, type, (center ? x.nz / 2 : pz));
@@ -259,16 +280,20 @@ public class Output {
 			}
 			break;
 		case ORTHO:
-			orthoview(monitors, x, title, filename, live);
+			if (!start)
+				orthoview(monitors, x, title, filename, live);
 			break;
 		case FIGURE:
-			figure(monitors, x, title, filename, live);
+			if (!start)
+				figure(monitors, x, title, filename, live);
 			break;
 		case MIP:
-			mip(monitors, x, title, filename, live);
+			if (!start)
+				mip(monitors, x, title, filename, live);
 			break;
 		case PLANAR:
-			planar(monitors, x, title, filename, live);
+			if (!start)
+				planar(monitors, x, title, filename, live);
 			break;
 		default:
 			break;

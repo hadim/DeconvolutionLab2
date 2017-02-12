@@ -21,9 +21,9 @@ import fft.FFT;
 public class DeconvolutionLab2_Course_SpectralAnaylsis implements PlugIn {
 
 	private String desktop = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "Desktop";
-	private String root = desktop + File.separator + "DeconvolutionLab2-Course" + File.separator;
-	private String res = root + "Results" + File.separator + "star" + File.separator;
-	private String data = root + "Data" + File.separator + "star" + File.separator;
+	private String root = desktop + File.separator + "Deconvolution" + File.separator;
+	private String res = root + "results" + File.separator + "star" + File.separator;
+	private String data = root + "data" + File.separator + "star" + File.separator;
 	
 	public DeconvolutionLab2_Course_SpectralAnaylsis() {
 		
@@ -68,7 +68,7 @@ public class DeconvolutionLab2_Course_SpectralAnaylsis implements PlugIn {
 		h.plus(new Gaussian(0.5, 0.5, 0.5).generate(nx, ny, nz));
 		Lab.save(monitors, h, res + "psfPerturbated.tif");
 	
-		String psf = " -psf file psf.tif  -fft FFTW2";
+		String psf = " -psf file psf.tif -fft FFTW2";
 		String impulse = " -psf synthetic impulse 100.0 0.0 " + size;
 		String image = " -image file " + data + "ref.tif";
 		String constant = " -image constant 0 0 " + size;
@@ -140,11 +140,12 @@ public class DeconvolutionLab2_Course_SpectralAnaylsis implements PlugIn {
 		algo  = " -algorithm ICTM 100 1.5 0.001 -out mip @1 ICTM-ITER/I  ";
 		new Deconvolution(simulation  + algo + out("ICTM/ICTM")).deconvolve(false);
 		new File(res + "ICTM-ITER/I.tif").delete();
+
 	}
 
 	private static String out(String name) {
-		return " -out stack " + name + 
-			 " -out stack " + name + "-BYTE rescaled byte noshow";
+		return " -out stats " + name + 
+			 " -out stack " + name + " noshow -out ortho " + name + "-BYTE rescaled byte noshow";
 	}
 	
 	public static void main(String arg[]) {

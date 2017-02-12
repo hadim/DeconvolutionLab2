@@ -1,14 +1,14 @@
-import ij.ImagePlus;
-import ij.Macro;
-import ij.WindowManager;
-
 import java.io.File;
 
-import matlab.Converter;
 import deconvolution.Deconvolution;
 import deconvolutionlab.Config;
 import deconvolutionlab.Lab;
 import deconvolutionlab.dialog.LabDialog;
+import ij.ImagePlus;
+import ij.Macro;
+import ij.WindowManager;
+import matlab.Converter;
+import signal.RealSignal;
 
 /*
  * DeconvolutionLab2
@@ -56,11 +56,11 @@ public class DL2 {
 	}
 
 	public static void run(String command) {
-		new Deconvolution(Macro.getOptions()).deconvolve(false);
+		new Deconvolution(command).deconvolve(false);
 	}	
 	
 	public static void launch(String command) {
-		new Deconvolution(Macro.getOptions()).launch("matlab", false);
+		new Deconvolution(command).launch("matlab", false);
 	}	
 
 	public static Object get(String image) {
@@ -70,12 +70,13 @@ public class DL2 {
 		return null;
 	}	
 
-	public static void run(Object image, Object psf, String algo) {
-		Converter.createImage("input", image, true);
-		Converter.createImage("psf", psf, true);
-		String cmd = " -image platform input -psf platform psf -algorithm " + algo;
-		Deconvolution d = new Deconvolution(cmd);
-		d.deconvolve(false);
+	public static Object run(Object arrayImage, Object arrayPSF, String algo) {
+		RealSignal image = Converter.createRealSignal(arrayImage);
+		RealSignal psf = Converter.createRealSignal(arrayPSF);
+		String command = " -image platform input -psf platform psf -algorithm " + algo;
+		Deconvolution d = new Deconvolution(command);
+		RealSignal result = d.deconvolve(image, psf, false);
+		return Converter.createObject(result);
 	}
 	
 	public static void help() {
@@ -90,5 +91,149 @@ public class DL2 {
 				imp.close();
 		}
 	}
+
+	public static Object DIV(Object arrayImage, Object arrayPSF) {
+		return DIV(arrayImage, arrayPSF, "");
+	}
+	
+	public static Object DIV(Object arrayImage, Object arrayPSF, String options) {
+		RealSignal image = Converter.createRealSignal(arrayImage);
+		RealSignal psf = Converter.createRealSignal(arrayPSF);
+		String command = " -algorithm DIV " + options;
+		Deconvolution d = new Deconvolution(command);
+		RealSignal result = d.deconvolve(image, psf, false);
+		return Converter.createObject(result);
+	}
+
+	public static Object CONV(Object arrayImage, Object arrayPSF) {
+		return CONV(arrayImage, arrayPSF, "");
+	}
+	
+	public static Object CONV(Object arrayImage, Object arrayPSF, String options) {
+		RealSignal image = Converter.createRealSignal(arrayImage);
+		RealSignal psf = Converter.createRealSignal(arrayPSF);
+		String command = " -algorithm CONV " + options;
+		Deconvolution d = new Deconvolution(command);
+		RealSignal result = d.deconvolve(image, psf, false);
+		return Converter.createObject(result);
+	}
+
+	public static Object NIF(Object arrayImage, Object arrayPSF) {
+		return NIF(arrayImage, arrayPSF, "");
+	}
+	
+	public static Object NIF(Object arrayImage, Object arrayPSF, String options) {
+		RealSignal image = Converter.createRealSignal(arrayImage);
+		RealSignal psf = Converter.createRealSignal(arrayPSF);
+		String command = " -algorithm NIF " + options;
+		Deconvolution d = new Deconvolution(command);
+		RealSignal result = d.deconvolve(image, psf, false);
+		return Converter.createObject(result);
+	}
+
+	public static Object TRIF(Object arrayImage, Object arrayPSF, double regularizationFactor) {
+		return TRIF(arrayImage, arrayPSF, regularizationFactor, "");
+	}
+	
+	public static Object TRIF(Object arrayImage, Object arrayPSF, double regularizationFactor, String options) {
+		RealSignal image = Converter.createRealSignal(arrayImage);
+		RealSignal psf = Converter.createRealSignal(arrayPSF);
+		String command = " -algorithm TRIF " + regularizationFactor + " " + options;
+		Deconvolution d = new Deconvolution(command);
+		RealSignal result = d.deconvolve(image, psf, false);
+		return Converter.createObject(result);
+	}
+	
+	public static Object RIF(Object arrayImage, Object arrayPSF, double regularizationFactor) {
+		return RIF(arrayImage, arrayPSF, regularizationFactor, "");
+	}
+	
+	public static Object RIF(Object arrayImage, Object arrayPSF, double regularizationFactor, String options) {
+		RealSignal image = Converter.createRealSignal(arrayImage);
+		RealSignal psf = Converter.createRealSignal(arrayPSF);
+		String command = " -algorithm RIF " + regularizationFactor + " " + options;
+		Deconvolution d = new Deconvolution(command);
+		RealSignal result = d.deconvolve(image, psf, false);
+		return Converter.createObject(result);
+	}	
+	
+	public static Object RL(Object arrayImage, Object arrayPSF, double itmax) {
+		return RL(arrayImage, arrayPSF, itmax, "");
+	}
+	
+	public static Object RL(Object arrayImage, Object arrayPSF, double itmax, String options) {
+		RealSignal image = Converter.createRealSignal(arrayImage);
+		RealSignal psf = Converter.createRealSignal(arrayPSF);
+		String command = " -algorithm RL " + itmax + " " + options;
+		Deconvolution d = new Deconvolution(command);
+		RealSignal result = d.deconvolve(image, psf, false);
+		return Converter.createObject(result);
+	}
+	
+	public static Object RLTV(Object arrayImage, Object arrayPSF, double itmax, double regularizationFactor) {
+		return RLTV(arrayImage, arrayPSF, itmax, regularizationFactor, "");
+	}
+	
+	public static Object RLTV(Object arrayImage, Object arrayPSF, double itmax, double regularizationFactor, String options) {
+		RealSignal image = Converter.createRealSignal(arrayImage);
+		RealSignal psf = Converter.createRealSignal(arrayPSF);
+		String command = " -algorithm RLTV " + itmax + " " + regularizationFactor + " " + options;
+		Deconvolution d = new Deconvolution(command);
+		RealSignal result = d.deconvolve(image, psf, false);
+		return Converter.createObject(result);
+	}	
+
+	public static Object LW(Object arrayImage, Object arrayPSF, double itmax, double gamma) {
+		return LW(arrayImage, arrayPSF, itmax, gamma, "");
+	}
+	
+	public static Object LW(Object arrayImage, Object arrayPSF, double itmax, double gamma, String options) {
+		RealSignal image = Converter.createRealSignal(arrayImage);
+		RealSignal psf = Converter.createRealSignal(arrayPSF);
+		String command = " -algorithm LW " + itmax + " " + gamma + " " + options;
+		Deconvolution d = new Deconvolution(command);
+		RealSignal result = d.deconvolve(image, psf, false);
+		return Converter.createObject(result);
+	}
+
+	public static Object NNLS(Object arrayImage, Object arrayPSF, double itmax, double gamma) {
+		return LW(arrayImage, arrayPSF, itmax, gamma, "");
+	}
+	
+	public static Object NNLS(Object arrayImage, Object arrayPSF, double itmax, double gamma, String options) {
+		RealSignal image = Converter.createRealSignal(arrayImage);
+		RealSignal psf = Converter.createRealSignal(arrayPSF);
+		String command = " -algorithm LW+ " + itmax + " " + options;
+		Deconvolution d = new Deconvolution(command);
+		RealSignal result = d.deconvolve(image, psf, false);
+		return Converter.createObject(result);
+	}
+	
+	public static Object TM(Object arrayImage, Object arrayPSF, double itmax, double gamma, double lambda) {
+		return TM(arrayImage, arrayPSF, itmax, gamma, lambda, "");
+	}
+	
+	public static Object TM(Object arrayImage, Object arrayPSF, double itmax, double gamma, double lambda, String options) {
+		RealSignal image = Converter.createRealSignal(arrayImage);
+		RealSignal psf = Converter.createRealSignal(arrayPSF);
+		String command = " -algorithm TM " + itmax + " " + gamma + " " + lambda + " " + options;
+		Deconvolution d = new Deconvolution(command);
+		RealSignal result = d.deconvolve(image, psf, false);
+		return Converter.createObject(result);
+	}
+
+	public static Object ICTM(Object arrayImage, Object arrayPSF, double itmax, double gamma, double lambda) {
+		return ICTM(arrayImage, arrayPSF, itmax, gamma, lambda, "");
+	}
+	
+	public static Object ICTM(Object arrayImage, Object arrayPSF, double itmax, double gamma, double lambda, String options) {
+		RealSignal image = Converter.createRealSignal(arrayImage);
+		RealSignal psf = Converter.createRealSignal(arrayPSF);
+		String command = " -algorithm ICTM " + itmax + " " + gamma + " " + lambda + " " + options;
+		Deconvolution d = new Deconvolution(command);
+		RealSignal result = d.deconvolve(image, psf, false);
+		return Converter.createObject(result);
+	}
+
 
 }

@@ -54,7 +54,6 @@ import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolutionlab.Config;
 import lab.component.GridPanel;
-import lab.component.SpinnerRangeInteger;
 import lab.tools.Files;
 import signal.Constraint;
 
@@ -64,21 +63,16 @@ public class ControllerModule extends AbstractModule implements ActionListener, 
 
 	private JTextField			txtReference;
 	private JTextField			txtResidu;
-	private JTextField			txtSaveStats;
-	private JTextField			txtShowStats;
+	private JTextField			txtTime;
+	private JTextField			txtIterations;
+
 	private JComboBox<String>	cmbConstraint;
 
 	private JCheckBox			chkResidu;
 	private JCheckBox			chkReference;
 	private JCheckBox			chkConstraint;
-	private JCheckBox			chkSaveStats;
-	private JCheckBox			chkShowStats;
-
-	private SpinnerRangeInteger	snapshotResidu;
-	private SpinnerRangeInteger	snapshotConstraint;
-	private SpinnerRangeInteger	snapshotReference;
-	private SpinnerRangeInteger	snapshotSaveStats;
-	private SpinnerRangeInteger	snapshotShowStats;
+	private JCheckBox			chkTime;
+	private JCheckBox			chkItermax;
 
 	public ControllerModule(boolean expanded) {
 		super("Controller", "", "Default", "", expanded);
@@ -87,69 +81,48 @@ public class ControllerModule extends AbstractModule implements ActionListener, 
 	@Override
 	public String getCommand() {
 		String cmd = "";
-		int sr = snapshotResidu.get();
-		int sc = snapshotConstraint.get();
-		int sg = snapshotReference.get();
-		int ss = snapshotSaveStats.get();
-		int sd = snapshotShowStats.get();
-		
 		if (chkConstraint.isSelected())
-			cmd += "-constraint " +  (sc > 1 ? "@" + sc + " ": "") + cmbConstraint.getSelectedItem() + " ";
+			cmd += "-constraint " + cmbConstraint.getSelectedItem() + " ";
 		if (chkReference.isSelected())
-			cmd += "-reference " +  (sg > 1 ? "@" + sg + " " : "") +  txtReference.getText() + " ";
+			cmd += "-reference " +  txtReference.getText() + " ";
 		if (chkResidu.isSelected())
-			cmd += "-residu " +  (sr > 1 ? "@" + sr + " " : "") + txtResidu.getText() + " ";
-		if (chkSaveStats.isSelected())
-			cmd += "-savestats " +  (ss > 1 ? "@" + ss + " " : "") + txtSaveStats.getText() + " ";
-		if (chkShowStats.isSelected())
-			cmd += "-showstats " +  (sd > 1 ? "@" + sd + " " : "") + txtShowStats.getText() + " ";
+			cmd += "-residu " + txtResidu.getText() + " ";
+		if (chkTime.isSelected())
+			cmd += "-time " + txtTime.getText() + " ";
 		return cmd;
 	}
 
 	@Override
 	public JPanel buildExpandedPanel() {
 
-		snapshotResidu	= new SpinnerRangeInteger(10, 1, 99999, 1, "###");
-		snapshotConstraint	= new SpinnerRangeInteger(10, 1, 99999, 1, "###");
-		snapshotReference	= new SpinnerRangeInteger(10, 1, 99999, 1, "###");
-		snapshotSaveStats	= new SpinnerRangeInteger(10, 1, 99999, 1, "###");
-		snapshotShowStats	= new SpinnerRangeInteger(10, 1, 99999, 1, "###");
+		chkTime = new JCheckBox("Time Limitation (s)");
+		chkItermax = new JCheckBox("Early Stopping");
 		chkConstraint = new JCheckBox("Constraint");
 		chkResidu = new JCheckBox("Residu Minimun");
 		chkReference = new JCheckBox("Reference");
-		chkSaveStats = new JCheckBox("Save Stats");
-		chkShowStats = new JCheckBox("Show Stats");
 
 		bnBrowse = new JButton("Browse");
 		txtReference = new JTextField("");
 		txtResidu = new JTextField("0.01");
-		txtSaveStats = new JTextField("stats");
-		txtShowStats = new JTextField("stats");
-		
+		txtTime = new JTextField("3600");
+		txtIterations = new JTextField("Iteration max (mandatory)");
+		txtIterations.setEditable(false);
+			
 		cmbConstraint = new JComboBox<String>(Constraint.getContraintsAsArray());
 		txtReference.setPreferredSize(new Dimension(200, 20));
 
 		GridPanel pn = new GridPanel(true);
-	
+
+		pn.place(0, 0, chkItermax);
+		pn.place(0, 1, txtIterations);
 		pn.place(1, 0, chkResidu);
 		pn.place(1, 1, txtResidu);
-		pn.place(1, 2, snapshotResidu);
-
 		pn.place(4, 0, chkConstraint);
 		pn.place(4, 1, cmbConstraint);
-		pn.place(4, 2, snapshotConstraint);
-
-		pn.place(5, 0, chkSaveStats);
-		pn.place(5, 1, txtSaveStats);
-		pn.place(5, 2, snapshotSaveStats);
-
-		pn.place(6, 0, chkShowStats);
-		pn.place(6, 1, txtShowStats);
-		pn.place(6, 2, snapshotShowStats);
-
+		pn.place(5, 0, chkTime);
+		pn.place(5, 1, txtTime);
 		pn.place(7, 0, chkReference);
 		pn.place(7, 1, txtReference);
-		pn.place(7, 2, snapshotReference);
 		pn.place(8, 0, "Ground-truth file");
 		pn.place(8, 1, bnBrowse);
 
@@ -166,56 +139,45 @@ public class ControllerModule extends AbstractModule implements ActionListener, 
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		panel.add(scroll, BorderLayout.NORTH);
 
-		bnBrowse.addActionListener(this);
-		
-		chkResidu.addChangeListener(this);
-		chkReference.addChangeListener(this);
-		chkConstraint.addChangeListener(this);
-		chkSaveStats.addChangeListener(this);
-		chkShowStats.addChangeListener(this);
-		
-		snapshotResidu.addChangeListener(this);
-		snapshotConstraint.addChangeListener(this);
-		snapshotReference.addChangeListener(this);
-		snapshotShowStats.addChangeListener(this);
-		snapshotSaveStats.addChangeListener(this);
-
-		txtResidu.addKeyListener(this);
-		txtReference.addKeyListener(this);
-		txtSaveStats.addKeyListener(this);
-		txtShowStats.addKeyListener(this);
-		cmbConstraint.addActionListener(this);
-		getAction1Button().addActionListener(this);
-		
+			
 		Config.register(getName(), "residu.enable", chkResidu, false);
 		Config.register(getName(), "reference.enable", chkReference, false);
 		Config.register(getName(), "constraint.enable", chkConstraint, false);
-		Config.register(getName(), "showstats.enable", chkShowStats, false);
-		Config.register(getName(), "savestats.enable", chkSaveStats, false);
+		Config.register(getName(), "time.enable", chkTime, false);
+		Config.register(getName(), "itmax.enable", chkItermax, true);
 		
 		Config.register(getName(), "reference.value", txtReference, "");
 		Config.register(getName(), "residu.value", txtResidu, "0.01");
-		Config.register(getName(), "showstats.value", txtShowStats, "Stats");
-		Config.register(getName(), "savestats.value", txtSaveStats, "Stats");
+		Config.register(getName(), "time.value", txtTime, "3600");
 		Config.register(getName(), "constraint.value", cmbConstraint, "No");
 		
-		Config.register(getName(), "residu.snapshot", snapshotResidu, "1");
-		Config.register(getName(), "reference.snapshot", snapshotConstraint, "1");
-		Config.register(getName(), "constraint.snapshot", snapshotReference, "1");
-		Config.register(getName(), "showstats.snapshot", snapshotShowStats, "1");
-		Config.register(getName(), "savestats.snapshot", snapshotSaveStats, "1");
+		chkItermax.setSelected(true);
+
+		bnBrowse.addActionListener(this);
+		chkResidu.addChangeListener(this);
+		chkReference.addChangeListener(this);
+		chkConstraint.addChangeListener(this);
+		chkTime.addChangeListener(this);
+		chkItermax.addChangeListener(this);
+
+		txtResidu.addKeyListener(this);
+		txtReference.addKeyListener(this);
+		txtTime.addKeyListener(this);
+		cmbConstraint.addActionListener(this);
+		getAction1Button().addActionListener(this);
+
 		return panel;
 	}
 
 	private void update() {
+		chkItermax.setSelected(true);
 		setCommand(getCommand());
 		int count = 0;
 		count += (chkResidu.isSelected() ? 1 : 0);
-		count += (chkReference.isSelected() ? 1 : 0);
 		count += (chkConstraint.isSelected() ? 1 : 0);
-		count += (chkSaveStats.isSelected() ? 1 : 0);
-		count += (chkShowStats.isSelected() ? 1 : 0);
-		setSynopsis("" + count + (count >= 2 ? " controls" : " control "));
+		count += (chkTime.isSelected() ? 1 : 0);
+		count += (chkItermax.isSelected() ? 1 : 0);
+		setSynopsis("" + count + " stopping criteria");
 		Command.command();
 	}
 
@@ -232,44 +194,26 @@ public class ControllerModule extends AbstractModule implements ActionListener, 
 			chkResidu.removeChangeListener(this);
 			chkReference.removeChangeListener(this);
 			chkConstraint.removeChangeListener(this);
-			chkSaveStats.removeChangeListener(this);
-			chkShowStats.removeChangeListener(this);
-			
-			snapshotResidu.removeChangeListener(this);
-			snapshotConstraint.removeChangeListener(this);
-			snapshotReference.removeChangeListener(this);
-			snapshotShowStats.removeChangeListener(this);
-			snapshotSaveStats.removeChangeListener(this);
+			chkTime.removeChangeListener(this);
+			chkItermax.removeChangeListener(this);
 			
 			chkResidu.setSelected(false);
 			chkReference.setSelected(false);
 			chkConstraint.setSelected(false);
-			chkShowStats.setSelected(false);
-			chkSaveStats.setSelected(false);
+			chkTime.setSelected(false);
+			chkItermax.setSelected(true);
 			
 			txtReference.setText("");
 			txtResidu.setText("0.01");
-			txtShowStats.setText("Stats");
-			txtSaveStats.setText("Stats");
+			txtTime.setText("3600");
 			cmbConstraint.setSelectedIndex(0);
 			
-			snapshotResidu.set(1);
-			snapshotConstraint.set(1);
-			snapshotReference.set(1);
-			snapshotShowStats.set(1);
-			snapshotSaveStats.set(1);
-
-				chkResidu.addChangeListener(this);
+	
+			chkResidu.addChangeListener(this);
 			chkReference.addChangeListener(this);
 			chkConstraint.addChangeListener(this);
-			chkSaveStats.addChangeListener(this);
-			chkShowStats.addChangeListener(this);
-			
-			snapshotResidu.addChangeListener(this);
-			snapshotConstraint.addChangeListener(this);
-			snapshotReference.addChangeListener(this);
-			snapshotShowStats.addChangeListener(this);
-			snapshotSaveStats.addChangeListener(this);
+			chkTime.addChangeListener(this);
+			chkItermax.addChangeListener(this);
 
 		}
 		update();
@@ -298,9 +242,9 @@ public class ControllerModule extends AbstractModule implements ActionListener, 
 		bnBrowse.removeActionListener(this);
 		chkReference.removeChangeListener(this);
 		chkResidu.removeChangeListener(this);
-			chkConstraint.removeChangeListener(this);
-		chkShowStats.removeChangeListener(this);
-		chkSaveStats.removeChangeListener(this);
+		chkConstraint.removeChangeListener(this);
+		chkItermax.removeChangeListener(this);
+		chkTime.removeChangeListener(this);
 		getAction1Button().removeChangeListener(this);
 	}
 

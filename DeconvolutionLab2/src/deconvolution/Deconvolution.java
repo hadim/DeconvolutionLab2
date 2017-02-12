@@ -34,8 +34,6 @@ package deconvolution;
 import java.io.File;
 import java.util.ArrayList;
 
-import javax.swing.JFrame;
-
 import deconvolution.algorithm.AbstractAlgorithm;
 import deconvolution.algorithm.Controller;
 import deconvolutionlab.Lab;
@@ -46,7 +44,6 @@ import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.monitor.StatusMonitor;
 import deconvolutionlab.monitor.TableMonitor;
 import deconvolutionlab.monitor.Verbose;
-import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 import fft.FFT;
 import lab.tools.NumFormat;
@@ -87,12 +84,18 @@ public class Deconvolution implements Runnable {
 	
 	private ArrayList<DeconvolutionListener> listeners = new ArrayList<DeconvolutionListener>();
 	
+	private boolean				imageLoaded = false;
+	private RealSignal			image;
+	private RealSignal			psf;
+	private RealSignal			result;
+	
 	public Deconvolution(String command) {
 		super();
 		monitors = Monitors.createDefaultMonitor();
 		this.command = command;
 		decode();
 	}
+	
 
 	public void setCommand(String command) {
 		this.command = command;
@@ -115,27 +118,38 @@ public class Deconvolution implements Runnable {
 	 * @param exit
 	 *            System.exit call is true
 	 */
-	public void deconvolve(boolean exit) {
+	public RealSignal deconvolve(RealSignal image, RealSignal psf, boolean exit) {
+		this.image = image;
+		this.psf = psf;
 		this.exit = exit;
-		
-		monitors = new Monitors();
-		if (watcherConsole)
-			monitors.add(new ConsoleMonitor());
-		
-		if (watcherMonitor) {
-			TableMonitor m = new TableMonitor(440, 440);
-			monitors.add(m);
-			String t = algo == null ? "Monitor " + name : name + " " + algo.getName();
-			JFrame frame = new JFrame(t);
-			frame.add(m.getPanel());
-			frame.pack();
-			frame.setVisible(true);
-		}
+		imageLoaded = true;
+		monitors = createMonitors();
+		deconvolve();
+		return result;
+	}
 
+	public RealSignal deconvolve(boolean exit) {
+		this.image = null;
+		this.psf = null;
+		this.exit = exit;
+		imageLoaded = false;
+		monitors = createMonitors();
+		deconvolve();
+		return result;
+	}
+
+	/**
+	 * This method runs the deconvolution without graphical user interface.
+	 * 
+	 * @param exit
+	 *            System.exit call is true
+	 */
+	private void deconvolve() {
 		if (fft == null) {
 			run();
 			return;
 		}
+		
 		if (!fft.isMultithreadable()) {
 			run();
 			return;
@@ -149,8 +163,9 @@ public class Deconvolution implements Runnable {
 		else {
 			run();
 		}
-		
 	}
+	
+	
 
 	/**
 	 * This method runs the deconvolution with a graphical user interface.
@@ -200,40 +215,43 @@ public class Deconvolution implements Runnable {
 			if (token.keyword.equalsIgnoreCase("-algorithm"))
 				algo = Command.decodeAlgorithm(token, controller);
 
-			if (token.keyword.equalsIgnoreCase("-disable")) {
-				watcherMonitor = Command.decodeDisable(token, "monitor");
-				watcherConsole = Command.decodeDisable(token, "console");
-				watcherDisplay = Command.decodeDisable(token, "display");
-				watcherMultithreading = Command.decodeDisable(token, "multithreading");
-			}
+			if (token.keyword.equalsIgnoreCase("-monitor")) 
+				watcherMonitor = Command.decodeMonitor(token);
+			
+			if (token.keyword.equalsIgnoreCase("-display")) 						
+				watcherDisplay = Command.decodeDisplay(token);
+			
+			if (token.keyword.equalsIgnoreCase("-multithreading")) 						
+				watcherMultithreading = Command.decodeMultithreading(token);
 
 			if (token.keyword.equalsIgnoreCase("-verbose"))
 				verbose = Verbose.getByName(token.parameters);
 
-			if (token.keyword.equalsIgnoreCase("-path") && !token.parameters.equalsIgnoreCase("current")) {
+			if (token.keyword.equalsIgnoreCase("-path") && !token.parameters.equalsIgnoreCase("current"))
 				path = token.parameters;
-			}
 
 			if (token.keyword.equalsIgnoreCase("-fft"))
 				fft = FFT.getLibraryByName(token.parameters);
 
 			if (token.keyword.equalsIgnoreCase("-pad"))
 				pad = Command.decodePadding(token);
+			
 			if (token.keyword.equalsIgnoreCase("-apo"))
 				apo = Command.decodeApodization(token);
+			
 			if (token.keyword.equalsIgnoreCase("-norm"))
 				norm = Command.decodeNormalization(token);
+			
 			if (token.keyword.equalsIgnoreCase("-constraint"))
 				Command.decodeController(token, controller);
+			
 			if (token.keyword.equalsIgnoreCase("-time"))
 				Command.decodeController(token, controller);
+			
 			if (token.keyword.equalsIgnoreCase("-residu"))
 				Command.decodeController(token, controller);
+			
 			if (token.keyword.equalsIgnoreCase("-reference"))
-				Command.decodeController(token, controller);
-			if (token.keyword.equalsIgnoreCase("-savestats"))
-				Command.decodeController(token, controller);
-			if (token.keyword.equalsIgnoreCase("-showstats"))
 				Command.decodeController(token, controller);
 
 			if (token.keyword.equals("-out")) {
@@ -245,9 +263,22 @@ public class Deconvolution implements Runnable {
 
 		if (name.equals("") && algo != null)
 			name = algo.getShortname();
-
 	}
 
+	public Monitors createMonitors() {
+		Monitors monitors = new Monitors();
+		
+		if (watcherConsole)
+			monitors.add(new ConsoleMonitor());
+		
+		if (watcherMonitor) {
+			TableMonitor m = new TableMonitor(440, 440);
+			monitors.add(m);
+			m.show(algo == null ? "Monitor " + name : name + " " + algo.getName());
+		}
+		return monitors;
+	}
+	
 	public void setApodization(ArrayList<AbstractApodization> apos) {
 		AbstractApodization apoXY = new UniformApodization();
 		AbstractApodization apoZ = new UniformApodization();
@@ -272,7 +303,9 @@ public class Deconvolution implements Runnable {
 		report.add("Path: " + checkPath(path));
 		monitors.log("Path: " + checkPath(path));
 		
-		RealSignal image = openImage();
+		if (!imageLoaded)
+			image = openImage();
+		
 		if (image == null) {
 			monitors.error("Image: Not valid " + command);
 			report.add("Image: Not valid");
@@ -283,7 +316,9 @@ public class Deconvolution implements Runnable {
 		report.add(  "Image: " + image.dimAsString());
 		monitors.log("Image: " + image.dimAsString());
 		
-		RealSignal psf = openPSF();
+		if (!imageLoaded)
+			psf = openPSF();
+		
 		if (psf == null) {
 			monitors.error("PSF: not valid");
 			report.add("PSF: Not valid");
@@ -310,7 +345,6 @@ public class Deconvolution implements Runnable {
 		}
 		report.add("FFT: " + fft.getLibraryName());
 
-		algo.setController(controller);
 		if (outs != null) {
 			outs.setPath(path);
 			controller.setOutputs(outs);
@@ -318,11 +352,8 @@ public class Deconvolution implements Runnable {
 
 		monitors.log("Algorithm: " + algo.getName());
 		report.add("Algorithm: " + algo.getName());
-
-		RealSignal result = algo.run(monitors, image, psf, fft, pad, apo, norm, true);
-
-		if (outs != null)
-			outs.executeFinal(monitors, result, controller);
+		algo.setController(controller);
+		result = algo.run(monitors, image, psf, fft, pad, apo, norm, true);
 
 		live = false;
 		for(DeconvolutionListener listener : listeners)
@@ -363,12 +394,12 @@ public class Deconvolution implements Runnable {
 			lines.add("<b>Algorithm</b>:  <span color=\"red\">not valid</span>");
 		}
 		else {
-			Controller controller = algo.getController();
-			String con = ", " + controller.getConstraintAsString() + " constraint";
-			lines.add("<b>Algorithm</b>: " + algo.toString() + con);
-			lines.add("<b>Stopping Criteria</b>: " + controller.getStoppingCriteria(algo));
+
+			algo.setController(controller);
+			lines.add("<b>Algorithm</b>: " + algo.toString());
+			lines.add("<b>Stopping Criteria</b>: " + controller.getStoppingCriteriaAsString(algo));
 			lines.add("<b>Reference</b>: " + controller.getReference());
-			lines.add("<b>Stats</b>: " + controller.getShowStats() + " " + controller.getSaveStats());
+			lines.add("<b>Constraint</b>: " + controller.getConstraintAsString());
 			lines.add("<b>Padding</b>: " + pad.toString());
 			lines.add("<b>Apodization</b>: " + apo.toString());
 			if (algo.getFFT() != null)
@@ -378,7 +409,6 @@ public class Deconvolution implements Runnable {
 
 		lines.add("<b>Verbose</b>: " + verbose.name().toLowerCase());
 		lines.add("<b>Monitor</b>: " + (watcherMonitor ? "on" : "off"));
-		lines.add("<b>Console</b>: " + (watcherConsole ? "on" : "off"));
 		lines.add("<b>Final Display</b>: " + (watcherDisplay ? "on" : "off"));
 		lines.add("<b>Multithreading</b>: " + (watcherMultithreading ? "on" : "off"));
 	
@@ -414,10 +444,14 @@ public class Deconvolution implements Runnable {
 			return lines;
 		}
 
-		Controller controller = algo.getController();
+		if (controller == null) {
+			lines.add("No valid controller");
+			return lines;
+		}
 
+		algo.setController(controller);
 		int iter = controller.getIterationMax();
-		algo.getController().setIterationMax(1);
+		controller.setIterationMax(1);
 		RealSignal x = algo.run(monitors, image, psf, fft, pad, apo, norm, true);
 		Lab.show(monitors, x, "Estimate after 1 iteration");
 		lines.add("Time: " + NumFormat.seconds(controller.getTimeNano()));

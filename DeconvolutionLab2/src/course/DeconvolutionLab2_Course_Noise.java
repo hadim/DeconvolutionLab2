@@ -13,8 +13,8 @@ import signal.factory.Cube;
 public class DeconvolutionLab2_Course_Noise implements PlugIn {
 
 	private String desktop = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "Desktop";
-	private String root = desktop + File.separator + "DeconvolutionLab2-Course" + File.separator;
-	private String res = root + "Results" + File.separator + "noise" + File.separator;
+	private String root = desktop + File.separator + "Deconvolution" + File.separator;
+	private String res = root + "results" + File.separator + "noise" + File.separator;
 	
 	public DeconvolutionLab2_Course_Noise() {
 

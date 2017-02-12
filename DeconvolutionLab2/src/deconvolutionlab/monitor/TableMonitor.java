@@ -161,7 +161,7 @@ public class TableMonitor implements AbstractMonitor, ActionListener {
 	public String getName() {
 		return "table";
 	}
-
+	
 	class RowRenderer extends DefaultTableCellRenderer {
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

@@ -111,6 +111,7 @@ public class CustomizedTable extends JTable {
 				tc.setCellRenderer(bn);
 			}
 		}
+		getTableHeader().setReorderingAllowed(false);
 	}
 
 	public void setPreferredSize(int width, int height) {

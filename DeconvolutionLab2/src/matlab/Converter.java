@@ -6,6 +6,7 @@ import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.FloatProcessor;
 import ij.process.ShortProcessor;
+import signal.RealSignal;
 
 public class Converter {
 
@@ -138,6 +139,7 @@ public class Converter {
 			return null;
 		}
 	}
+	
 	/**
 	 * Create a new image in ImageJ from a Matlab variable with a specified
 	 * title.
@@ -405,5 +407,147 @@ public class Converter {
 		}
 		return imp;
 	}
+	
+	/**
+	 * Create a new RealSignal from a Matlab variable with a specified
+	 * title.
+	 */
+	public static RealSignal createRealSignal(Object object) {
+		RealSignal signal = null;
+		if (object instanceof byte[][]) {
+			byte[][] data = (byte[][]) object;
+			int h = data.length;
+			int w = data[0].length;
+			signal = new RealSignal(h, w, 1);
+			for(int i=0; i<h; i++)
+			for(int j=0; j<w; j++)
+				signal.data[0][i+j*h]= data[i][j];
+			return signal;
+		}
+		if (object instanceof short[][]) {
+			short[][] data = (short[][]) object;
+			int h = data.length;
+			int w = data[0].length;
+			signal = new RealSignal(h, w, 1);
+			for(int i=0; i<h; i++)
+			for(int j=0; j<w; j++)
+				signal.data[0][i+j*h]= data[i][j];
+			return signal;
+		}
+		
+		if (object instanceof int[][]) {
+			int[][] data = (int[][]) object;
+			int h = data.length;
+			int w = data[0].length;
+			signal = new RealSignal(h, w, 1);
+			for(int i=0; i<h; i++)
+			for(int j=0; j<w; j++)
+				signal.data[0][i+j*h]= data[i][j];
+			return signal;
+		}
+		
+		if (object instanceof float[][]) {
+			float[][] data = (float[][]) object;
+			int h = data.length;
+			int w = data[0].length;
+			signal = new RealSignal(h, w, 1);
+			for(int i=0; i<h; i++)
+			for(int j=0; j<w; j++)
+				signal.data[0][i+j*h]= data[i][j];
+			return signal;
+		}
+		
+		if (object instanceof double[][]) {
+			double[][] data = (double[][]) object;
+			int h = data.length;
+			int w = data[0].length;
+			signal = new RealSignal(h, w, 1);
+			for(int i=0; i<h; i++)
+			for(int j=0; j<w; j++)
+				signal.data[0][i+j*h]= (float)data[i][j];
+			return signal;
+		}
+		
+		if (object instanceof byte[][][]) {
+			byte[][][] data = (byte[][][]) object;
+			int h = data.length;
+			int w = data[0].length;
+			int d = data[0][0].length;
+			signal = new RealSignal(h, w, d);
+			for(int k=0; k<d; k++)
+			for(int i=0; i<h; i++)
+			for(int j=0; j<w; j++)
+				signal.data[k][i+j*h]= (float)data[i][j][k];
+			return signal;
+		}
+			
+		if (object instanceof short[][][]) {
+			short[][][] data = (short[][][]) object;
+			int h = data.length;
+			int w = data[0].length;
+			int d = data[0][0].length;
+			signal = new RealSignal(h, w, d);
+			for(int k=0; k<d; k++)
+			for(int i=0; i<h; i++)
+			for(int j=0; j<w; j++)
+				signal.data[k][i+j*h]= (float)data[i][j][k];
+			return signal;
+		}
+		
+		if (object instanceof int[][][]) {
+			int[][][] data = (int[][][]) object;
+			int h = data.length;
+			int w = data[0].length;
+			int d = data[0][0].length;
+			signal = new RealSignal(h, w, d);
+			for(int k=0; k<d; k++)
+			for(int i=0; i<h; i++)
+			for(int j=0; j<w; j++)
+				signal.data[k][i+j*h]= (float)data[i][j][k];
+			return signal;
+		}
+		
+		if (object instanceof float[][][]) {
+			float[][][] data = (float[][][]) object;
+			int h = data.length;
+			int w = data[0].length;
+			int d = data[0][0].length;
+			signal = new RealSignal(h, w, d);
+			for(int k=0; k<d; k++)
+			for(int i=0; i<h; i++)
+			for(int j=0; j<w; j++)
+				signal.data[k][i+j*h]= data[i][j][k];
+			return signal;
+		}
+		
+		if (object instanceof double[][][]) {
+			double[][][] data = (double[][][]) object;
+			int h = data.length;
+			int w = data[0].length;
+			int d = data[0][0].length;
+			signal = new RealSignal(h, w, d);
+			for(int k=0; k<d; k++)
+			for(int i=0; i<h; i++)
+			for(int j=0; j<w; j++)
+				signal.data[k][i+j*h]= (float)data[i][j][k];
+			return signal;
+		}
+		
+		return null;
+	}
 
+	public static Object createObject(RealSignal signal) {
+		if (signal == null)
+			return null;
+		int nx = signal.nx;
+		int ny = signal.ny;
+		int nz = signal.nz;
+		double[][][] object = new double[ny][nx][nz];
+		for(int k=0; k<nz; k++)
+		for(int i=0; i<nx; i++)
+		for(int j=0; j<ny; j++)
+			object[j][i][k] = signal.data[k][i+j*nx];
+		return object;
+	}
+	
 }

@@ -13,9 +13,8 @@ import signal.factory.GridSpots;
 public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 
 	private String desktop = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "Desktop";
-	private String root = desktop + File.separator + "DeconvolutionLab2-Course" + File.separator;
-	private String res = root + "Results" + File.separator + "resolution" + File.separator;
-	private String data = root + "Data" + File.separator + "resolution" + File.separator;
+	private String root = desktop + File.separator + "Deconvolution" + File.separator;
+	private String res = root + "results" + File.separator + "resolution" + File.separator;
 	
 	public DeconvolutionLab2_Course_Resolution() {
 
@@ -45,10 +44,10 @@ public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 		
 		String paramout = " intact float  (" + spacing + "," + spacing + "," + spacing + ")";
 		
-		algo  = " -algorithm CONV  -showstats @3 PR -out stack PR -out ortho PRo ";
+		algo  = " -algorithm CONV  -out stats @3 PR -out stack PR -out ortho PRo ";
 		new Deconvolution(ground + "-reference reference.tif -psf synthetic impulse 100 0 size 128 128 128 " + algo).deconvolve(false);
 
-		algo  = " -algorithm SIM 0 1.5 0  -showstats @3 SIM -out stack signal -out ortho SIGNALo ";
+		algo  = " -algorithm SIM 0 1.5 0  -out stats @3 SIM -out stack signal -out ortho SIGNALo ";
 		new Deconvolution(ground + psf + algo).deconvolve(false);
 
 		algo  = " -algorithm NIF -out ortho NIF " + paramout;
@@ -60,15 +59,8 @@ public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 			new Deconvolution(signal + psf + algo).deconvolve(false);
 		}
 		
-		algo  = " -algorithm LW+ 305 1 -showstats @3 LW+  -out ortho @25 LW+/LW+" + paramout;
+		algo  = " -algorithm LW+ 305 1 -out stats @3 LW+ nosave -out ortho @25 LW+/LW+" + paramout;
 		new Deconvolution(signal + psf + algo).deconvolve(false);
-		
-//		algo  = " -algorithm LW 205 1 -showstats @3 LW  -out ortho @25 LW/LW" + paramout;
-//		new Deconvolution(signal + psf + algo).deconvolve(false);
-		
-//	algo  = " -algorithm RL 205 1 -showstats @3 RL -constraint Non-negativity -out ortho @25 RL/RL" + paramout;
-//		new Deconvolution(signal + psf + algo).deconvolve(false);
-		
 	}
 	
 	public static void main(String arg[]) {

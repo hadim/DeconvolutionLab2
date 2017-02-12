@@ -207,8 +207,8 @@ public class Lab {
 		monitors.log("Save Real Signal " + filename);
 	}
 
-	public static void firstStats(Monitors monitors, String name, Controller controller, boolean show, boolean save) {
-		if (controller == null)
+	public static void firstStats(Monitors monitors, String name, String[] stats, boolean show, boolean save) {
+		if (stats == null)
 			return;
 
 		Lab.createStats();
@@ -219,15 +219,14 @@ public class Lab {
 			frameStats.pack();
 			frameStats.setVisible(true);
 		}
-		nextStats(monitors, "Start", controller, show, save);
 	}
 
-	public static void nextStats(Monitors monitors, String name, Controller controller, boolean show, boolean save) {
+	public static void nextStats(Monitors monitors, String name, String[] stats, boolean show, boolean save) {
 		if (tableStats == null)
 			return;
-		if (controller == null)
+		if (stats == null)
 			return;
-		tableStats.append(controller.stats(name));
+		tableStats.append(stats);
 		monitors.log("Stats " + name);
 		if (show && frameStats != null) {
 			if (!frameStats.isVisible())
@@ -236,12 +235,11 @@ public class Lab {
 		}
 	}
 
-	public static void lastStats(Monitors monitors, String filename, Controller controller, boolean show, boolean save) {
-		if (controller == null)
+	public static void lastStats(Monitors monitors, String filename, String[] stats, boolean show, boolean save) {
+		if (stats == null)
 			return;
 		if (tableStats == null)
 			return;
-		nextStats(monitors, "End", controller, show, save);
 		if (save) {
 			monitors.log("Stats " + filename);
 			tableStats.saveCSV(filename + ".csv");

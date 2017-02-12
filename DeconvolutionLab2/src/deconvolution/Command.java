@@ -36,6 +36,13 @@ import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import deconvolution.algorithm.AbstractAlgorithm;
+import deconvolution.algorithm.Algorithm;
+import deconvolution.algorithm.Controller;
+import deconvolutionlab.Output;
+import deconvolutionlab.Output.View;
+import deconvolutionlab.modules.AbstractModule;
+import deconvolutionlab.modules.CommandModule;
 import lab.tools.NumFormat;
 import signal.Constraint;
 import signal.apodization.AbstractApodization;
@@ -45,21 +52,10 @@ import signal.padding.AbstractPadding;
 import signal.padding.NoPadding;
 import signal.padding.Padding;
 import wavelets.Wavelets;
-import deconvolution.algorithm.AbstractAlgorithm;
-import deconvolution.algorithm.Algorithm;
-import deconvolution.algorithm.Controller;
-import deconvolutionlab.Output;
-import deconvolutionlab.Output.View;
-import deconvolutionlab.modules.AbstractModule;
-import deconvolutionlab.modules.CommandModule;
-import deconvolutionlab.modules.LanguageModule;
-import deconvolutionlab.monitor.ConsoleMonitor;
-import deconvolutionlab.monitor.Monitors;
-import deconvolutionlab.monitor.TableMonitor;
 
 public class Command {
 
-	public static String			keywords[]	= { "-image", "-psf", "-algorithm", "-path", "-disable", "-verbose", "-time", "-constraint", "-residu", "-reference", "-savestats", "-showstats", "-out", "-pad", "-apo", "-norm", "-fft" };
+	public static String			keywords[]	= { "-image", "-psf", "-algorithm", "-path", "-disable", "-verbose", "-monitor", "-display", "-multithreading", "-constraint", "-time", "-residu", "-reference", "-out", "-pad", "-apo", "-norm", "-fft" };
 
 	private static AbstractModule	modules[];
 	private static CommandModule	command;
@@ -73,6 +69,7 @@ public class Command {
 		if (modules == null)
 			return "";
 		String cmd = "";
+
 		for (AbstractModule m : modules)
 			cmd += m.getCommand() + " ";
 
@@ -98,22 +95,13 @@ public class Command {
 		Collections.sort(segments);
 
 		ArrayList<Token> tokens = new ArrayList<Token>();
-		for(int i=0; i<segments.size(); i++) {
+		for (int i = 0; i < segments.size(); i++) {
 			String keyword = segments.get(i).keyword;
-			int begin = segments.get(i).index+keyword.length()+1;
-			int end = (i<segments.size()-1 ? segments.get(i+1).index : command.length());
+			int begin = segments.get(i).index + keyword.length() + 1;
+			int end = (i < segments.size() - 1 ? segments.get(i + 1).index : command.length());
 			Token token = new Token(keyword, command, begin, end);
 			tokens.add(token);
 		}
-		/*
-		for (int i = 0; i < segments.size(); i++) {
-			CommandSegment segment = segments.get(i);
-			String next = (i + 1 < segments.size() ? segments.get(i + 1).keyword : "");
-			int end = (i + 1 < segments.size() ? segments.get(i + 1).index - next.length() : command.length());
-			tokens.add(new Token(segment.keyword, command, segment.index, end));
-		}
-		*/
-		
 		return tokens;
 	}
 
@@ -141,13 +129,30 @@ public class Command {
 	public static ArrayList<CommandSegment> findSegment(String command, String keyword) {
 		ArrayList<CommandSegment> segments = new ArrayList<CommandSegment>();
 		String regex = "(?<!\\w)" + keyword + "(?!\\w)";
+		if (command == null)
+			return segments;
 		Matcher matcher = Pattern.compile(regex).matcher(command);
-
 		while (matcher.find()) {
 			segments.add(new CommandSegment(keyword, matcher.start()));
 		}
-
 		return segments;
+	}
+
+	public static String extractOptions(String command) {
+		ArrayList<CommandSegment> segments = new ArrayList<CommandSegment>();
+		for (String keyword : keywords)
+			segments.addAll(findSegment(command, keyword));
+		Collections.sort(segments);
+
+		String options = "";
+		for (int i = 0; i < segments.size(); i++) {
+			String keyword = segments.get(i).keyword;
+			int begin = segments.get(i).index + keyword.length() + 1;
+			int end = (i < segments.size() - 1 ? segments.get(i + 1).index : command.length());
+			if (keyword != "-image" && keyword != "-psf" && keyword != "-algorithm")
+				options += keyword + " " + command.substring(begin, end);
+		}
+		return options;
 	}
 
 	public static AbstractAlgorithm decodeAlgorithm(Token token, Controller controller) {
@@ -195,6 +200,10 @@ public class Command {
 			out = new Output(View.FIGURE, freq, line.substring("figure".length(), line.length()));
 		if (p.startsWith("planar"))
 			out = new Output(View.PLANAR, freq, line.substring("planar".length(), line.length()));
+		if (p.startsWith("stats"))
+			out = new Output(View.STATS, freq, line.substring("stats".length(), line.length()));
+		if (p.startsWith("profile"))
+			out = new Output(View.PROFILE, freq, line.substring("profile".length(), line.length()));
 
 		return out;
 	}
@@ -211,31 +220,15 @@ public class Command {
 			}
 		}
 
-		if (token.keyword.equals("-constraint")) {
-			controller.setConstraint(freq, Constraint.getByName(line.trim()));
-		}
+		if (token.keyword.equals("-constraint"))
+			controller.setConstraint(Constraint.getByName(line.trim()));
+		else if (token.keyword.equals("-residu"))
+			controller.setResiduStop(NumFormat.parseNumber(line, -1));
+		else if (token.keyword.equals("-reference"))
+			controller.setReference(line);
+		else if (token.keyword.equals("-time"))
+			controller.setTimeStop(NumFormat.parseNumber(line, Double.MAX_VALUE));
 
-		else if (token.keyword.equals("-residu")) {
-			double stop = NumFormat.parseNumber(line, -1);
-			controller.setResiduStop(freq, stop);
-		}
-
-		else if (token.keyword.equals("-reference")) {
-			controller.setReference(freq, line);
-		}
-
-		else if (token.keyword.equals("-savestats")) {
-			controller.setSaveStats(freq, line);
-		}
-
-		else if (token.keyword.equals("-showstats")) {
-			controller.setShowStats(freq, line);
-		}
-
-		else if (token.keyword.equals("-time")) {
-			double stop = NumFormat.parseNumber(line, Double.MAX_VALUE);
-			controller.setTimeStop(stop);
-		}
 	}
 
 	public static double decodeNormalization(Token token) {
@@ -245,13 +238,40 @@ public class Command {
 			return NumFormat.parseNumber(token.parameters, 1);
 	}
 
-	public static boolean decodeDisable(Token token, String word) {
+	public static boolean decodeMonitor(Token token) {
 		String p = token.parameters.toLowerCase();
-		String parts[] = p.split(" ");
-		for (String part : parts) {
-			if (part.trim().equals(word))
-				return false;
-		}
+		if (p.startsWith("no"))
+			return false;
+		if (p.equals("0"))
+			return false;
+		if (p.equals("false"))
+			return false;
+		if (p.equals("console"))
+			return false;
+		return true;
+	}
+
+	public static boolean decodeDisplay(Token token) {
+		String p = token.parameters.toLowerCase();
+		if (p.startsWith("no"))
+			return false;
+		if (p.equals("0"))
+			return false;
+		if (p.equals("false"))
+			return false;
+		return true;
+	}
+
+	public static boolean decodeMultithreading(Token token) {
+		String p = token.parameters.toLowerCase();
+		if (p.startsWith("no"))
+			return false;
+		if (p.equals("0"))
+			return false;
+		if (p.equals("false"))
+			return false;
+		if (p.startsWith("dis"))
+			return false;
 		return true;
 	}
 

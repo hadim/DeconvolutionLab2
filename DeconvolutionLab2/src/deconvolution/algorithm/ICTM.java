@@ -47,7 +47,7 @@ public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
 	public ICTM(int iter, double gamma, double lambda) {
 		super();
 		controller.setIterationMax(iter);
-		controller.setConstraint(1, Constraint.Mode.NONNEGATIVE);
+		controller.setConstraint(Constraint.Mode.NONNEGATIVE);
 		this.gamma = gamma;
 		this.lambda = lambda;
 	}
@@ -62,7 +62,7 @@ public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
 		A.minus(L2);
 		ComplexSignal G = Operations.multiplyConjugate(gamma, H, Y);
 		ComplexSignal X = G.duplicate();
-		controller.setConstraint(1, Constraint.Mode.NONNEGATIVE);
+		controller.setConstraint(Constraint.Mode.NONNEGATIVE);
 		while (!controller.ends(X)) {
 			X.times(A);
 			X.plus(G);

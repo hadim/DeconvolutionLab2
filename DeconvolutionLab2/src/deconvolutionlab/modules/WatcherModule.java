@@ -39,159 +39,146 @@ import java.io.File;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import deconvolution.Command;
 import deconvolutionlab.Config;
+import ij.IJ;
 import lab.component.GridPanel;
+import lab.system.SystemPanel;
 import lab.tools.Files;
 
 public class WatcherModule extends AbstractModule implements ActionListener, KeyListener {
 
-	private JTextField			txtTime;
+	private JComboBox<String>	cmbVerbose;
+	private JComboBox<String>	cmbMonitor;
+	private JComboBox<String>	cmbDisplay;
+	private JComboBox<String>	cmbMultithreading;
+	private JComboBox<String>	cmbPath;
 	private JTextField			txtPath;
 	private JButton				bnBrowse;
-	private JComboBox<String>	cmbTime;
-	private JComboBox<String>	cmbPath;
-	private JComboBox<String>	cmbVerbose;
-	private JCheckBox			chkDisableTable;
-	private JCheckBox			chkDisableConsole;
-	private JCheckBox			chkDisableDisplay;
-	private JCheckBox			chkDisableMultithreading;
+
+	private JButton				bnSystem;
 
 	public WatcherModule(boolean expanded) {
-		super("Watcher", "", "Default", "", expanded);
+		super("Path & Watcher", "", "Default", "", expanded);
 	}
 
 	@Override
 	public String getCommand() {
 		String cmd = "";
-		boolean t = chkDisableTable.isSelected();
-		boolean c = chkDisableConsole.isSelected();
-		boolean d = chkDisableDisplay.isSelected();
-		boolean m = chkDisableMultithreading.isSelected();
 		if (cmbPath.getSelectedIndex() != 0)
 			cmd += " -path " + txtPath.getText();
-		if (cmbTime.getSelectedIndex() != 0)
-			cmd += " -time " + txtTime.getText();
-		if (c || t || d || m)
-			cmd += " -disable " + (t ? "monitor " : "") + 
-					(c ? "console " : "") + (d ? "display " : "") + (m ? "multithreading " : "");
-		if (cmbVerbose.getSelectedIndex() != 0) {
-			String parts[] = ((String)cmbVerbose.getSelectedItem()).split(" ");
-			cmd += " -verbose " + parts[1];
-		}
+		if (cmbMultithreading.getSelectedIndex() != 0)
+			cmd += " -" + (String)cmbMultithreading.getSelectedItem();
+		if (cmbDisplay.getSelectedIndex() != 0)
+			cmd += " -" + (String)cmbDisplay.getSelectedItem();
+		if (cmbMonitor.getSelectedIndex() != 0) 
+			cmd += " -" + (String)cmbMonitor.getSelectedItem();
+		if (cmbVerbose.getSelectedIndex() != 0) 
+			cmd += " -" + (String)cmbVerbose.getSelectedItem();
 		return cmd;
 	}
 
 	@Override
 	public JPanel buildExpandedPanel() {
 
-		cmbTime = new JComboBox<String>(new String[] { "No time limitation", "Specify limit (s) ..." });
-		cmbPath = new JComboBox<String>(new String[] { "Current", "Specify ..." });
-		cmbVerbose = new JComboBox<String>(new String[] { "Verbose: log", "Verbose: quiet ", "Verbose: prolix", "Verbose: mute" });
-		chkDisableTable = new JCheckBox("No Monitor");
-		chkDisableConsole = new JCheckBox("No Console");
-		chkDisableDisplay = new JCheckBox("No Display");
-		chkDisableMultithreading = new JCheckBox("No Multithreading");
-
-		txtTime = new JTextField("3600");
-		txtPath = new JTextField("...", 30);
+		cmbVerbose = new JComboBox<String>(new String[] { "verbose log ", "verbose quiet ", "verbose prolix", "verbose mute" });
+		cmbDisplay = new JComboBox<String>(new String[] { "display final", "display no"});
+		cmbMonitor = new JComboBox<String>(new String[] { "monitor full", "monitor console", "monitor none"});
+		cmbMultithreading = new JComboBox<String>(new String[] {  "multithreading enabled", "multithreading disabled"});
+		cmbPath = new JComboBox<String>(new String[] { "Current", "Specify"});
+		txtPath = new JTextField("", 30);
 		bnBrowse = new JButton("Browse");
-
-		GridPanel pn = new GridPanel("Output Directory", 3);
-		pn.place(0, 1, cmbPath);
-		pn.place(0, 2, bnBrowse);
-		pn.place(1, 0, 4, 1, txtPath);
-
-		GridPanel pn2 = new GridPanel("Settings", 3);
-		pn2.place(2, 0, 2, 1, cmbTime);
-		pn2.place(2, 2, txtTime);
-		pn2.place(2, 3, cmbVerbose);
-		pn2.place(4, 0, chkDisableTable);
-		pn2.place(4, 1, chkDisableConsole);
-		pn2.place(4, 2, chkDisableDisplay);
-		pn2.place(4, 3, chkDisableMultithreading);
+		bnSystem = new JButton("System");
 		
+		GridPanel pn1 = new GridPanel(true, 3);
+		pn1.place(0, 0, 2, 1, "Working directory");
+		pn1.place(1, 0, cmbPath);
+		pn1.place(1, 1, bnBrowse);
+		pn1.place(2, 0, 2, 1, txtPath);
+
+		GridPanel pn2 = new GridPanel(true, 3);
+		pn2.place(2, 0, cmbVerbose);
+		pn2.place(2, 1, cmbMonitor);
+		pn2.place(3, 0, cmbDisplay);
+		pn2.place(3, 1, cmbMultithreading);
+		pn2.place(4, 1, bnSystem);
+	
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-		panel.add(pn);
+		panel.add(pn1);
 		panel.add(pn2);
+		String dir = System.getProperty("user.dir");
 
 		Config.register(getName(), "verbose", cmbVerbose, cmbVerbose.getItemAt(0));
-		Config.register(getName(), "path", cmbPath, cmbPath.getItemAt(0));
-		Config.register(getName(), "time", cmbTime, cmbTime.getItemAt(0));
-		Config.register(getName(), "time.value", txtTime, "3600");
-		Config.register(getName(), "path", txtPath, new File(System.getProperty("user.dir")).getAbsolutePath());
-		Config.register(getName(), "disable.table", chkDisableTable, "false");
-		Config.register(getName(), "disable.console", chkDisableConsole, "false");
-		Config.register(getName(), "disable.display", chkDisableDisplay, "false");
-		Config.register(getName(), "disable.multithreading", chkDisableMultithreading, "false");
-
-		cmbVerbose.addActionListener(this);
+		Config.register(getName(), "monitor", cmbMonitor, cmbMonitor.getItemAt(0));
+		Config.register(getName(), "display", cmbDisplay, cmbDisplay.getItemAt(0));
+		Config.register(getName(), "multithreading", cmbMultithreading, cmbMultithreading.getItemAt(0));
+		Config.register(getName(), "current", cmbPath, cmbPath.getItemAt(0));
+		Config.register(getName(), "path", txtPath, dir);
+		
 		cmbPath.addActionListener(this);
-		cmbTime.addActionListener(this);
-		chkDisableTable.addActionListener(this);
-		chkDisableConsole.addActionListener(this);
-		chkDisableDisplay.addActionListener(this);
-		chkDisableMultithreading.addActionListener(this);
-
-		txtTime.addKeyListener(this);
-		bnBrowse.addActionListener(this);
 		txtPath.addKeyListener(this);
-
+		cmbVerbose.addActionListener(this);
+		cmbDisplay.addActionListener(this);
+		cmbMultithreading.addActionListener(this);
+		cmbMonitor.addActionListener(this);
+		bnBrowse.addActionListener(this);
+		bnSystem.addActionListener(this);
 		return panel;
 	}
 
 	private void update() {
+		
 		setCommand(getCommand());
+		if (cmbPath.getSelectedIndex() == 0) {
+			txtPath.setText(System.getProperty("user.dir"));
+			txtPath.setEnabled(false);
+			bnBrowse.setEnabled(false);
+		}
+		else {
+			txtPath.setEnabled(true);
+			bnBrowse.setEnabled(true);
+		}
 		setSynopsis(txtPath.getText());
-		if (cmbPath != null) {
-			boolean b = cmbPath.getSelectedIndex() != 0;
-			bnBrowse.setEnabled(b);
-			txtPath.setEnabled(b);
-		}
-		if (txtTime != null) {
-			boolean b = cmbTime.getSelectedIndex() != 0;
-			txtTime.setEnabled(b);
-		}
 		Command.command();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
-		if (e.getSource() == bnBrowse) {
+		if (e.getSource() == bnSystem) {
+			SystemPanel.show(400, 400);
+		}
+		else if (e.getSource() == bnBrowse) {
 			File f = Files.browseDirectory(txtPath.getText());
 			if (f != null) {
 				txtPath.setText(f.getAbsolutePath());
 			}
 		}
-		if (e.getSource() == cmbPath) {
+		else if (e.getSource() == cmbPath) {
 			if (cmbPath.getSelectedIndex() == 0) {
 				File f = new File(System.getProperty("user.dir"));
 				txtPath.setText(f.getAbsolutePath());
 			}
-
 		}
 		update();
 	}
 
 	@Override
 	public void close() {
-		chkDisableTable.removeActionListener(this);
-		chkDisableConsole.removeActionListener(this);
-		chkDisableDisplay.removeActionListener(this);
-		chkDisableMultithreading.removeActionListener(this);
 		cmbVerbose.removeActionListener(this);
-		cmbTime.removeActionListener(this);
-		txtTime.removeActionListener(this);
+		cmbDisplay.removeActionListener(this);
+		cmbMultithreading.removeActionListener(this);
+		cmbMonitor.removeActionListener(this);
+		cmbPath.removeActionListener(this);
 		txtPath.removeKeyListener(this);
 		bnBrowse.removeActionListener(this);
-	}
+}
+	
 
 	@Override
 	public void keyTyped(KeyEvent e) {
@@ -205,4 +192,5 @@ public class WatcherModule extends AbstractModule implements ActionListener, Key
 	public void keyReleased(KeyEvent e) {
 		update();
 	}
+
 }

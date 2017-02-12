@@ -59,16 +59,22 @@ public class OutputCollection {
 		return flag;
 	}
 
+	public void executeStarting(Monitors monitors, RealSignal signal, Controller controller) {
+		for (Output out : list)
+			if (out != null)
+				out.executeStarting(monitors, signal, controller);
+	}
+
 	public void executeFinal(Monitors monitors, RealSignal signal, Controller controller) {
 		for (Output out : list)
 			if (out != null)
-				out.execute(monitors, signal, controller, 0, false);
+				out.executeFinal(monitors, signal, controller);
 	}
 
-	public void executeIterative(Monitors monitors, RealSignal signal, int iter, Controller controller) {
+	public void executeIterative(Monitors monitors, RealSignal signal, Controller controller, int iter) {
 		for (Output out : list)
 			if (out != null)
-				out.execute(monitors, signal, controller, iter, true);
+				out.executeIterative(monitors, signal, controller, iter);
 	}
 
 	public ArrayList<String> getInformation() {

@@ -49,11 +49,11 @@ public class Constraint {
 	}
 	
 	public static String[] getContraintsAsArray() {
-		return new String[] {"No", "Non-negativity", "Clipped"};
+		return new String[] {"no", "nonnegativity", "clipped"};
 	}
 	
 	public static Constraint.Mode getByName(String c) {
-		if (c.toLowerCase().equalsIgnoreCase("Non-negativity"))
+		if (c.toLowerCase().equalsIgnoreCase("nonnegativity"))
 			return Constraint.Mode.NONNEGATIVE;
 		if (c.toLowerCase().equalsIgnoreCase("clipped"))
 			return Constraint.Mode.CLIPPED;

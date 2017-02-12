@@ -203,4 +203,15 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		s += (isStepControllable() ? ", &gamma=" + NumFormat.nice(getStepFactor()) : "");
 		return s;
 	}
+	
+	public String getParametersAsString() {
+		double p[] = getParameters();
+		String param  = "";
+		for(int i=0; i<p.length; i++)
+			if (i==p.length-1)
+				param += p[i];
+			else
+				param += p[i] + ", ";
+		return param;
+	}
 }

@@ -45,7 +45,7 @@ public class LandweberPositivity extends AbstractAlgorithm implements Callable<R
 	public LandweberPositivity(int iter, double gamma) {
 		super();
 		controller.setIterationMax(iter);
-		controller.setConstraint(1, Constraint.Mode.NONNEGATIVE);
+		controller.setConstraint(Constraint.Mode.NONNEGATIVE);
 		this.gamma = gamma;
 	}
 
@@ -62,7 +62,7 @@ public class LandweberPositivity extends AbstractAlgorithm implements Callable<R
 		ComplexSignal A = Operations.delta(gamma, H);
 		ComplexSignal G = Operations.multiplyConjugate(gamma, H, Y);
 		ComplexSignal X = G.duplicate();
-		controller.setConstraint(1, Constraint.Mode.NONNEGATIVE);
+		controller.setConstraint(Constraint.Mode.NONNEGATIVE);
 		while (!controller.ends(X)) {
 			X.times(A);
 			X.plus(G);
