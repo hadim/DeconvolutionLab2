@@ -37,56 +37,47 @@ import deconvolution.algorithm.Controller;
 import deconvolutionlab.monitor.Monitors;
 import signal.RealSignal;
 
-public class OutputCollection {
-
-	private ArrayList<Output> list = new ArrayList<Output>();
+public class OutputCollection extends ArrayList<Output> {
 
 	public void setPath(String path) {
-		for (Output out : list)
+		for (Output out : this)
 			out.setPath(path);
-	}
-
-	public void add(Output out) {
-		if (out != null) {
-			list.add(out);
-		}
 	}
 
 	public boolean hasShow(int iterations) {
 		boolean flag = false;
-		for (Output out : list)
+		for (Output out : this)
 			flag = flag | out.is(iterations);
 		return flag;
 	}
 
 	public void executeStarting(Monitors monitors, RealSignal signal, Controller controller) {
-		for (Output out : list)
+		for (Output out : this)
 			if (out != null)
 				out.executeStarting(monitors, signal, controller);
 	}
 
 	public void executeFinal(Monitors monitors, RealSignal signal, Controller controller) {
-		for (Output out : list)
+		for (Output out : this)
 			if (out != null)
 				out.executeFinal(monitors, signal, controller);
 	}
 
 	public void executeIterative(Monitors monitors, RealSignal signal, Controller controller, int iter) {
-		for (Output out : list)
+		for (Output out : this)
 			if (out != null)
 				out.executeIterative(monitors, signal, controller, iter);
 	}
 
 	public ArrayList<String> getInformation() {
 		ArrayList<String> lines = new ArrayList<String>();
-		for (Output out : list) {
+		for (Output out : this) {
 			if (out == null)
-				lines.add("ERR>" + list.size());
+				lines.add("ERR>" + this.size());
 			else
 				lines.add("" + out.toString());
 		}
 		return lines;
-
 	}
 
 }

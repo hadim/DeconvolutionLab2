@@ -179,7 +179,9 @@ public class Padding {
 		int ox = (lx - nx) / 2;
 		int oy = (ly - ny) / 2;
 		int oz = (lz - nz) / 2;
-		RealSignal large = new RealSignal(lx, ly, lz);
+		String name = " pad( " + input.name + ")";
+
+		RealSignal large = new RealSignal(name, lx, ly, lz);
 		
 		for(int k=0; k<nz; k++) {
 			float in[] = input.data[k];
@@ -207,7 +209,9 @@ public class Padding {
 		if (lz == nz)
 			return large;
 
-		RealSignal output = new RealSignal(nx, ny, nz);
+		String name = " crop( " + large.name + ")";
+
+		RealSignal output = new RealSignal(name, nx, ny, nz);
 		monitors.log("Cropping to (" + nx + ", " + ny + ", " + nz + ")");
 		
 		for(int k=0; k<nz; k++) {

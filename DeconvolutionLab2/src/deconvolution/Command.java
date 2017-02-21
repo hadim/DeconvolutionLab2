@@ -40,11 +40,17 @@ import deconvolution.algorithm.AbstractAlgorithm;
 import deconvolution.algorithm.Algorithm;
 import deconvolution.algorithm.Controller;
 import deconvolutionlab.Output;
+import deconvolutionlab.OutputCollection;
 import deconvolutionlab.Output.View;
 import deconvolutionlab.modules.AbstractModule;
 import deconvolutionlab.modules.CommandModule;
+import deconvolutionlab.monitor.Verbose;
+import fft.AbstractFFT;
+import fft.AbstractFFTLibrary;
+import fft.FFT;
 import lab.tools.NumFormat;
 import signal.Constraint;
+import signal.Operations;
 import signal.apodization.AbstractApodization;
 import signal.apodization.Apodization;
 import signal.apodization.UniformApodization;
@@ -55,7 +61,7 @@ import wavelets.Wavelets;
 
 public class Command {
 
-	public static String			keywords[]	= { "-image", "-psf", "-algorithm", "-path", "-disable", "-verbose", "-monitor", "-display", "-multithreading", "-constraint", "-time", "-residu", "-reference", "-out", "-pad", "-apo", "-norm", "-fft" };
+	public static String			keywords[]	= { "-image", "-psf", "-algorithm", "-path", "-disable", "-verbose", "-monitor", "-display", "-multithreading", "-system", "-stats", "-constraint", "-time", "-residu", "-reference", "-out", "-pad", "-apo", "-norm", "-fft", "-epsilon" };
 
 	private static AbstractModule	modules[];
 	private static CommandModule	command;
@@ -78,7 +84,95 @@ public class Command {
 
 		return cmd;
 	}
+	
+	public static void decode(String command, Deconvolution deconvolution) {
+		
+		AbstractAlgorithm algo = Algorithm.getDefaultAlgorithm();
+		boolean flagSystem = true;
+		boolean flagDisplay = true;
+		boolean flagMultithreading = true;
+		int monitor = 4;
+		int stats = 4;
+		Verbose verbose = Verbose.Log;
+		String path = System.getProperty("user.dir");
+		Controller controller = new Controller();
+		OutputCollection outs = new OutputCollection();
+		Padding pad = new Padding();
+		Apodization apo = new Apodization();
+		double norm = 1.0;
+		AbstractFFTLibrary fft = FFT.getLibraryByName("Academic");
 
+		ArrayList<Token> tokens = parse(command);
+		for (Token token : tokens) {
+			if (token.keyword.equalsIgnoreCase("-algorithm"))
+				algo = Command.decodeAlgorithm(token, controller);
+
+			if (token.keyword.equalsIgnoreCase("-path") && !token.parameters.equalsIgnoreCase("current"))
+				path = token.parameters;
+
+			if (token.keyword.equalsIgnoreCase("-monitor"))
+				monitor = decodeMonitor(token);
+			if (token.keyword.equalsIgnoreCase("-stats"))
+				stats = decodeStats(token);
+			if (token.keyword.equalsIgnoreCase("-system")) 
+				flagSystem = decodeSystem(token);
+
+			if (token.keyword.equalsIgnoreCase("-display")) 						
+				flagDisplay = decodeDisplay(token);
+			
+			if (token.keyword.equalsIgnoreCase("-multithreading")) 						
+				flagMultithreading = decodeMultithreading(token);
+
+			if (token.keyword.equalsIgnoreCase("-verbose"))
+				verbose = Verbose.getByName(token.parameters);
+
+			if (token.keyword.equalsIgnoreCase("-fft"))
+				fft = FFT.getLibraryByName(token.parameters);
+
+			if (token.keyword.equalsIgnoreCase("-pad"))
+				pad = decodePadding(token);
+			
+			if (token.keyword.equalsIgnoreCase("-apo"))
+				apo =  decodeApodization(token);
+			
+			if (token.keyword.equalsIgnoreCase("-norm"))
+				norm = decodeNormalization(token);
+			
+			if (token.keyword.equalsIgnoreCase("-constraint"))
+				decodeController(token, controller);
+			
+			if (token.keyword.equalsIgnoreCase("-time"))
+				decodeController(token, controller);
+			
+			if (token.keyword.equalsIgnoreCase("-residu"))
+				decodeController(token, controller);
+			
+			if (token.keyword.equalsIgnoreCase("-reference"))
+				decodeController(token, controller);
+
+			if (token.keyword.equalsIgnoreCase("-epsilon"))
+				Operations.epsilon = NumFormat.parseNumber(token.parameters, 1e-6);
+
+			if (token.keyword.equals("-out")) {
+				Output out = decodeOut(token);
+				if (out != null)
+					outs.add(out);
+			}
+		}
+		
+		deconvolution.setAlgorithm(algo, controller);
+		deconvolution.setPath(path);
+		deconvolution.setNormalization(norm);
+		deconvolution.setPadding(pad);
+		deconvolution.setApodization(apo);
+		deconvolution.setOutput(outs);
+		deconvolution.setVerbose(verbose);
+		deconvolution.setFFT(fft);
+		deconvolution.setMonitor(monitor);
+		deconvolution.setStats(stats);
+		deconvolution.setFlags(flagDisplay, flagMultithreading, flagSystem);
+	}
+	
 	/**
 	 * This methods first segments the command line, then create all the tokens
 	 * of the command line
@@ -163,8 +257,8 @@ public class Command {
 		double params[] = parseNumeric(token.parameters);
 		if (params != null) {
 			algo.setParameters(params);
-			if (algo.isIterative())
-				controller.setIterationMax(algo.getController().getIterationMax());
+			if (algo.isIterative() && params.length >= 1) 
+				controller.setIterationMax((int)params[0]);
 		}
 
 		if (algo.isWaveletsBased()) {
@@ -200,22 +294,15 @@ public class Command {
 			out = new Output(View.FIGURE, freq, line.substring("figure".length(), line.length()));
 		if (p.startsWith("planar"))
 			out = new Output(View.PLANAR, freq, line.substring("planar".length(), line.length()));
-		if (p.startsWith("stats"))
-			out = new Output(View.STATS, freq, line.substring("stats".length(), line.length()));
-		if (p.startsWith("profile"))
-			out = new Output(View.PROFILE, freq, line.substring("profile".length(), line.length()));
 
 		return out;
 	}
 
 	public static void decodeController(Token token, Controller controller) {
-
-		int freq = 1;
 		String line = token.parameters;
 		if (token.parameters.startsWith("@")) {
 			String parts[] = token.parameters.split(" ");
 			if (parts.length >= 1) {
-				freq = (int) NumFormat.parseNumber(parts[0], 1);
 				line = token.parameters.substring(parts[0].length(), token.parameters.length()).trim();
 			}
 		}
@@ -238,7 +325,56 @@ public class Command {
 			return NumFormat.parseNumber(token.parameters, 1);
 	}
 
-	public static boolean decodeMonitor(Token token) {
+	public static int decodeMonitor(Token token) {
+		String parts[] = token.parameters.toLowerCase().split(" ");
+		int m = 0;
+		for(String p : parts) {
+			if (p.startsWith("no"))
+				return 0;
+			if (p.equals("false"))
+				return 0;
+			if (p.equals("0"))
+				return 0;
+			if (p.equals("1"))
+				return 1;
+			if (p.equals("2"))
+				return 2;
+			if (p.equals("3"))
+				return 3;
+			if (p.equals("console"))
+				m += 1;
+			if (p.equals("table"))
+				m += 2;
+		}
+		return m;
+	}
+	
+	public static int decodeStats(Token token) {
+		String parts[] = token.parameters.toLowerCase().split(" ");
+		int m = 0;
+		for(String p : parts) {
+			if (p.startsWith("no"))
+				return 0;
+			if (p.equals("false"))
+				return 0;
+			if (p.equals("0"))
+				return 0;
+			if (p.equals("1"))
+				return 1;
+			if (p.equals("2"))
+				return 2;
+			if (p.equals("3"))
+				return 3;
+			if (p.equals("show"))
+				m += 1;
+			if (p.equals("save"))
+				m += 2;
+		}
+		return m;
+	}
+
+	
+	public static boolean decodeMonitorConsole(Token token) {
 		String p = token.parameters.toLowerCase();
 		if (p.startsWith("no"))
 			return false;
@@ -246,7 +382,16 @@ public class Command {
 			return false;
 		if (p.equals("false"))
 			return false;
-		if (p.equals("console"))
+		return true;
+	}
+
+	public static boolean decodeSystem(Token token) {
+		String p = token.parameters.toLowerCase();
+		if (p.startsWith("no"))
+			return false;
+		if (p.equals("0"))
+			return false;
+		if (p.equals("false"))
 			return false;
 		return true;
 	}
@@ -306,5 +451,18 @@ public class Command {
 			apoZ = Apodization.getByShortname(parts[1].trim());
 		return new Apodization(apoXY, apoXY, apoZ);
 	}
+	
+	public static String getPath() {
+		command();
+		ArrayList<Token> tokens = parse(command.getCommand());
+		String path = System.getProperty("user.dir");
+		
+		for (Token token : tokens)
+			if (token.keyword.equalsIgnoreCase("-path") && !token.parameters.equalsIgnoreCase("current"))
+				path = token.parameters;
+		return path;
+	}
+
+
 
 }

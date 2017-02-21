@@ -32,6 +32,7 @@
 package signal.factory;
 
 import deconvolutionlab.Lab;
+import signal.Operations;
 import signal.RealSignal;
 
 public class Sinc extends SignalFactory {
@@ -80,7 +81,7 @@ public class Sinc extends SignalFactory {
 			
 			double r = Math.sqrt(KX*(x-xc)*(x-xc) + KY*(y-yc)*(y-yc) + KZ*(z-zc)*(z-zc));
 			double v = 1.0;
-			if (r > RealSignal.epsilon)
+			if (r > Operations.epsilon)
 				v = Math.sin(r) / r;
 			signal.data[z][x+nx*y] = (float)((amplitude-background) * v + background);
 		}

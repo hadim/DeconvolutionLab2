@@ -33,10 +33,10 @@ import java.io.File;
 
 import deconvolution.Command;
 import deconvolution.Deconvolution;
-import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
+import deconvolutionlab.Imaging;
+import deconvolutionlab.Imaging.Platform;
 import deconvolutionlab.Lab;
-import deconvolutionlab.Platform;
 import deconvolutionlab.dialog.LabDialog;
 import deconvolutionlab.monitor.Monitors;
 
@@ -47,7 +47,7 @@ public class DeconvolutionLab2 {
 	public static void main(String arg[]) {
 
 		System.out.println(ack);
-		Lab.getInstance(Platform.STANDALONE);
+		Lab.init(Platform.STANDALONE);
 
 		if (arg.length == 0) {
 			System.out.println("Starting lab");
@@ -77,7 +77,7 @@ public class DeconvolutionLab2 {
 			String cmd = "";
 			for (int i = 1; i < arg.length; i++)
 				cmd += arg[i] + " ";
-			new Deconvolution(cmd).deconvolve(true);
+			new Deconvolution("Run", cmd, Deconvolution.Finish.KILL).deconvolve();
 		}
 
 		else if (flag.equalsIgnoreCase("launch")) {
@@ -85,7 +85,7 @@ public class DeconvolutionLab2 {
 			String cmd = "";
 			for (int i = 1; i < arg.length; i++)
 				cmd += arg[i] + " ";
-			new Deconvolution(cmd).launch("", true);
+			new Deconvolution("Launch", cmd, Deconvolution.Finish.KILL).launch();
 		}
 		else 
 			System.out.println("" + flag +  " command not found");
@@ -102,7 +102,7 @@ public class DeconvolutionLab2 {
 					if (file.canRead())
 						config = filename;
 		}
-		Config.getInstance(config);
+		Lab.init(Platform.STANDALONE, config);
 		LabDialog dialog = new LabDialog();
 		dialog.setVisible(true);
 	}
@@ -125,10 +125,8 @@ public class DeconvolutionLab2 {
 
 	public DeconvolutionLab2(String cmd) {
 		System.out.println("cmd: " + cmd);
-		deconvolutionlab.Lab.getInstance(Platform.STANDALONE);
-		String config = System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config";
-		Config.getInstance(config);
-		new Deconvolution(cmd).deconvolve(false);
+		Lab.init(Imaging.Platform.STANDALONE, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
+		new Deconvolution("CommandLine", cmd).deconvolve();
 	}
 	
 

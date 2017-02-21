@@ -29,46 +29,32 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package deconvolutionlab;
+package deconvolutionlab.system;
 
-import java.util.ArrayList;
+import java.awt.Graphics;
 
-import imagej.IJImager;
-import plugins.sage.deconvolutionlab.IcyImager;
+import signal.SignalCollector;
 
-public enum Platform {
+public class SignalMeter extends AbstractMeter {
 
-	IMAGEJ, ICY, STANDALONE, MATLAB;
-
-	public static ArrayList<PlatformImager> getImagers() {
-		ArrayList<PlatformImager> imagers = new ArrayList<PlatformImager>();
-		try {
-			PlatformImager imager = new IJImager();
-			if (imager != null) {
-				imagers.add(imager);
-			}
-		}
-		catch (NoClassDefFoundError ex) {
-		}
-
-		try {
-			PlatformImager imager = new IcyImager();
-			if (imager != null) {
-				imagers.add(imager);
-			}
-		}
-		catch (NoClassDefFoundError ex) {
-		}
-
-		imagers.add(new LabImager());
-		return imagers;
+	@Override
+	public void paintComponent(Graphics g) {
+ 	    g.setColor(colorText);
+	    g.drawString(prefix + SignalCollector.sumarize(), 10, 17);
 	}
 
-	public static ArrayList<String> getNameImagers() {
-		ArrayList<PlatformImager> imagers = getImagers();
-		ArrayList<String> names = new ArrayList<String>();
-		for (PlatformImager imager : imagers)
-			names.add(imager.getName());
-		return names;
+	@Override
+	public void update() {
+		repaint();
 	}
-};
+
+	@Override
+	public String getName() {
+		return "Signals";
+	}
+
+	@Override
+	public void setDetail() {
+		
+	}
+}

@@ -45,9 +45,7 @@ import javax.swing.JTextField;
 
 import deconvolution.Command;
 import deconvolutionlab.Config;
-import ij.IJ;
 import lab.component.GridPanel;
-import lab.system.SystemPanel;
 import lab.tools.Files;
 
 public class WatcherModule extends AbstractModule implements ActionListener, KeyListener {
@@ -59,8 +57,6 @@ public class WatcherModule extends AbstractModule implements ActionListener, Key
 	private JComboBox<String>	cmbPath;
 	private JTextField			txtPath;
 	private JButton				bnBrowse;
-
-	private JButton				bnSystem;
 
 	public WatcherModule(boolean expanded) {
 		super("Path & Watcher", "", "Default", "", expanded);
@@ -92,7 +88,6 @@ public class WatcherModule extends AbstractModule implements ActionListener, Key
 		cmbPath = new JComboBox<String>(new String[] { "Current", "Specify"});
 		txtPath = new JTextField("", 30);
 		bnBrowse = new JButton("Browse");
-		bnSystem = new JButton("System");
 		
 		GridPanel pn1 = new GridPanel(true, 3);
 		pn1.place(0, 0, 2, 1, "Working directory");
@@ -105,8 +100,7 @@ public class WatcherModule extends AbstractModule implements ActionListener, Key
 		pn2.place(2, 1, cmbMonitor);
 		pn2.place(3, 0, cmbDisplay);
 		pn2.place(3, 1, cmbMultithreading);
-		pn2.place(4, 1, bnSystem);
-	
+		
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 		panel.add(pn1);
@@ -127,7 +121,6 @@ public class WatcherModule extends AbstractModule implements ActionListener, Key
 		cmbMultithreading.addActionListener(this);
 		cmbMonitor.addActionListener(this);
 		bnBrowse.addActionListener(this);
-		bnSystem.addActionListener(this);
 		return panel;
 	}
 
@@ -150,10 +143,7 @@ public class WatcherModule extends AbstractModule implements ActionListener, Key
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
-		if (e.getSource() == bnSystem) {
-			SystemPanel.show(400, 400);
-		}
-		else if (e.getSource() == bnBrowse) {
+		if (e.getSource() == bnBrowse) {
 			File f = Files.browseDirectory(txtPath.getText());
 			if (f != null) {
 				txtPath.setText(f.getAbsolutePath());

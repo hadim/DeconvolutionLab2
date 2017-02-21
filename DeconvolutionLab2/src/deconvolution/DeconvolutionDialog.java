@@ -32,17 +32,15 @@
 package deconvolution;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -52,63 +50,95 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JTabbedPane;
+import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
-import javax.swing.text.BadLocationException;
 
-import lab.component.HTMLPane;
-import lab.system.SystemBar;
+import deconvolution.modules.AlgorithmDModule;
+import deconvolution.modules.RecapDModule;
+import deconvolution.modules.ImageDModule;
+import deconvolution.modules.PSFDModule;
+import deconvolution.modules.ReportDModule;
+import deconvolutionlab.Config;
 import deconvolutionlab.Lab;
-import deconvolutionlab.monitor.StatusMonitor;
+import deconvolutionlab.TableStats;
 import deconvolutionlab.monitor.TableMonitor;
+import lab.component.BorderToggledButton;
+import lab.component.CustomizedTable;
+import lab.component.JPanelImage;
 
-public class DeconvolutionDialog extends JDialog implements ActionListener, Runnable, KeyListener, DeconvolutionListener {
+public class DeconvolutionDialog extends JDialog implements ActionListener, Runnable, DeconvolutionListener {
 
-	public enum State {NOTDEFINED, READY, RUN, FINISH};
+	public enum State {
+		NOTDEFINED, READY, RUN, FINISH
+	};
+
+	private JButton				bnStart		= new JButton("Run");
+	private JButton				bnStop		= new JButton("Stop");
+	private JButton				bnReset		= new JButton("Reset");
+	private JButton				bnHelp		= new JButton("Help");
+	private JButton				bnQuit		= new JButton("Quit");
+
+	private BorderToggledButton	bnRecap		= new BorderToggledButton("Recap");
+	private BorderToggledButton	bnImage		= new BorderToggledButton("Image");
+	private BorderToggledButton	bnPSF		= new BorderToggledButton("PSF");
+	private BorderToggledButton	bnAlgo		= new BorderToggledButton("Algorithm");
+	private BorderToggledButton	bnReport	= new BorderToggledButton("Report");
+	private BorderToggledButton	bnMonitor	= new BorderToggledButton("Monitor");
+	private BorderToggledButton	bnStats		= new BorderToggledButton("Stats");
+
+	private String				job			= "";
+	private Thread				thread		= null;
+
+	private Deconvolution		deconvolution;
+	private State				state		= State.NOTDEFINED;
+	private JProgressBar		progress	= new JProgressBar();
+
+	public static Point			location	= new Point(0, 0);
+
+	private JPanel				cards		= new JPanel(new CardLayout());
+
+	private boolean				flagMonitor	= false;
+	private boolean				flagStats	= false;
+
+	private ImageDModule			image;
+	private	PSFDModule				psf;
+	private RecapDModule			recap;
+	private AlgorithmDModule		algorithm;
+	private ReportDModule			report;
 	
-	private JButton			bnStart	= new JButton("Run");
-	private JButton			bnQuit	= new JButton("Quit");
-	private JButton			bnRecap	= new JButton("Recap");
-	private JButton			bnImage	= new JButton("Check Image");
-	private JButton			bnPSF	= new JButton("Check PSF");
-	private JButton			bnAlgo	= new JButton("Check Algo");
-	private JButton			bnHelp	= new JButton("Help");
-	private JTabbedPane		tab		= new JTabbedPane();
-
-	private HTMLPane		pnCommand;
-	private HTMLPane		pnResume;
-
-	private JButton			job		= null;
-	private Thread			thread	= null;
-
-	private Deconvolution	deconvolution;
-	private State			state = State.NOTDEFINED;
-	private JProgressBar 	progress = new JProgressBar();
-	
-	public static Point		location = new Point(0, 0);
-	
-	public DeconvolutionDialog(Deconvolution deconvolution) {
-		super(new JFrame(), deconvolution.getName() + " " + new SimpleDateFormat("dd/MM/yy HH:m:s").format(new Date()));
+	public DeconvolutionDialog(Deconvolution deconvolution, TableMonitor tableMonitor, TableStats tableStats) {
+		super(new JFrame(), deconvolution.getName());
 
 		this.deconvolution = deconvolution;
+		
+		image = new ImageDModule(deconvolution);
+		psf = new PSFDModule(deconvolution);
+		recap = new RecapDModule(deconvolution);
+		algorithm = new AlgorithmDModule(deconvolution);
+		report = new ReportDModule(deconvolution);
+		
+		// Panel tool with all buttons
+		JToolBar tool = new JToolBar();
+		tool.setFloatable(false);
+		tool.setLayout(new GridLayout(1, 6));
+		tool.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		tool.add(bnRecap);
+		tool.add(bnImage);
+		tool.add(bnPSF);
+		tool.add(bnAlgo);
+		tool.add(bnMonitor);
+		tool.add(bnStats);
+		tool.add(bnReport);
 
-		pnCommand = new HTMLPane("Monaco", 100, 100);
-		pnCommand.append("p", deconvolution.getCommand());
-		pnResume = new HTMLPane("Verdana", 450, 150);
+		// Panel buttons
+		JPanelImage buttons = new JPanelImage("celegans.jpg");
+		buttons.setLayout(new FlowLayout());
+		buttons.setBorder(BorderFactory.createEtchedBorder());
+		buttons.add(bnReset);
+		buttons.add(bnStop);
+		buttons.add(bnStart);
 
-		tab.add("Resume", pnResume.getPane());
-
-		pnCommand.setEditable(true);
-		pnCommand.addKeyListener(this);
-		JPanel bn = new JPanel();
-		bn.setLayout(new GridLayout(1, 5));
-		bn.setBorder(BorderFactory.createEtchedBorder());
-		bn.add(bnRecap);
-		bn.add(bnImage);
-		bn.add(bnPSF);
-		bn.add(bnAlgo);
-		bn.add(bnStart);
-
+		// Panel status bar on bottom
 		progress.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		progress.setBorder(BorderFactory.createLoweredBevelBorder());
 		JToolBar statusBar = new JToolBar();
@@ -119,201 +149,202 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		statusBar.add(progress, BorderLayout.CENTER);
 		statusBar.add(bnQuit, BorderLayout.EAST);
 
+		// Panel bottom
 		JPanel bottom = new JPanel();
 		bottom.setLayout(new BoxLayout(bottom, BoxLayout.PAGE_AXIS));
-		bottom.add(bn);
-		bottom.add(new SystemBar(200));
+		bottom.add(buttons);
 		bottom.add(statusBar);
 
+		// Panel Image
+		cards.add(recap.getName(), recap.getPane());
+		cards.add(image.getName(), image.getPane());
+		cards.add(psf.getName(), psf.getPane());
+		cards.add(algorithm.getName(), algorithm.getPane());
+		cards.add(report.getName(), report.getPane());
+		if (tableMonitor != null)
+			cards.add("Monitor", tableMonitor.getPanel());
+		if (tableStats != null)
+			cards.add("Stats", tableStats.getPanel());
+
+		// Panel Main
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
-		panel.add(pnCommand.getPane(), BorderLayout.NORTH);
+		panel.add(tool, BorderLayout.NORTH);
+		panel.add(cards, BorderLayout.CENTER);
 		panel.add(bottom, BorderLayout.SOUTH);
-		panel.add(tab, BorderLayout.CENTER);
 
 		add(panel);
+		bnReset.addActionListener(this);
 		bnQuit.addActionListener(this);
 		bnStart.addActionListener(this);
+		bnStop.addActionListener(this);
 		bnPSF.addActionListener(this);
 		bnImage.addActionListener(this);
 		bnAlgo.addActionListener(this);
 		bnRecap.addActionListener(this);
 		bnHelp.addActionListener(this);
+		bnMonitor.addActionListener(this);
+		bnStats.addActionListener(this);
 		deconvolution.addDeconvolutionListener(this);
 
 		setMinimumSize(new Dimension(400, 200));
-		setLocation(location);
-		
 		pack();
-		location.x = location.x + 20;
-		location.y = location.y + 20;
+		Config.registerFrame("DeconvolutionLab", "DeconvolutionDialog", this);
 		
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		double width = screenSize.getWidth();
-		double height = screenSize.getHeight();
-		if (location.x + 400 > width)
-			location.x = 0;
-		if (location.y + 200 > height)
-			location.y = 0;
 		
-		setVisible(true);
+		Rectangle rect = Config.getDialog("DeconvolutionLab.DeconvolutionDialog");
+		if (rect.x > 0 && rect.y > 0)
+			setLocation(rect.x, rect.y);
 
-		print(deconvolution.recap());
+		bnStop.setEnabled(false);
+
+		toggle(bnRecap);
 		state = State.READY;
+		
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
 		if (e.getSource() == bnStart) {
-			if (state == State.FINISH) 
-				print(deconvolution.getDeconvolutionReports());
-			else if (thread == null) {
-				job = bnStart;
+			if (flagMonitor)
+				toggle(bnMonitor);
+			else if (flagStats)
+				toggle(bnStats);
+			
+			if (thread == null) {
+				job = bnStart.getText();
 				thread = new Thread(this);
 				thread.setPriority(Thread.MIN_PRIORITY);
 				thread.start();
 			}
-			else {
-				finish();
-				if (deconvolution != null)
-					deconvolution.abort();
-			}
+		}
+		else if (e.getSource() == bnStop) {
+			toggle(bnReport);
+			finish();
+			if (deconvolution != null)
+				deconvolution.abort();
 		}
 		else if (e.getSource() == bnRecap) {
+			toggle(bnRecap);
 			if (thread == null) {
-				job = bnRecap;
+				job = bnRecap.getText();
 				thread = new Thread(this);
 				thread.setPriority(Thread.MIN_PRIORITY);
 				thread.start();
 			}
 		}
 		else if (e.getSource() == bnImage) {
+			toggle(bnImage);
 			if (thread == null) {
-				job = bnImage;
+				job = bnImage.getText();
 				thread = new Thread(this);
 				thread.setPriority(Thread.MIN_PRIORITY);
 				thread.start();
 			}
 		}
 		else if (e.getSource() == bnPSF) {
+			toggle(bnPSF);
 			if (thread == null) {
-				job = bnPSF;
+				job = bnPSF.getText();
 				thread = new Thread(this);
 				thread.setPriority(Thread.MIN_PRIORITY);
 				thread.start();
 			}
 		}
 		else if (e.getSource() == bnAlgo) {
+			toggle(bnAlgo);
 			if (thread == null) {
-				job = bnAlgo;
+				job = bnAlgo.getText();
 				thread = new Thread(this);
 				thread.setPriority(Thread.MIN_PRIORITY);
 				thread.start();
 			}
 		}
-
+		else if (job.equals(bnRecap.getText())) {
+			toggle(bnRecap);
+			recap.update();
+		}
+		else if (e.getSource() == bnReport) {
+			toggle(bnReport);
+			report.update();
+		}
+		else if (e.getSource() == bnReset) {
+			toggle(bnRecap);
+			state = State.READY;
+			bnStart.setEnabled(true);
+		}
 		else if (e.getSource() == bnQuit) {
+			deconvolution.finalize();
+			deconvolution = null;
 			dispose();
 		}
 		else if (e.getSource() == bnHelp)
 			Lab.help();
+		else if (e.getSource() == bnMonitor)
+			toggle(bnMonitor);
+		else if (e.getSource() == bnStats)
+			toggle(bnStats);
 	}
 
 	@Override
 	public void run() {
-		
 		bnRecap.setEnabled(false);
-		bnAlgo.setEnabled(false);
-		bnPSF.setEnabled(false);
 		bnImage.setEnabled(false);
-		bnStart.setEnabled(false);
-		String command = pnCommand.getText();
-		deconvolution.setCommand(command);
-		if (job == bnStart) {
-			if (tab.getTabCount() > 1)
-				tab.setSelectedIndex(1);
-			else
-				print(deconvolution.recap());
+		bnPSF.setEnabled(false);
+		bnAlgo.setEnabled(false);
+
+		deconvolution.setCommand(recap.getCommand());
+		if (job.equals(bnStart.getText())) {
+			bnStart.setEnabled(false);
+			bnStop.setEnabled(true);
 			deconvolution.run();
-			print(deconvolution.getDeconvolutionReports());
+			toggle(bnReport);
+			bnStop.setEnabled(false);
 		}
-		else if (job == bnRecap) {
-			tab.setSelectedIndex(0);
-			print(deconvolution.recap());
-		}
-		else if (job == bnImage) {
-			tab.setSelectedIndex(0);
-			print(deconvolution.checkImage());
-		}
-		else if (job == bnPSF) {
-			tab.setSelectedIndex(0);
-			print(deconvolution.checkPSF());
-		}
-		else if (job == bnAlgo) {
-			tab.setSelectedIndex(0);
-			print(deconvolution.checkAlgo());
-		}
+		else if (job.equals(bnImage.getText()))
+			image.update();
+		else if (job.equals(bnPSF.getText())) 
+			psf.update();
+		else if (job.equals(bnAlgo.getText())) 
+			algorithm.update();
+		
 		bnRecap.setEnabled(true);
 		bnAlgo.setEnabled(true);
 		bnPSF.setEnabled(true);
 		bnImage.setEnabled(true);
-		bnStart.setEnabled(true);
 		thread = null;
 	}
-
-	private void print(ArrayList<String> lines) {
-		pnResume.clear();
-		for (String line : lines)
-			pnResume.append("p", line);
-	}
-
-	public void addTableMonitor(String title, TableMonitor tm) {
-		tab.add(title, tm.getPanel());
-	}
 	
 	@Override
-	public void keyTyped(KeyEvent e) {
+	public void started() {
+		state = State.RUN;
 	}
 
 	@Override
-	public void keyPressed(KeyEvent e) {
+	public void finish() {
+		state = State.FINISH;
 	}
 
-	@Override
-	public void keyReleased(KeyEvent e) {
-		try {
-			int len = pnCommand.getDocument().getLength();
-			String command = pnCommand.getDocument().getText(0, len);
-			deconvolution.setCommand(command);
-			print(deconvolution.recap());
-		}
-		catch (BadLocationException e1) {
-			e1.printStackTrace();
-		}
-	}
-
-	@Override
-    public void started() {
-	    bnStart.setEnabled(true);
-	    bnStart.setText("Abort");
-	    state = State.RUN;
-    }
-
-	@Override
-    public void finish() {
-	    bnStart.setEnabled(true);
-	    bnStart.setText("Report");
-	    state = State.FINISH;
-	    tab.setSelectedIndex(0);
-    }
-	
 	public JProgressBar getProgressBar() {
 		return progress;
 	}
-	
+
 	public static void setLocationLaunch(Point l) {
 		location = l;
+	}
+
+	private void toggle(BorderToggledButton bn) {
+		((CardLayout) (cards.getLayout())).show(cards, bn.getText());
+		bnRecap.setSelected(false);
+		bnImage.setSelected(false);
+		bnPSF.setSelected(false);
+		bnAlgo.setSelected(false);
+		bnMonitor.setSelected(false);
+		bnStats.setSelected(false);
+		bnReport.setSelected(false);
+		bn.setSelected(true);
+
 	}
 
 }

@@ -33,12 +33,15 @@ package signal;
 
 public class Operations {
 	
+	public static double epsilon	= 1e-6;
+
 	public static RealSignal log(RealSignal s) {
+		String name = "log(" + s.name + ")";
 		int nx = s.nx;
 		int ny = s.ny;
 		int nz = s.nz;
 		int nxy = nx * ny;
-		RealSignal log = new RealSignal(nx, ny, nz);
+		RealSignal log = new RealSignal(name, nx, ny, nz);
 		for(int k=0; k<nz; k++)
 		for(int i=0; i< nxy; i++) {
 			log.data[k][i] = (float) Math.log(s.data[k][i]);
@@ -46,10 +49,10 @@ public class Operations {
 		return log;
 	}
 
-	public static void divide(RealSignal numerator, RealSignal denominator, RealSignal output) {
+	public static void divide(RealSignal numerator, RealSignal denominator, RealSignal output) { 
+		String name = numerator.name + "/" + denominator.name;
 		if (output == null)
-			 output = new RealSignal(numerator.nx, numerator.ny, numerator.nz);
-		double epsilon = Signal.epsilon;
+			 output = new RealSignal(name, numerator.nx, numerator.ny, numerator.nz);
 		
 		int nxy = numerator.nx * numerator.ny;
 		for(int k=0; k<numerator.nz; k++)
@@ -62,17 +65,19 @@ public class Operations {
 	}
 
 	public static RealSignal divide(RealSignal numerator, RealSignal denominator) {
-		RealSignal output = new RealSignal(numerator.nx, numerator.ny, numerator.nz);
+		String name = numerator.name + "/" + denominator.name;
+		RealSignal output = new RealSignal(name, numerator.nx, numerator.ny, numerator.nz);
 		divide(numerator, denominator, output);
 		return output;
 	}
 
 	public static ComplexSignal conjugate(ComplexSignal s) {
+		String name = "conj(" + s.name + ")";
 		int nx = s.nx;
 		int ny = s.ny;
 		int nz = s.nz;
 		int nxy = nx * ny * 2;
-		ComplexSignal result = new ComplexSignal(nx, ny, nz);
+		ComplexSignal result = new ComplexSignal(name, nx, ny, nz);
 		for(int k=0; k<nz; k++)
 		for(int i=0; i< nxy; i+=2) {
 			result.data[k][i] = s.data[k][i];
@@ -82,8 +87,9 @@ public class Operations {
 	}
 
 	public static void multiply(ComplexSignal a, ComplexSignal b, ComplexSignal output) {
+		String name = a.name + "*" + b.name;
 		if (output == null)
-			 output = new ComplexSignal(a.nx, a.ny, a.nz);
+			 output = new ComplexSignal(name, a.nx, a.ny, a.nz);
 		int nx = a.nx;
 		int ny = a.ny;
 		int nz = a.nz;
@@ -101,20 +107,23 @@ public class Operations {
 	}
 
 	public static ComplexSignal multiply(ComplexSignal a, ComplexSignal b) {
-		ComplexSignal output = new ComplexSignal(a.nx, a.ny, a.nz);
+		String name = a.name + "*" + b.name;
+		ComplexSignal output = new ComplexSignal(name, a.nx, a.ny, a.nz);
 		multiply(a, b, output);
 		return output;
 	}
 
 	public static ComplexSignal multiplyConjugate(ComplexSignal aConjugate, ComplexSignal b) {
-		ComplexSignal output = new ComplexSignal(b.nx, b.ny, b.nz);
+		String name = aConjugate.name + "* *" + b.name;
+		ComplexSignal output = new ComplexSignal(name, b.nx, b.ny, b.nz);
 		multiplyConjugate(aConjugate, b, output);
 		return output;
 	}
 
 	public static void multiplyConjugate(ComplexSignal aConjugate, ComplexSignal b, ComplexSignal output) {
+		String name = aConjugate.name + "* *" + b.name;
 		if (output == null)
-			 output = new ComplexSignal(b.nx, b.ny, b.nz);
+			 output = new ComplexSignal(name, b.nx, b.ny, b.nz);
 		int nx = b.nx;
 		int ny = b.ny;
 		int nz = b.nz;
@@ -132,10 +141,11 @@ public class Operations {
 	}
 	
 	public static ComplexSignal multiply(double w, ComplexSignal a, ComplexSignal b) {
+		String name = a.name + "* w *" + b.name;
 		int nx = a.nx;
 		int ny = a.ny;
 		int nz = a.nz;
-		ComplexSignal result = new ComplexSignal(nx, ny, nz);
+		ComplexSignal result = new ComplexSignal(name, nx, ny, nz);
 		double a1, a2, b1, b2;
 		int nxy = nx * ny * 2;
 		for(int k=0; k<nz; k++)
@@ -151,10 +161,11 @@ public class Operations {
 	}
 
 	public static ComplexSignal multiplyConjugate(double w, ComplexSignal aConjugate, ComplexSignal b) {
+		String name = aConjugate.name + "* * w *" + b.name;
 		int nx = b.nx;
 		int ny = b.ny;
 		int nz = b.nz;
-		ComplexSignal result = new ComplexSignal(nx, ny, nz);
+		ComplexSignal result = new ComplexSignal(name, nx, ny, nz);
 		double a1, a2, b1, b2;
 		int nxy = nx * ny * 2;
 		for(int k=0; k<nz; k++)
@@ -170,13 +181,13 @@ public class Operations {
 	}
 
 	public static ComplexSignal divideStabilized(ComplexSignal numerator, ComplexSignal denominator) {
+		String name = numerator.name + " / " + denominator.name;
 		int nx = numerator.nx;
 		int ny = numerator.ny;
 		int nz = numerator.nz;
-		ComplexSignal result = new ComplexSignal(nx, ny, nz);
+		ComplexSignal result = new ComplexSignal(name, nx, ny, nz);
 		double a1, a2, b1, b2, mag;
 		int nxy = nx * ny * 2;
-		double epsilon = Signal.epsilon;
 		for(int k=0; k<nz; k++)
 		for(int i=0; i< nxy; i+=2) {
 			a1 = numerator.data[k][i];
@@ -191,10 +202,11 @@ public class Operations {
 	}
 	
 	public static ComplexSignal divideNotStabilized(ComplexSignal numerator, ComplexSignal denominator) {
+		String name = numerator.name + " /0/ " + denominator.name;
 		int nx = numerator.nx;
 		int ny = numerator.ny;
 		int nz = numerator.nz;
-		ComplexSignal result = new ComplexSignal(nx, ny, nz);
+		ComplexSignal result = new ComplexSignal(name, nx, ny, nz);
 		double a1, a2, b1, b2;
 		int nxy = nx * ny * 2;
 		for(int k=0; k<nz; k++)
@@ -211,11 +223,12 @@ public class Operations {
 	}
 
 	public static ComplexSignal add(ComplexSignal s1, ComplexSignal s2) {
+		String name = s1.name + " + " + s2.name;
 		int nx = s1.nx;
 		int ny = s1.ny;
 		int nz = s1.nz;
 		int nxy = nx * ny * 2;
-		ComplexSignal result = new ComplexSignal(nx, ny, nz);
+		ComplexSignal result = new ComplexSignal(name, nx, ny, nz);
 		for(int k=0; k<nz; k++)
 		for(int i=0; i<nxy; i++)
 			result.data[k][i] = s1.data[k][i] + s2.data[k][i];
@@ -223,11 +236,12 @@ public class Operations {
 	}
 
 	public static ComplexSignal subtract(ComplexSignal s1, ComplexSignal s2) {
+		String name = s1.name + " - " + s2.name;
 		int nx = s1.nx;
 		int ny = s1.ny;
 		int nz = s1.nz;
 		int nxy = nx * ny * 2;
-		ComplexSignal result = new ComplexSignal(nx, ny, nz);
+		ComplexSignal result = new ComplexSignal(name, nx, ny, nz);
 		for(int k=0; k<nz; k++)
 		for(int i=0; i<nxy; i++)
 			result.data[k][i] = s1.data[k][i] - s2.data[k][i];
@@ -235,8 +249,9 @@ public class Operations {
 	}
 
 	public static void subtract(RealSignal s1, RealSignal s2, RealSignal output) {
+		String name = s1.name + " - " + s2.name;
 		if (output == null)
-			output = new RealSignal(s1.nx, s1.ny, s1.nz);
+			output = new RealSignal(name, s1.nx, s1.ny, s1.nz);
 		int nxy = s1.nx * s1.ny;
 		for(int k=0; k<s1.nz; k++)
 		for(int i=0; i<nxy; i++)
@@ -244,16 +259,18 @@ public class Operations {
 	}
 	
 	public static RealSignal subtract(RealSignal s1, RealSignal s2) {
-		RealSignal output = new RealSignal(s1.nx, s1.ny, s1.nz);
+		String name = s1.name + " - " + s2.name;
+		RealSignal output = new RealSignal(name, s1.nx, s1.ny, s1.nz);
 		subtract(s1, s2, output);
 		return output;
 	}
 
 	public static ComplexSignal computeHtH(double w, ComplexSignal h) {
+		String name = " w * HtH( " + h.name + ")";
 		int nx = h.nx;
 		int ny = h.ny;
 		int nz = h.nz;
-		ComplexSignal result = new ComplexSignal(nx, ny, nz);
+		ComplexSignal result = new ComplexSignal(name, nx, ny, nz);
 		double a, b;
 		int nxy = nx * ny * 2;
 		for(int k=0; k<nz; k++)
@@ -268,10 +285,11 @@ public class Operations {
 
 	// I - gamma * Ht * H
 	public static ComplexSignal delta(double w, ComplexSignal h) {
+		String name = " w * Delta2( " + h.name + ")";
 		int nx = h.nx;
 		int ny = h.ny;
 		int nz = h.nz;
-		ComplexSignal result = new ComplexSignal(nx, ny, nz);
+		ComplexSignal result = new ComplexSignal(name, nx, ny, nz);
 		double a, b;
 		int nxy = nx * ny * 2;
 		for(int k=0; k<nz; k++)
@@ -286,10 +304,11 @@ public class Operations {
 
 	// I - gamma * H
 	public static ComplexSignal delta1(double w, ComplexSignal h) {
+		String name = " w * Delta1( " + h.name + ")";
 		int nx = h.nx;
 		int ny = h.ny;
 		int nz = h.nz;
-		ComplexSignal result = new ComplexSignal(nx, ny, nz);
+		ComplexSignal result = new ComplexSignal(name, nx, ny, nz);
 		double a, b;
 		int nxy = nx * ny * 2;
 		for(int k=0; k<nz; k++)
@@ -303,11 +322,12 @@ public class Operations {
 	}
 
 	public static ComplexSignal multiply(double factor, ComplexSignal s) {
+		String name = " w * ( " + s.name + ")";
 		int nx = s.nx;
 		int ny = s.ny;
 		int nz = s.nz;
 		int nxy = nx * ny * 2;
-		ComplexSignal result = new ComplexSignal(nx, ny, nz);
+		ComplexSignal result = new ComplexSignal(name, nx, ny, nz);
 		for(int k=0; k<nz; k++)
 		for(int i=0; i<nxy; i++)
 			result.data[k][i] = (float)(factor * s.data[k][i]);

@@ -51,7 +51,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import deconvolution.Command;
-import deconvolution.Deconvolution;
 import deconvolutionlab.Config;
 import lab.component.GridPanel;
 import lab.tools.Files;
@@ -126,10 +125,6 @@ public class ControllerModule extends AbstractModule implements ActionListener, 
 		pn.place(8, 0, "Ground-truth file");
 		pn.place(8, 1, bnBrowse);
 
-		Border b1 = BorderFactory.createEtchedBorder();
-		Border b2 = BorderFactory.createEmptyBorder(10, 10, 10, 10);
-		pn.setBorder(BorderFactory.createCompoundBorder(b1, b2));
-		
 		JScrollPane scroll = new JScrollPane(pn);
 		scroll.setBorder(BorderFactory.createEmptyBorder());
 		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -137,9 +132,8 @@ public class ControllerModule extends AbstractModule implements ActionListener, 
 
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.setBorder(BorderFactory.createEtchedBorder());
-		panel.add(scroll, BorderLayout.NORTH);
-
-			
+		panel.add(scroll, BorderLayout.CENTER);
+	
 		Config.register(getName(), "residu.enable", chkResidu, false);
 		Config.register(getName(), "reference.enable", chkReference, false);
 		Config.register(getName(), "constraint.enable", chkConstraint, false);
@@ -185,8 +179,7 @@ public class ControllerModule extends AbstractModule implements ActionListener, 
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
 		if (e.getSource() == bnBrowse) {
-			Deconvolution deconvolution = new Deconvolution(Command.command());		
-			File file = Files.browseFile(deconvolution.getPath());
+			File file = Files.browseFile(Command.getPath());
 			if (file != null)
 				txtReference.setText(file.getAbsolutePath());
 		}

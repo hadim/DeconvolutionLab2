@@ -31,39 +31,67 @@
 
 package deconvolutionlab;
 
+import java.util.ArrayList;
+
+import javax.swing.JDialog;
+
+import imagej.IJImager;
+import plugins.sage.deconvolutionlab.IcyImager;
 import signal.ComplexComponent;
 import signal.ComplexSignal;
 import signal.RealSignal;
-import deconvolutionlab.monitor.Monitors;
 
-public abstract class PlatformImager {
-	
+public abstract class Imaging {
+
+	public enum Type {FLOAT, SHORT, BYTE};
+	public enum Platform {IMAGEJ, ICY, STANDALONE, MATLAB};
+
 	public class ContainerImage {	
 		public Object object;
 	}
-	
-	public enum Type {FLOAT, SHORT, BYTE};
-	
+
+	public abstract void setVisible(JDialog dialog, boolean modal);
+	public abstract Platform getPlatform();
 	public abstract RealSignal create();
 	public abstract RealSignal create(String name);
-
 	public abstract ContainerImage createContainer(String title);
-	
 	public abstract void show(ComplexSignal signal, String title, ComplexComponent complex);
-	public abstract void show(ComplexSignal signal, String title);
-
-	public abstract void append(ContainerImage container, RealSignal signal, String title);
+	public abstract void show(RealSignal signal, String title, Imaging.Type type, int z);
 	public abstract void append(ContainerImage container,  RealSignal signal, String title, Type type);
-
-	public abstract void show(RealSignal signal, String title);
-	public abstract void show(RealSignal signal, String title, Type type);
-	public abstract void show(RealSignal signal, String title, PlatformImager.Type type, int z);
-
-	public abstract void save(RealSignal signal, String filename);
 	public abstract void save(RealSignal signal, String filename, Type type);
-	
 	public abstract RealSignal open(String filename);
-	
 	public abstract String getName();
+	public abstract String getSelectedImage();
+	public abstract boolean isSelectable();
+	
 
+	public static ArrayList<Imaging> getImagings() {
+		ArrayList<Imaging> imagings = new ArrayList<Imaging>();
+		try {
+			Imaging imaging = new IJImager();
+			if (imaging != null) {
+				imagings.add(imaging);
+			}
+		}
+		catch (NoClassDefFoundError ex) {
+		}
+
+		try {
+			Imaging imaging = new IcyImager();
+			if (imaging != null) {
+				imagings.add(imaging);
+			}
+		}
+		catch (NoClassDefFoundError ex) {
+		}
+		return imagings;
+	}
+
+	public static ArrayList<String> getImagingByName() {
+		ArrayList<Imaging> imagings = getImagings();
+		ArrayList<String> names = new ArrayList<String>();
+		for (Imaging imaging : imagings)
+			names.add(imaging.getName());
+		return names;
+	}
 }

@@ -29,58 +29,63 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lab.system;
+package deconvolutionlab.system;
 
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
+import java.io.File;
+import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryUsage;
-
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
 
 import lab.tools.NumFormat;
 
-public class SystemHeap extends JLabel {
-	
-	private double peak;
-	
-	public SystemHeap() {
-		super("");
-		setBorder(BorderFactory.createEtchedBorder());
-		setPreferredSize(new Dimension(200, 20));
-		setMinimumSize(new Dimension(200, 20));
-		setMaximumSize(new Dimension(200, 20));
-	}
-	
-	public void reset() {
-		peak = 0;
-	}
-	
+public class FileMeter extends AbstractMeter {
+
 	@Override
 	public void paintComponent(Graphics g) {
-		MemoryUsage mem = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
-		double used = mem.getUsed();
-		double maxi = mem.getMax();
-		peak = Math.max(used, peak);
 	    super.paintComponent(g);
+	    
+		double maxi = SystemUsage.getTotalSpace();
+		double used = maxi - SystemUsage.getAvailableSpace();
+		String space = NumFormat.bytes(used);
 	    int w = getWidth();
-	    g.setColor(new Color(10, 10, 10, 30));
+	    g.setColor(colorBackground);
 	    for(int i=0; i<w; i+=w/10)
 	    	g.drawLine(i, 0, i, 30);
 	    
 	    int posu = (int)Math.round(w*used/maxi);
-   	    int posp = (int)Math.round(w*peak/maxi);
-		String u = NumFormat.bytes(used); 
-		String m = NumFormat.bytes(maxi);
-
-   	    g.setColor(new Color(10, 10, 160, 30));
+	 	    g.setColor(colorHot);
    	    g.fillRect(0, 0, posu, 30);
-   	    g.fillRect(0, 0, posp, 30);
-   	    g.setColor(new Color(160, 10, 10));
-  	    	g.drawString(u, 10, 13);
-  	    //g.drawString(p, posp, 13);
-   	    g.drawString(m, w-60, 13);
+ 
+	    g.setColor(colorText);
+	    g.drawString(prefix + space, 10, 17);
+	}
+
+	@Override
+	public void update() {
+		repaint();
+	}
+
+	@Override
+	public String getName() {
+		return "File";
+	}
+
+	@Override
+	public void setDetail() {
+		File[] roots = File.listRoots();
+		int i=0;
+		add(i++, new String[] { "Properties", "java.class.path", System.getProperty("java.class.path") });
+		add(i++, new String[] { "Properties", "java.home", System.getProperty("java.home") });
+		add(i++, new String[] { "Properties", "user.dir", System.getProperty("user.dir") });
+		add(i++, new String[] { "Properties", "user.home", System.getProperty("user.home") });
+		add(i++, new String[] { "Properties", "user.name", System.getProperty("user.name") });
+
+		for (File root : roots) {
+			add(i++, new String[] { "FileSystem", "Root Path", root.getAbsolutePath() });
+			add(i++, new String[] { "FileSystem", "Total Space", NumFormat.bytes(root.getTotalSpace()) });
+			add(i++, new String[] { "FileSystem", "Usable Space", NumFormat.bytes(root.getUsableSpace()) });
+		}		
+		ClassLoadingMXBean loader = ManagementFactory.getClassLoadingMXBean();
+		add(i++, new String[] { "ClassLoading", "Loaded Class", "" + loader.getLoadedClassCount() });
 	}
 }

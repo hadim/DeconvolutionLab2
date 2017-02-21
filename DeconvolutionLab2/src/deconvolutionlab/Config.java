@@ -31,6 +31,7 @@
 
 package deconvolutionlab;
 
+import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -51,23 +52,23 @@ import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
+import deconvolutionlab.monitor.Monitors;
 import lab.component.CustomizedTable;
 import lab.component.SpinnerRangeDouble;
 import lab.component.SpinnerRangeInteger;
 import lab.tools.NumFormat;
-import deconvolutionlab.monitor.Monitors;
 
 public class Config {
 
 	private static String							project		= Constants.name;
 	private static String							filename;
 	private static HashMap<String, Object>			inits;
-	private static HashMap<String, JComponent>		components;
-	private static HashMap<String, CustomizedTable>	tables;
-	private static HashMap<String, JDialog>			dialogs;
+	private static HashMap<String, JComponent>		components	= new HashMap<String, JComponent>();
+	private static HashMap<String, CustomizedTable>	tables		= new HashMap<String, CustomizedTable>();;
+	private static HashMap<String, JDialog>			dialogs		= new HashMap<String, JDialog>();
 	private static Monitors							monitors	= Monitors.createDefaultMonitor();
 
-	public static Config getInstance(String filename) {
+	public static Config init(String filename) {
 		Config.filename = filename;
 		Config.inits = new HashMap<String, Object>();
 		Config.components = new HashMap<String, JComponent>();
@@ -86,25 +87,30 @@ public class Config {
 
 	public static boolean check() {
 		File file = new File(Config.filename);
-		if (!file.exists()) return false;
-		if (file.isDirectory()) return false;
+		if (!file.exists())
+			return false;
+		if (file.isDirectory())
+			return false;
 		return true;
 	}
 
 	public static void register(String module, String key, JComponent component, Object init) {
-		if (component == null) return;
+		if (component == null)
+			return;
 		components.put(module + "." + key, component);
 		inits.put(module + "." + key, init);
 		setValue(key, init);
 	}
 
 	public static void registerTable(String module, String key, CustomizedTable table) {
-		if (table == null) return;
+		if (table == null)
+			return;
 		tables.put(module + "." + key, table);
 	}
 
 	public static void registerFrame(String module, String key, JDialog dialog) {
-		if (dialog == null) return;
+		if (dialog == null)
+			return;
 		dialogs.put(module + "." + key, dialog);
 	}
 
@@ -116,7 +122,8 @@ public class Config {
 			return ((Double) object).toString();
 		else if (object instanceof Integer)
 			return ((Integer) object).toString();
-		else if (object instanceof Boolean) return ((Boolean) object).toString();
+		else if (object instanceof Boolean)
+			return ((Boolean) object).toString();
 		return null;
 	}
 
@@ -124,15 +131,18 @@ public class Config {
 		Object object = getValue(key);
 		if (object instanceof Double)
 			return ((Double) object).doubleValue();
-		else if (object instanceof Integer) return ((Integer) object).intValue();
+		else if (object instanceof Integer)
+			return ((Integer) object).intValue();
 		return 0;
 	}
 
 	private static void setValue(String key, Object value) {
 		JComponent component = components.get(key);
-		if (component == null) return;
+		if (component == null)
+			return;
 
-		if (value == null) value = inits.get(key);
+		if (value == null)
+			value = inits.get(key);
 
 		if (component instanceof JTextField) {
 			JTextField txt = (JTextField) component;
@@ -182,13 +192,15 @@ public class Config {
 			JTabbedPane tab = (JTabbedPane) component;
 			String source = value.toString();
 			for (int i = 0; i < tab.getTabCount(); i++)
-				if (source.equals(tab.getTitleAt(i))) tab.setSelectedIndex(i);
+				if (source.equals(tab.getTitleAt(i)))
+					tab.setSelectedIndex(i);
 		}
 	}
 
 	private static Object getValue(String key) {
 		JComponent component = components.get(key);
-		if (component == null) return inits.get(key);
+		if (component == null)
+			return inits.get(key);
 
 		if (component instanceof JTextField)
 			return ((JTextField) component).getText();
@@ -229,15 +241,18 @@ public class Config {
 			for (int i = 0; i < 100; i++) {
 				String keyrow = key + ".row" + i;
 				String value = props.getProperty(keyrow, "???");
-				if (!value.equals("???")) table.append(value.split(";"));
+				if (!value.equals("???"))
+					table.append(value.split(";"));
 			}
 			String selected[] = props.getProperty(key + ".selected", "???").split(";");
 			int ncol = Math.min(table.getColumnCount(), selected.length) - 1;
 			for (int i = 0; i < table.getRowCount(); i++) {
 				int n = 0;
-				for (int j = 0; j < ncol; j++)
+				for (int j = 0; j < ncol; j++) {
 					n += table.getCell(i, j).trim().equals(selected[j].trim()) ? 1 : 0;
-				if (n == ncol) table.setRowSelectionInterval(i, i);
+				}
+				if (n == ncol)
+					table.setRowSelectionInterval(i, i);
 			}
 		}
 
@@ -257,7 +272,8 @@ public class Config {
 		Properties props = new Properties();
 		for (String key : components.keySet()) {
 			String s = getAsString(key);
-			if (s != null) props.setProperty(key, s);
+			if (s != null)
+				props.setProperty(key, s);
 		}
 
 		for (String key : tables.keySet()) {
@@ -266,7 +282,8 @@ public class Config {
 			for (int row = 0; row < nrows; row++)
 				props.setProperty(key + ".row" + row, table.getRowCSV(row, ";"));
 			int row = table.getSelectedRow();
-			if (row >= 0) props.setProperty(key + ".selected", table.getRowCSV(row, ";"));
+			if (row >= 0)
+				props.setProperty(key + ".selected", table.getRowCSV(row, ";"));
 		}
 
 		for (String key : dialogs.keySet()) {
@@ -295,10 +312,11 @@ public class Config {
 				ArrayList<String> keys = new ArrayList<String>();
 				ArrayList<String> headers = new ArrayList<String>();
 				line = br.readLine();
-				if (line != null) if (!line.startsWith("#"))
-					keys.add(line);
-				else
-					headers.add(line);
+				if (line != null)
+					if (!line.startsWith("#"))
+						keys.add(line);
+					else
+						headers.add(line);
 				while (line != null) {
 					if (!line.startsWith("#"))
 						keys.add(line);
@@ -342,8 +360,26 @@ public class Config {
 	public static void printInit() {
 		for (String key : inits.keySet()) {
 			Object object = inits.get(key);
-			if (object != null) System.out.println("Default " + key + " = " + (object.toString()));
+			if (object != null)
+				System.out.println("Default " + key + " = " + (object.toString()));
 		}
+	}
+	
+	public static Rectangle getDialog(String key) {
+		Properties props = new Properties();
+		try {
+			FileInputStream in = new FileInputStream(filename);
+			props.load(in);
+		}
+		catch (Exception e) {
+			props = new Properties();
+		}
+
+		int x = (int) NumFormat.parseNumber(props.getProperty(key + ".location.x", "-1"), -1);
+		int y = (int) NumFormat.parseNumber(props.getProperty(key + ".location.y", "-1"), -1);
+		int w = (int) NumFormat.parseNumber(props.getProperty(key + ".location.w", "-1"), -1);
+		int h = (int) NumFormat.parseNumber(props.getProperty(key + ".location.h", "-1"), -1);
+		return new Rectangle(x, y, w, h);
 	}
 
 }

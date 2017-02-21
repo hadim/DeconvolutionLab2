@@ -181,7 +181,6 @@ public class SyntheticDialog extends JDialog implements ActionListener, WindowLi
 			spnParameter3.set(params[2]);
 		}
 		pack();
-
 	}
 
 	@Override

@@ -51,7 +51,7 @@ public class DeconvolutionLab2_Course_Celegans implements PlugIn {
 			String img = " -image file " + data + "CElegans-" + channel +".tif";
 			String param = " -fft JTransforms -disable display multithreading";
 			String algo = a + out(name + channel);
-			new Deconvolution(img + psf + algo + param).deconvolve(false);
+			new Deconvolution("deconvolve", img + psf + algo + param).deconvolve();
 			ort[i] = new Opener().openImage( res + name + channel + "_ortho_8.tif");
 			fig[i] = new Opener().openImage( res + name + channel + "_figure_8.tif");
 		}

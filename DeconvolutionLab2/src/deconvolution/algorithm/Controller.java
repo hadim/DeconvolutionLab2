@@ -35,18 +35,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import deconvolution.Deconvolution;
-import deconvolutionlab.Lab;
 import deconvolutionlab.OutputCollection;
+import deconvolutionlab.TableStats;
 import deconvolutionlab.monitor.Monitors;
+import deconvolutionlab.system.SystemUsage;
 import fft.AbstractFFT;
 import fft.FFT;
-import lab.system.SystemUsage;
 import lab.tools.NumFormat;
 import signal.Assessment;
 import signal.ComplexSignal;
 import signal.Constraint;
 import signal.RealSignal;
-import signal.Signal;
 
 public class Controller {
 
@@ -81,8 +80,9 @@ public class Controller {
 	private AbstractFFT			fft;
 
 	private String				algo				= "";
-	private float				statsInput[];
-
+	private TableStats			tableStats;
+	private float[]				statsInput;
+	
 	private Monitors			monitors			= new Monitors();
 
 	public Controller() {
@@ -91,6 +91,10 @@ public class Controller {
 		doTime = false;
 		doReference = false;
 		doConstraint = false;
+	}
+
+	public void setTableStats(TableStats tableStats) {
+		this.tableStats = tableStats;
 	}
 
 	public void setMonitors(Monitors monitors) {
@@ -144,18 +148,19 @@ public class Controller {
 	public void start(RealSignal x) {
 		this.x = x;
 		statsInput = x.getStats();
+		if (tableStats != null)
+			tableStats.nextStats(monitors, stats());
 		iterations = 0;
 		timer = new Timer();
 		timer.schedule(new Updater(), 0, 100);
 		timeStarting = System.nanoTime();
 		memoryStarting = SystemUsage.getHeapUsed();
-		Signal.bytes = 0;
 
 		if (doConstraint && x != null)
 			Constraint.setModel(x);
 
 		if (doReference) {
-			refImage = new Deconvolution("-image file " + referenceName).openImage();
+			refImage = new Deconvolution("Reference", "-image file " + referenceName).openImage();
 			if (refImage == null)
 				monitors.error("Impossible to load the reference image " + referenceName);
 			else
@@ -173,8 +178,7 @@ public class Controller {
 		if (doConstraint || doResidu || doReference || out) {
 			if (fft == null)
 				fft = FFT.createDefaultFFT(monitors, X.nx, X.ny, X.nz);
-			x = new RealSignal(X.nx, X.ny, X.nz, false);
-			fft.inverse(X, x);
+			x = fft.inverse(X, x);
 			return ends(x);
 		}
 
@@ -197,7 +201,10 @@ public class Controller {
 		boolean stopIter = (iterations >= iterationsMax);
 		boolean stopTime = doTime && (timeElapsed >= timeMax);
 		boolean stopResd = doResidu && (residu <= residuMin);
-		monitors.log("@" + iterations + " Time: " + NumFormat.seconds(timeElapsed) + " Memory: " + NumFormat.bytes(Signal.bytes));
+		monitors.log("@" + iterations + " Time: " + NumFormat.seconds(timeElapsed));
+
+		if (tableStats != null)
+			tableStats.nextStats(monitors, stats());
 
 		String prefix = "Stopped>> by ";
 		if (abort)
@@ -220,6 +227,9 @@ public class Controller {
 		boolean res = doResidu;
 		if (con || res || ref)
 			compute(iterations, x, con, res, ref);
+
+		if (tableStats != null)
+			tableStats.lastStats(monitors, stats());
 
 		if (outs != null)
 			outs.executeFinal(monitors, x, this);
@@ -254,12 +264,14 @@ public class Controller {
 
 	}
 
-	public String[] stats(String name) {
+	public String[] stats() {
+		if (tableStats == null)
+			return null;
 		float params[] = null;
 		if (x != null)
 			params = x.getStats();
 		String[] row = new String[15];
-		row[0] = name;
+		row[0] = tableStats.getName();
 		row[1] = algo;
 		row[2] = "" + iterations;
 		row[3] = (params == null ? "-" : "" + params[0]);

@@ -43,15 +43,15 @@ public class DeconvolutionLab2_Course_Noise implements PlugIn {
 		// Simulation
 		String name = "SIM m 0 s 50 p 0";
 		String out = " -stack " + name + " -out stack " + name + "-BYTE rescaled byte noshow";
-		new Deconvolution(psf + image + " -algorithm " + name + out).run();
+		new Deconvolution("noise", psf + image + " -algorithm " + name + out).run();
 		
 		name = "SIM m 0 s 00 p 150";
 		out = " -stack " + name + " -out stack " + name + "-BYTE rescaled byte noshow";
-		new Deconvolution(psf + image + " -algorithm " + name + out).run();
+		new Deconvolution("noise", psf + image + " -algorithm " + name + out).run();
 		
 		name = "SIM m 0 s 15 p 30";
 		out = " -stack " + name + " -out stack " + name + "-BYTE rescaled byte noshow";
-		new Deconvolution(psf + image + " -algorithm " + name + out).run();
+		new Deconvolution("noise", psf + image + " -algorithm " + name + out).run();
 	}
 	
 	

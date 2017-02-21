@@ -45,22 +45,22 @@ public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 		String paramout = " intact float  (" + spacing + "," + spacing + "," + spacing + ")";
 		
 		algo  = " -algorithm CONV  -out stats @3 PR -out stack PR -out ortho PRo ";
-		new Deconvolution(ground + "-reference reference.tif -psf synthetic impulse 100 0 size 128 128 128 " + algo).deconvolve(false);
+		new Deconvolution("run", ground + "-reference reference.tif -psf synthetic impulse 100 0 size 128 128 128 " + algo).deconvolve();
 
 		algo  = " -algorithm SIM 0 1.5 0  -out stats @3 SIM -out stack signal -out ortho SIGNALo ";
-		new Deconvolution(ground + psf + algo).deconvolve(false);
+		new Deconvolution("run", ground + psf + algo).deconvolve();
 
 		algo  = " -algorithm NIF -out ortho NIF " + paramout;
-		new Deconvolution(signal + psf + algo).deconvolve(false);
+		new Deconvolution("run", signal + psf + algo).deconvolve();
 
 		for(int i=0; i<=24; i++) {
 			double p = Math.pow(10, i-18);
 			algo  = " -algorithm RIF " + p + " -out ortho @5 RIF/RIF" + i + paramout;
-			new Deconvolution(signal + psf + algo).deconvolve(false);
+			new Deconvolution("run", signal + psf + algo).deconvolve();
 		}
 		
 		algo  = " -algorithm LW+ 305 1 -out stats @3 LW+ nosave -out ortho @25 LW+/LW+" + paramout;
-		new Deconvolution(signal + psf + algo).deconvolve(false);
+		new Deconvolution("run", signal + psf + algo).deconvolve();
 	}
 	
 	public static void main(String arg[]) {

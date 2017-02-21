@@ -51,7 +51,7 @@ public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<Real
 	@Override
 	public RealSignal call() {
 		ComplexSignal H = fft.transform(h);
-		ComplexSignal U = new ComplexSignal(y.nx, y.ny, y.nz);
+		ComplexSignal U = new ComplexSignal("RLTV-U",y.nx, y.ny, y.nz);
 		RealSignal x = y.duplicate();
 		RealSignal gx = y.duplicate();
 		RealSignal gy = y.duplicate();
@@ -139,7 +139,7 @@ public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<Real
 		int nx = x.nx;
 		int ny = y.ny;
 		int nz = z.nz;
-		float e = (float)RealSignal.epsilon;
+		float e = (float) Operations.epsilon;
 		for(int k=0; k<nz; k++) 
 		for(int i=0; i<nx*ny; i++) {
 			double norm = Math.sqrt(x.data[k][i] * x.data[k][i] + y.data[k][i] * y.data[k][i] + z.data[k][i] * z.data[k][i]);

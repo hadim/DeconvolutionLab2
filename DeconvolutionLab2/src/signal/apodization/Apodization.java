@@ -134,8 +134,8 @@ public class Apodization {
 		}
 		if (monitors != null)
 			monitors.log("Apodization (" + apoX.getName() + ", " + apoY.getName() + ", " + apoZ.getName() + ")");
-		
-		RealSignal out = new RealSignal(input.nx, input.ny, input.nz);
+		String name = " apo( " + input.name + ")";
+		RealSignal out = new RealSignal(name, input.nx, input.ny, input.nz);
 		for(int i=0; i<input.nx; i++) {
 			double cx = apoX.apodize(i, input.nx);
 			for(int j=0; j<input.ny; j++) {

@@ -50,7 +50,7 @@ public class Assessment {
 	
 	public static double relativeResidu(RealSignal test, RealSignal ref) {
 		double measures[] = measure(test, ref);
-		return measures[3] / Math.max(measures[2], RealSignal.epsilon);
+		return measures[3] / Math.max(measures[2], Operations.epsilon);
 	}
 
 	/**

@@ -31,6 +31,7 @@
 
 package signal.factory;
 
+import signal.Operations;
 import signal.RealSignal;
 import signal.Signal;
 
@@ -80,7 +81,7 @@ public class MotionBlur extends SignalFactory {
 				double dx = (x - xc);
 				double dy = (y - yc);
 
-				double M = (dx * cosa + dy * sina) / Math.max(dx * dx + dy * dy, Signal.epsilon);
+				double M = (dx * cosa + dy * sina) / Math.max(dx * dx + dy * dy, Operations.epsilon);
 				M = (1.0 - 1.0 / (1.0 + Math.exp(-M / elongation)));
 
 				double r2 = (x - xc) * (x - xc) + (y - yc) * (y - yc);

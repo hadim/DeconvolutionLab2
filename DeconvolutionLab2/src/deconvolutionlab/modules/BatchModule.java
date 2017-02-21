@@ -117,23 +117,23 @@ public class BatchModule extends AbstractModule implements MouseListener, Action
 		if (e.getSource() == bnRunJob) {
 			int rows[] = table.getSelectedRows();
 			for (int row : rows) {
-				new Deconvolution(table.getCell(row, 1)).deconvolve(false);
+				new Deconvolution("Batch" + table.getCell(row, 0), table.getCell(row, 1)).deconvolve();
 			}
 		}
 		else if (e.getSource() == bnLaunchJob) {
 			int rows[] = table.getSelectedRows();
 			for (int row : rows) {
-				new Deconvolution(table.getCell(row, 1)).launch(table.getCell(row, 0), false);
+				new Deconvolution("Batch " + table.getCell(row, 0), table.getCell(row, 1)).launch();
 			}
 		}
 		else if (e.getSource() == bnRunAll) {
 			for (int row = 0; row < table.getRowCount(); row++) {
-				new Deconvolution(table.getCell(row, 1)).deconvolve(false);
+				new Deconvolution("Batch " + table.getCell(row, 0), table.getCell(row, 1)).deconvolve();
 			}
 		}
 		else if (e.getSource() == bnLaunchAll) {
 			for (int row = 0; row < table.getRowCount(); row++) {
-				new Deconvolution(table.getCell(row, 1)).launch(table.getCell(row, 0), false);
+				new Deconvolution("Batch " + table.getCell(row, 0), table.getCell(row, 1)).launch();
 			}
 		}
 	}

@@ -39,7 +39,6 @@ public class Token {
 
 	public Token(String keyword, String command, int begin, int end) {
 		this.keyword = keyword;
-		
 		this.parameters = command.substring(begin, end).trim();
 		String arg[] = parameters.split(" ");
 		option = arg.length >= 1 ? arg[0].trim() : ""; 

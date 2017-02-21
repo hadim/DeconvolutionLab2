@@ -31,43 +31,36 @@
 
 package signal;
 
+import java.util.ArrayList;
+
 public class Signal {
 
 	public int		nx = 0;
 	public int		ny;
 	public int		nz;
 	public float	data[][];
+	public String	name = "untitled";
+	
+	private ArrayList<SignalListener> listeners = new ArrayList<SignalListener>();
+	
+	public Signal(String name, int nx, int ny, int nz) {
+		this.name = name;
+		this.nx = nx;
+		this.ny = ny;
+		this.nz = nz;
+	}
 
-	public static double bytes = 0;
-	
-	public static double epsilon	= 1e-6;
-	
 	public String dimAsString() {
 		return nx + "x" + ny + "x" + nz + " ";
 	}
 	
-	public void allocateRealSignal(int nx, int ny, int nz, boolean incMemory) {
-		this.nx = nx;
-		this.ny = ny;
-		this.nz = nz;
-		Signal.bytes += (incMemory ? nx * ny * nz * 4 : 0);
-		this.data = new float[nz][nx * ny];	
+	public void addSignalListener(SignalListener listener) {
+		listeners.add(listener);
 	}
 	
-	public void allocateRealSignal(int nx, int ny, int nz) {
-		this.nx = nx;
-		this.ny = ny;
-		this.nz = nz;
-		Signal.bytes += nx * ny * nz * 4;
-		this.data = new float[nz][nx * ny];
+	public void notify(String name, double progress) {
+		for(SignalListener listener : listeners)
+			listener.notify(name, progress);
 	}
-
-	public void allocateComplexSignal(int nx, int ny, int nz) {
-		this.nx = nx;
-		this.ny = ny;
-		this.nz = nz;
-		Signal.bytes += 2 * nx * ny * nz * 4;
-		this.data = new float[nz][nx * ny * 2];
-	}
-		
+	
 }

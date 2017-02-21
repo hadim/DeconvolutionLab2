@@ -59,10 +59,11 @@ public class HaarWavelets extends AbstractWavelets {
 
 	@Override
 	public RealSignal analysis1(RealSignal in) {
+		String name = "w(" + in.name + ")";
 		int nx = in.nx;
 		int ny = in.ny;
 		int nz = in.nz;
-		RealSignal out = new RealSignal(nx, ny, nz, false);
+		RealSignal out = new RealSignal(name, nx, ny, nz);
 
 		float ux[] = new float[nx];
 		float vx[] = new float[nx];
@@ -96,10 +97,12 @@ public class HaarWavelets extends AbstractWavelets {
 
 	@Override
 	public RealSignal synthesis1(RealSignal in) {
+		String name = "iw(" + in.name + ")";
+
 		int nx = in.nx;
 		int ny = in.ny;
 		int nz = in.nz;
-		RealSignal out = new RealSignal(nx, ny, nz, false);
+		RealSignal out = new RealSignal(name, nx, ny, nz);
 
 		float ux[] = new float[nx];
 		float vx[] = new float[nx];

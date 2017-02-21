@@ -29,15 +29,15 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ij.plugin.PlugIn;
+import deconvolutionlab.Imaging;
 import deconvolutionlab.Lab;
-import deconvolutionlab.Platform;
+import ij.plugin.PlugIn;
 
 public class DeconvolutionLab2_Help implements PlugIn {
 
 	@Override
 	public void run(String arg) {
-		Lab.getInstance(Platform.IMAGEJ);
+		Lab.init(Imaging.Platform.IMAGEJ);
 		Lab.help();
 	}
 }

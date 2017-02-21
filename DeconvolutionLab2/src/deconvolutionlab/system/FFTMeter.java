@@ -29,11 +29,36 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package deconvolutionlab;
+package deconvolutionlab.system;
 
-public abstract class PlatformImageSelector {
+import java.awt.Graphics;
+import java.io.File;
+import java.lang.management.ClassLoadingMXBean;
+import java.lang.management.ManagementFactory;
 
-	public abstract String getSelectedImage();
+import fft.FFT;
+import lab.tools.NumFormat;
 
-	public abstract boolean isSelectable();
+public class FFTMeter extends AbstractMeter {
+
+	@Override
+	public void paintComponent(Graphics g) {
+	    super.paintComponent(g);
+	    g.setColor(colorText);
+	    g.drawString(prefix + FFT.getFastestFFT().getLibraryName(), 10, 17);
+	}
+
+	@Override
+	public void update() {
+		repaint();
+	}
+
+	@Override
+	public String getName() {
+		return "FFT";
+	}
+
+	@Override
+	public void setDetail() {
+	}
 }

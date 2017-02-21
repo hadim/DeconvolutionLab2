@@ -51,7 +51,7 @@ public class ComplexSignalFactory {
 					wr = Math.sqrt(wx * wx + wy * wy + wz * wz);
 					function[x][y][z] = (float) Math.exp(-wr * wr * K);
 				}
-		return createHermitian(nx, ny, nz, function);
+		return createHermitian("Gaussian", nx, ny, nz, function);
 	}
 
 	public static ComplexSignal identity(int nx, int ny, int nz) {
@@ -63,7 +63,7 @@ public class ComplexSignalFactory {
 			for (int y = 0; y <= ysize; y++)
 				for (int x = 0; x <= xsize; x++)
 					function[x][y][z] = 1.0f;
-		return createHermitian(nx, ny, nz, function);
+		return createHermitian("Identity", nx, ny, nz, function);
 	}
 
 	public static ComplexSignal laplacian(int nx, int ny, int nz) {
@@ -80,7 +80,7 @@ public class ComplexSignalFactory {
 					wz = Math.PI * z / ysize;
 					function[x][y][z] = (float) ((wx * wx + wy * wy + wz * wz));
 				}
-		return createHermitian(nx, ny, nz, function);
+		return createHermitian("Laplacian", nx, ny, nz, function);
 	}
 
 	public static ComplexSignal airySimulated(int nx, int ny, int nz, double mu) {
@@ -102,11 +102,11 @@ public class ComplexSignalFactory {
 							+ 1.0 / (1.0 + Math.exp(-K * (wr - 0.6 * mu))) 
 							- 1.0 / (1.0 + Math.exp(-K * (wr - 0.4 * mu))));
 				}
-		return createHermitian(nx, ny, nz, function);
+		return createHermitian("Airy", nx, ny, nz, function);
 	}
 
-	public static ComplexSignal createHermitian(int nx, int ny, int nz, float[][][] firstQuadrant) {
-		ComplexSignal signal = new ComplexSignal(nx, ny, nz);
+	public static ComplexSignal createHermitian(String name, int nx, int ny, int nz, float[][][] firstQuadrant) {
+		ComplexSignal signal = new ComplexSignal(name, nx, ny, nz);
 		int xsize = firstQuadrant.length - 1;
 		int ysize = firstQuadrant[0].length - 1;
 		int zsize = firstQuadrant[0][0].length - 1;

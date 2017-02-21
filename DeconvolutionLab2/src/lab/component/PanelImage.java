@@ -3,6 +3,7 @@ package lab.component;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
@@ -16,6 +17,13 @@ public class PanelImage extends JPanel {
 		super();
 		image = ImageLoader.get(filename);
 	}
+	
+	public PanelImage(int w, int h) {
+		super();
+		image = null;
+		this.w = w;
+		this.h = h;
+	}
 
 	public PanelImage(String filename, int w, int h) {
 		super();
@@ -23,13 +31,13 @@ public class PanelImage extends JPanel {
 		this.w = w;
 		this.h = h;
 	}
-
+	
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		if (image != null) {
 			if (w < 0)
-				g.drawImage(image, getWidth(), 0, getWidth(), getHeight(), null);
+				g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
 			else {
 				g.setColor(Color.WHITE);
 				g.fillRect(0, 0, getWidth(), getHeight());

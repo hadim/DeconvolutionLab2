@@ -31,231 +31,56 @@
 
 package deconvolutionlab.dialog;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.io.File;
-import java.util.ArrayList;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.border.Border;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import deconvolution.Command;
-import deconvolution.Deconvolution;
 import deconvolution.DeconvolutionDialog;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
+import deconvolutionlab.Imaging;
 import deconvolutionlab.Lab;
-import deconvolutionlab.Platform;
-import deconvolutionlab.modules.AboutModule;
-import deconvolutionlab.modules.AbstractModule;
-import deconvolutionlab.modules.AlgorithmModule;
-import deconvolutionlab.modules.BatchModule;
-import deconvolutionlab.modules.BorderModule;
-import deconvolutionlab.modules.CommandModule;
-import deconvolutionlab.modules.ConfigModule;
-import deconvolutionlab.modules.ControllerModule;
-import deconvolutionlab.modules.FFTModule;
-import deconvolutionlab.modules.GroupedModulePanel;
-import deconvolutionlab.modules.ImageModule;
-import deconvolutionlab.modules.LanguageModule;
-import deconvolutionlab.modules.LicenceModule;
-import deconvolutionlab.modules.OutputModule;
-import deconvolutionlab.modules.PSFModule;
-import deconvolutionlab.modules.PathModule;
-import deconvolutionlab.modules.WatcherModule;
-import lab.component.JPanelImage;
-import lab.system.SystemPanel;
-import lab.tools.Files;
+import deconvolutionlab.system.SystemInfo;
 
-public class LabDialog extends JDialog implements ComponentListener, ActionListener, ChangeListener, WindowListener {
+public class LabDialog extends JDialog implements ComponentListener, ActionListener, WindowListener {
 
-	private JTabbedPane			tab			= new JTabbedPane();
-	private JButton				bnHelp		= new JButton("Help");
-	private JButton				bnClose		= new JButton("Close");
-	private JButton				bnQuit		= new JButton("Quit");
-	private JButton				bnBatch		= new JButton("Batch");
-	private JButton				bnRun		= new JButton("Run");
-	private JButton				bnLaunch	= new JButton("Launch");
-	
-	private ImageModule			image;
-	private PSFModule			psf;
-	private AlgorithmModule		algo;
-	private AboutModule			about;
-	private LicenceModule		licence;
-	private OutputModule		output;
-	private FFTModule			fourier;
-	private BorderModule		border;
-	private ConfigModule		config;
-	private BatchModule			batch;
-	private LanguageModule		language;
-	private CommandModule		command;
-	private WatcherModule		watcher;
-
-	private ControllerModule	controller;
-
-	private GroupedModulePanel	panelDeconv;
-	private GroupedModulePanel	panelAdvanc;
-	private GroupedModulePanel	panelScript;
-	private GroupedModulePanel	panelAbout;
-	private AbstractModule		modules[];
+	private LabPanel	panel;
+	private JButton		bnClose	= new JButton("Close");
 
 	public LabDialog() {
 		super(new JFrame(), Constants.name);
-		image = new ImageModule(false);
-		psf = new PSFModule(false);
-		algo = new AlgorithmModule(true);
-		output = new OutputModule(true);
-		fourier = new FFTModule(false);
-		border = new BorderModule(false);
-		controller = new ControllerModule(false);
-		batch = new BatchModule(false);
-		language = new LanguageModule(false);
-		about = new AboutModule(true);
-		licence = new LicenceModule(false);
-		config = new ConfigModule(false);
-		command = new CommandModule();
-		watcher = new WatcherModule(false);
-
-		doDialog();
-		modules = new AbstractModule[] {image, psf, algo, output, controller, border, fourier, watcher, batch };
-	
-		Command.active(modules, command);
-		Command.command();
-
+		Config.registerFrame("DeconvolutionLab", "MainDialog", this);
+		panel = new LabPanel(bnClose);
+		getContentPane().add(panel);
+		pack();
 		addWindowListener(this);
 		addComponentListener(this);
-		((GroupedModulePanel) tab.getSelectedComponent()).organize();
-		setMinimumSize(new Dimension(500, 500));
-		Config.registerFrame("DeconvolutionLab", "MainDialog", this);
-
-		pack();
-		setVisible(true);
-		Config.load();
-		sizeModule();
-		Command.command();
-		image.update();
-		psf.update();
-		output.update();
-	}
-
-	private void doDialog() {
-
-		panelDeconv = new GroupedModulePanel(buildDeconvolutionPanel(), this);
-		panelAdvanc = new GroupedModulePanel(buildAdvancedPanel(), this);
-		panelScript = new GroupedModulePanel(buildProgrammingPanel(), this);
-		panelAbout = new GroupedModulePanel(buildAboutPanel(), this);
-		Border b2 = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-		JPanelImage bottom = new JPanelImage("celegans.jpg");
-		bottom.setBorder(b2);
-	
-		bottom.setLayout(new GridLayout(1, 5));
-		bottom.setBorder(b2);
-
-		bottom.add(bnHelp);
-		bottom.add(bnClose);
-		bottom.add(bnBatch);
-		bottom.add(bnRun);
-		bottom.add(bnLaunch);
-		
-		tab.add("Deconvolution", panelDeconv);
-		tab.add("Advanced", panelAdvanc);
-		tab.add("Scripting", panelScript);
-		tab.add("About", panelAbout);
-		tab.addChangeListener(this);
-
-		add(tab, BorderLayout.CENTER);
-		add(bottom, BorderLayout.SOUTH);
-		
-		bnBatch.addActionListener(this);
-		bnRun.addActionListener(this);
-		bnLaunch.addActionListener(this);
 		bnClose.addActionListener(this);
-		bnQuit.addActionListener(this);
-		bnHelp.addActionListener(this);
+		
+		Rectangle rect = Config.getDialog("DeconvolutionLab.MainDialog");
+		if (rect.x > 0 && rect.y > 0)
+			setLocation(rect.x, rect.y);
+
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
-		if (e.getSource() == bnHelp) {
-			Lab.help();
-		}
-		else if (e.getSource() == bnClose) {
+		if (e.getSource() == bnClose) {
 			Config.store();
+			SystemInfo.close();
+			panel.close();
 			dispose();
+			return;
 		}
-		else if (e.getSource() == bnQuit) {
-			dispose();
-		}
-		else if (e.getSource() == bnBatch) {
-			tab.setSelectedIndex(2);
-			batch.expand();
-			sizeModule();
-			new BatchDialog(batch);
-		}
-		else if (e.getSource() == bnLaunch) {
-			new Deconvolution(Command.command()).launch("", false);
-		}
-		else if (e.getSource() == bnRun) {
-			new Deconvolution(Command.command()).deconvolve(false);
-		}
-	}
-
-	@Override
-	public void stateChanged(ChangeEvent e) {
-		((GroupedModulePanel) tab.getSelectedComponent()).organize();
-		Command.command();
-	}
-
-	private ArrayList<AbstractModule> buildDeconvolutionPanel() {
-		ArrayList<AbstractModule> list = new ArrayList<AbstractModule>();
-		list.add(image);
-		list.add(psf);
-		list.add(algo);
-		list.add(watcher);
-		return list;
-	}
-
-	private ArrayList<AbstractModule> buildAdvancedPanel() {
-		ArrayList<AbstractModule> list = new ArrayList<AbstractModule>();
-		list.add(output);
-		list.add(controller);
-		list.add(border);
-		list.add(fourier);
-		return list;
-	}
-
-	private ArrayList<AbstractModule> buildProgrammingPanel() {
-		ArrayList<AbstractModule> list = new ArrayList<AbstractModule>();
-		list.add(batch);
-		list.add(command);
-		list.add(language);
-		return list;
-	}
-
-	private ArrayList<AbstractModule> buildAboutPanel() {
-		ArrayList<AbstractModule> list = new ArrayList<AbstractModule>();
-		list.add(about);
-		list.add(licence);
-		list.add(config);
-		return list;
 	}
 
 	@Override
@@ -264,6 +89,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 
 	@Override
 	public void windowClosing(WindowEvent e) {
+		panel.close();
 		Config.store();
 		dispose();
 	}
@@ -288,26 +114,16 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 	public void windowDeactivated(WindowEvent e) {
 	}
 
-	private void close() {
-		for (AbstractModule module : modules)
-			module.close();
-		bnLaunch.removeActionListener(this);
-		bnRun.removeActionListener(this);
-		bnBatch.removeActionListener(this);
-		bnClose.removeActionListener(this);
-		bnHelp.removeActionListener(this);
-		removeWindowListener(this);
-	}
-
 	@Override
 	public void dispose() {
 		super.dispose();
-		if (Lab.getPlatform() == Platform.STANDALONE) System.exit(0);
+		if (Lab.getPlatform() == Imaging.Platform.STANDALONE)
+			System.exit(0);
 	}
 
 	@Override
 	public void componentResized(ComponentEvent e) {
-		sizeModule();
+		panel.sizeModule();
 	}
 
 	@Override
@@ -319,44 +135,11 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 
 	@Override
 	public void componentShown(ComponentEvent e) {
-		sizeModule();
+		panel.sizeModule();
 	}
 
 	@Override
 	public void componentHidden(ComponentEvent e) {
 	}
-	
-	public void sizeModule() {
-		if (tab.getSelectedIndex() == 0) sizePanel(panelDeconv);
-		if (tab.getSelectedIndex() == 1) sizePanel(panelAdvanc);
-		if (tab.getSelectedIndex() == 2) sizePanel(panelScript);
-		if (tab.getSelectedIndex() == 3) sizePanel(panelAbout);
-	}
 
-	private void sizePanel(GroupedModulePanel panel) {
-		Dimension dim = getSize();
-		int hpc = 60;
-		int npc = hpc * panel.getModules().size();
-		Dimension small = new Dimension(dim.width, hpc);
-		Dimension large = new Dimension(dim.width, dim.height - npc);
-		for (AbstractModule module : panel.getModules()) {
-			if (module.isExpanded()) {
-				module.setPreferredSize(large);
-				module.setMaximumSize(large);
-				module.setMinimumSize(small);
-				module.getExpandedPanel().setPreferredSize(large);
-				module.getExpandedPanel().setMaximumSize(large);
-				module.getExpandedPanel().setMinimumSize(small);
-
-			}
-			else {
-				module.setPreferredSize(small);
-				module.setMaximumSize(small);
-				module.setMinimumSize(small);
-				module.getCollapsedPanel().setPreferredSize(small);
-				module.getCollapsedPanel().setMaximumSize(small);
-				module.getCollapsedPanel().setMinimumSize(small);
-			}
-		}
-	}
 }

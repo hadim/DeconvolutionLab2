@@ -48,7 +48,7 @@ public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSi
 	@Override
 	public RealSignal call() {
 		ComplexSignal H = fft.transform(h);
-		ComplexSignal U = new ComplexSignal(y.nx, y.ny, y.nz);
+		ComplexSignal U = new ComplexSignal("RL-U", y.nx, y.ny, y.nz);
 		RealSignal x = y.duplicate();
 		RealSignal p = y.duplicate();
 		RealSignal u = y.duplicate();

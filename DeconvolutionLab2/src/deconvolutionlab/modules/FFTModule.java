@@ -34,129 +34,108 @@ package deconvolutionlab.modules;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import lab.component.CustomizedColumn;
-import lab.component.CustomizedTable;
-import lab.component.GridPanel;
-import lab.component.HTMLPane;
-import lab.tools.NumFormat;
-import signal.Signal;
 import deconvolution.Command;
-import deconvolution.Deconvolution;
 import deconvolution.algorithm.Algorithm;
 import deconvolutionlab.Config;
-import deconvolutionlab.Constants;
-import fft.AbstractFFTLibrary;
 import fft.FFT;
+import lab.component.GridPanel;
+import lab.tools.NumFormat;
 
 public class FFTModule extends AbstractModule implements ActionListener, ChangeListener {
-
-	private HTMLPane			info;
 
 	private JComboBox<String>	cmbFFT;
 	private JComboBox<String>	cmbType;
 	private JComboBox<String>	cmbSep;
 	private JComboBox<String>	cmbEpsilon;
-
-	private CustomizedTable		table;
-
+	private JComboBox<String>	cmbNormalization;
+	boolean init = false;
+	
 	public FFTModule(boolean expanded) {
-		super("Fourier", "", "", "Default", expanded);
+		super("Computation", "", "", "Default", expanded);
 	}
 
 	@Override
 	public String getCommand() {
 		String cmd = "";
-		if (cmbFFT.getSelectedIndex() != 0)
-			cmd += " -fft " + (String) cmbFFT.getSelectedItem();
+		if (cmbNormalization.getSelectedIndex() != 0)
+			cmd += " -norm  " + NumFormat.parseNumber((String)cmbNormalization.getSelectedItem(), 1);
+		if (cmbFFT.getSelectedIndex() != 0) {
+			cmd += " -fft " + FFT.getLibraryByName((String) cmbFFT.getSelectedItem()).getLibraryName();
+		}
+		if (cmbEpsilon.getSelectedIndex() != 6)
+			cmd += " -epsilon " + (String) cmbEpsilon.getSelectedItem();
 		return cmd;
 	}
 
 	@Override
 	public JPanel buildExpandedPanel() {
-
-		ArrayList<CustomizedColumn> columns = new ArrayList<CustomizedColumn>();
-		columns.add(new CustomizedColumn("Name", String.class, 120, false));
-		columns.add(new CustomizedColumn("Installed", String.class, 120, false));
-		columns.add(new CustomizedColumn("Multithreadable", String.class, 120, false));
-		columns.add(new CustomizedColumn("Location", String.class, Constants.widthGUI, false));
-		table = new CustomizedTable(columns, true);
-		table.setRowSelectionAllowed(false);
-
-		info = new HTMLPane(100, 100);
 		cmbFFT = new JComboBox<String>(FFT.getLibrariesAsArray());
 		cmbType = new JComboBox<String>(new String[] { "float" });
 		cmbSep = new JComboBox<String>(new String[] { "XYZ" });
 		cmbEpsilon = new JComboBox<String>(new String[] { "1E-0", "1E-1", "1E-2", "1E-3", "1E-4", "1E-5", "1E-6", "1E-7", "1E-8", "1E-9", "1E-10", "1E-11", "1E-12" });
 		cmbEpsilon.setSelectedItem("1E-6");
+		cmbNormalization = new JComboBox<String>(new String[] { "1", "10", "1000", "1E+6", "1E+9", "no" });
 
+		cmbNormalization.addActionListener(this);
+		cmbNormalization.setSelectedIndex(0);
+		cmbNormalization.removeActionListener(this);
+	
 		GridPanel pnNumeric = new GridPanel(false, 3);
-		pnNumeric.place(3, 0, new JLabel("FFT Fourier Library"));
+		pnNumeric.place(1, 0, "PSF Normalization");
+		pnNumeric.place(1, 1, cmbNormalization);
+		pnNumeric.place(1, 2, "1, recommended");
+		pnNumeric.place(3, 0, new JLabel("FFT Library"));
 		pnNumeric.place(3, 1, cmbFFT);
-		pnNumeric.place(6, 0, new JLabel("FFT Dimension"));
+		pnNumeric.place(3, 2, new JLabel("Fourier"));
+		pnNumeric.place(6, 0, new JLabel("FFT Processing"));
 		pnNumeric.place(6, 1, cmbSep);
-		pnNumeric.place(7, 0, new JLabel("<html>Machine Epsilon &epsilon;</html>"));
+		pnNumeric.place(6, 2, new JLabel("Dimension Ordering"));
+		
+		pnNumeric.place(7, 0, new JLabel("Machine Epsilon"));
 		pnNumeric.place(7, 1, cmbEpsilon);
-
-		JScrollPane scroll2 = new JScrollPane(pnNumeric);
-		scroll2.setBorder(BorderFactory.createEmptyBorder());
-		scroll2.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scroll2.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-		JPanel control = new JPanel(new BorderLayout());
-		Border b1 = BorderFactory.createEtchedBorder();
-		Border b2 = BorderFactory.createEmptyBorder(10, 10, 10, 10);
-
-		control.setBorder(BorderFactory.createCompoundBorder(b1, b2));
-		control.add(scroll2, BorderLayout.NORTH);
-		control.add(info.getPane(), BorderLayout.CENTER);
-		control.add(table.getPane(80, 80), BorderLayout.SOUTH);
+		pnNumeric.place(7, 2, new JLabel("<html>&epsilon;</html>"));
+	
+		pnNumeric.place(8, 0, new JLabel("Data Type"));
+		pnNumeric.place(8, 1, cmbType);
+		pnNumeric.place(8, 2, new JLabel("(Only float)"));
+	
+		JScrollPane scroll = new JScrollPane(pnNumeric);
+		scroll.setBorder(BorderFactory.createEmptyBorder());
+		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(control, BorderLayout.CENTER);
+		panel.setBorder(BorderFactory.createEtchedBorder());
+		panel.add(scroll, BorderLayout.CENTER);
 
-		Config.register(getName(), "epsilon", cmbEpsilon, "1E-6");
+		Config.register(getName(), "normalization", cmbNormalization, cmbNormalization.getItemAt(0));
 		Config.register(getName(), "fft", cmbFFT, Algorithm.getDefaultAlgorithm());
 		Config.register(getName(), "dim", cmbSep, "XYZ");
-
+		Config.register(getName(), "epsilon", cmbEpsilon, "1E-6");
+	
 		cmbFFT.addActionListener(this);
 		cmbType.addActionListener(this);
+		cmbSep.addActionListener(this);
 		cmbEpsilon.addActionListener(this);
-
+		cmbNormalization.addActionListener(this);
 		getAction1Button().addActionListener(this);
-		getAction2Button().addActionListener(this);
-		fillInstallation();
+		init = true;
 		return panel;
-	}
-
-	private void fillInstallation() {
-
-		ArrayList<AbstractFFTLibrary> libs = FFT.getRegisteredLibraries();
-		for (AbstractFFTLibrary lib : libs) {
-			String name = lib.getLibraryName();
-			String installed = lib.isInstalled() ? " Yes" : "No";
-			String multit = lib.isMultithreadable() ? " Yes" : "No";
-			String location = lib.getLocation();
-			table.append(new String[] { name, installed, multit, location });
-		}
-		AbstractFFTLibrary fftlib = FFT.getLibraryByName((String) cmbFFT.getSelectedItem());
-		info.clear();
-		info.append("p", fftlib.getLicence());
 	}
 
 	private void update() {
 		setCommand(getCommand());
-		Signal.epsilon = NumFormat.parseNumber((String) cmbEpsilon.getSelectedItem(), 1e-6);
+		if (init)
+			setSynopsis("Norm " + cmbNormalization.getSelectedItem() + " " + FFT.getLibraryByName((String) cmbFFT.getSelectedItem()).getLibraryName());
 		Command.command();
 	}
 
@@ -167,23 +146,14 @@ public class FFTModule extends AbstractModule implements ActionListener, ChangeL
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+System.out.println("" + e);
 		super.actionPerformed(e);
-		if (e.getSource() == cmbFFT || e.getSource() == cmbSep) {
-			AbstractFFTLibrary fftlib = FFT.getLibraryByName((String) cmbFFT.getSelectedItem());
-			info.clear();
-			info.append("p", fftlib.getLicence());
-		}
-
 		if (e.getSource() == getAction1Button()) {
-			cmbFFT.removeActionListener(this);
-			cmbType.removeActionListener(this);
-			cmbEpsilon.removeActionListener(this);
 			cmbFFT.setSelectedIndex(0);
+			cmbSep.setSelectedIndex(0);
 			cmbType.setSelectedIndex(0);
 			cmbEpsilon.setSelectedIndex(0);
-			cmbFFT.addActionListener(this);
-			cmbType.addActionListener(this);
-			cmbEpsilon.addActionListener(this);
+			cmbNormalization.setSelectedIndex(0);
 		}
 		update();
 	}
@@ -191,9 +161,10 @@ public class FFTModule extends AbstractModule implements ActionListener, ChangeL
 	@Override
 	public void close() {
 		getAction1Button().removeActionListener(this);
-		getAction2Button().removeActionListener(this);
 		cmbFFT.removeActionListener(this);
+		cmbSep.removeActionListener(this);
 		cmbType.removeActionListener(this);
 		cmbEpsilon.removeActionListener(this);
+		cmbNormalization.removeActionListener(this);
 	}
 }

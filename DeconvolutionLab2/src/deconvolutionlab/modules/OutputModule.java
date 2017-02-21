@@ -44,14 +44,15 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import lab.component.CustomizedColumn;
-import lab.component.CustomizedTable;
 import deconvolution.Command;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
+import deconvolutionlab.Lab;
 import deconvolutionlab.Output;
 import deconvolutionlab.Output.View;
 import deconvolutionlab.dialog.OutputDialog;
+import lab.component.CustomizedColumn;
+import lab.component.CustomizedTable;
 
 public class OutputModule extends AbstractModule implements ActionListener, MouseListener {
 
@@ -62,8 +63,6 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 	private JButton			bnOrtho;
 	private JButton			bnPlanar;
 	private JButton			bnFigure;
-	private JButton			bnStats;
-	private JButton			bnProfile;
 	
 	public OutputModule(boolean expanded) {
 		super("Output", "", "", "Default", expanded);
@@ -123,8 +122,6 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 		bnMIP 		= new JButton("\u2295 mip");
 		bnOrtho		= new JButton("\u2295 ortho");
 		bnPlanar 	= new JButton("\u2295 planar");
-		bnStats 	= new JButton("\u2295 stats");
-		bnProfile 	= new JButton("\u2295 profile");
 		bnFigure 	= new JButton("\u2295 figure");
 		
 		JToolBar pn = new JToolBar("Controls Image");
@@ -137,8 +134,6 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 		pn.add(bnOrtho);
 		pn.add(bnPlanar);
 		pn.add(bnFigure);
-		pn.add(bnStats);
-		pn.add(bnProfile);
 		
 		JToolBar tool = new JToolBar("Path");
 		tool.setBorder(BorderFactory.createEmptyBorder());
@@ -157,8 +152,6 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 		bnOrtho.addActionListener(this);
 		bnPlanar.addActionListener(this);
 		bnFigure.addActionListener(this);
-		bnStats.addActionListener(this);
-		bnProfile.addActionListener(this);
 		getAction1Button().addActionListener(this);
 		Config.registerTable(getName(), "output", table);
 	
@@ -181,13 +174,10 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 			view = View.PLANAR;
 		else if (e.getSource() == bnFigure)
 			view = View.FIGURE;
-		else if (e.getSource() == bnStats)
-			view = View.STATS;
-		else if (e.getSource() == bnProfile)
-			view = View.PROFILE;
 		
 		if (view != null) {
 			OutputDialog dlg = new OutputDialog(view);
+			Lab.setVisible(dlg, true);
 			if (dlg.wasCancel())
 				return;
 			Output out = dlg.getOut();
@@ -199,11 +189,7 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 		}
 		
 		if (e.getSource() == getAction1Button()) {
-			int n = table.getRowCount();
-			for (int i=0; i<n; i++)
-				table.removeRow(0);
-			String[] def = new String[] { "stack", "display", "intact", "float", "", "true", "false", "" };
-			table.append(def);
+			table.removeRows();
 		}
 	}
 
@@ -243,8 +229,6 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 		bnOrtho.removeActionListener(this);
 		bnPlanar.removeActionListener(this);
 		bnFigure.removeActionListener(this);
-		bnStats.removeActionListener(this);
-		bnProfile.removeActionListener(this);
 		getAction1Button().removeActionListener(this);
 		getAction2Button().removeActionListener(this);
 	}

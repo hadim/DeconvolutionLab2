@@ -61,16 +61,16 @@ public class DeconvolutionLab2_Course_Piecewise implements PlugIn {
 		String paramout = " intact float  (" + spacing + "," + spacing + "," + spacing + ")";
 
 		algo = " -algorithm CONV  -out stats @3 PR nosave -out stack PR -out ortho PRo ";
-		new Deconvolution(ground + "-reference reference.tif -psf synthetic impulse 100 0 size 128 128 128 " + algo).deconvolve(false);
+		new Deconvolution("run", ground + "-reference reference.tif -psf synthetic impulse 100 0 size 128 128 128 " + algo).deconvolve();
 		
 		algo = " -algorithm SIM 0 1 1  -out stats @3 SIM nosave -out stack signal -out ortho SIGNALo ";
-		new Deconvolution(ground + psf + algo).deconvolve(false);
+		new Deconvolution("run", ground + psf + algo).deconvolve();
 		  
 		algo = " -algorithm NIF -out ortho NIF " + paramout; 
-		new Deconvolution(signal + psf + algo).deconvolve(false);
+		new Deconvolution("run", signal + psf + algo).deconvolve();
 
 		algo = " -algorithm RLTV 15 0.01 -out stats @1 RLTV nosave -out ortho @1 RLTV/RLTV" + paramout; 
-		new Deconvolution(signal + psf + algo).deconvolve(false);
+		new Deconvolution("run", signal + psf + algo).deconvolve();
 	}
 
 	public static void main(String arg[]) {

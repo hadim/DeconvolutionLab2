@@ -29,44 +29,59 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package signal;
+
+import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 import deconvolutionlab.monitor.Monitors;
 
-public class RealSignal extends Signal {
+public class RealSignal extends Signal implements SignalListener {
 
-
-	public RealSignal(int nx, int ny, int nz) {
-		allocateRealSignal(nx, ny, nz, true);
+	public RealSignal(String name, int nx, int ny, int nz) {
+		super(name, nx, ny, nz);
+		this.data = new float[nz][];
+		int step = Math.max(1, nz / SignalCollector.NOTIFICATION_RATE);
+		notify(name, 0);
+		for (int k = 0; k < nz; k++) {
+			data[k] = new float[nx * ny];
+			if (k % step == 0)
+				notify(name, k * 100.0 / nz);
+		}
+		notify(name, 100);
+		SignalCollector.alloc(name, nx, ny, ny, false);
+		this.addSignalListener(this);
 	}
 
-	public RealSignal(int nx, int ny, int nz, boolean incMemory) {
-		allocateRealSignal(nx, ny, nz, incMemory);
+	@Override
+	public void notify(String name, double progress) {
+		SignalCollector.setProgress(progress);
 	}
 
-	public RealSignal(int nx, int ny, int nz, float data[]) {
-		allocateRealSignal(nx, ny, nz, true);
-		setXYZ(data);
+	@Override
+	public void finalize() {
+		data = null;
+		System.gc();
+		SignalCollector.free(name, nx, ny, ny, false);
 	}
 
 	public void copy(RealSignal source) {
 		int nxy = nx * ny;
-		for(int k=0; k<nz; k++)
-		for(int i=0; i< nxy; i++) {
-			data[k][i] = source.data[k][i];
-		}		
+		for (int k = 0; k < nz; k++)
+			for (int i = 0; i < nxy; i++) {
+				data[k][i] = source.data[k][i];
+			}
 	}
-	
+
 	public void setSignal(RealSignal signal) {
 		int sx = signal.nx;
 		int mx = Math.min(nx, signal.nx);
 		int my = Math.min(ny, signal.ny);
 		int mz = Math.min(nz, signal.nz);
 		for (int i = 0; i < mx; i++)
-		for (int j = 0; j < my; j++)
-		for (int k = 0; k < mz; k++)
-			data[k][i+nx*j] = signal.data[k][i+sx*j];
+			for (int j = 0; j < my; j++)
+				for (int k = 0; k < mz; k++)
+					data[k][i + nx * j] = signal.data[k][i + sx * j];
 	}
 
 	public void getSignal(RealSignal signal) {
@@ -75,126 +90,134 @@ public class RealSignal extends Signal {
 		int my = Math.min(ny, signal.ny);
 		int mz = Math.min(nz, signal.nz);
 		for (int i = 0; i < mx; i++)
-		for (int j = 0; j < my; j++)
-		for (int k = 0; k < mz; k++)
-			signal.data[k][i+sx*j] = data[k][i+nx*j];
+			for (int j = 0; j < my; j++)
+				for (int k = 0; k < mz; k++)
+					signal.data[k][i + sx * j] = data[k][i + nx * j];
 	}
 
 	/**
 	 * Applies a soft threshold (in-place processing)
+	 * 
 	 * @param inferiorLimit
 	 * @param superiorLimit
 	 * @return the instance of the calling object
 	 */
 	public RealSignal thresholdSoft(float inferiorLimit, float superiorLimit) {
 		int nxy = nx * ny;
-		for(int k=0; k<nz; k++)
-		for(int i=0; i< nxy; i++) {
-			if (data[k][i] <= inferiorLimit)
-				data[k][i] += inferiorLimit;
-			else if (data[k][i] >= superiorLimit)
-				data[k][i] -= superiorLimit;
-			else
-				data[k][i] = 0f;
-		}
+		for (int k = 0; k < nz; k++)
+			for (int i = 0; i < nxy; i++) {
+				if (data[k][i] <= inferiorLimit)
+					data[k][i] += inferiorLimit;
+				else if (data[k][i] >= superiorLimit)
+					data[k][i] -= superiorLimit;
+				else
+					data[k][i] = 0f;
+			}
 		return this;
 	}
 
 	/**
 	 * Multiplies by a signal pixelwise (in-place processing)
+	 * 
 	 * @param factor
 	 * @return the instance of the calling object
 	 */
 	public RealSignal times(RealSignal factor) {
 		int nxy = nx * ny;
-		for(int k=0; k<nz; k++)
-		for(int i=0; i< nxy; i++) {
-			data[k][i] *= factor.data[k][i];
-		}
+		for (int k = 0; k < nz; k++)
+			for (int i = 0; i < nxy; i++) {
+				data[k][i] *= factor.data[k][i];
+			}
 		return this;
 	}
- 
+
 	/**
 	 * Multiplies by a scalar factor (in-place processing)
+	 * 
 	 * @param factor
 	 * @return the instance of the calling object
 	 */
 	public RealSignal times(float factor) {
 		int nxy = nx * ny;
-		for(int k=0; k<nz; k++)
-		for(int i=0; i< nxy; i++) {
-			data[k][i] *= factor;
-		}
+		for (int k = 0; k < nz; k++)
+			for (int i = 0; i < nxy; i++) {
+				data[k][i] *= factor;
+			}
 		return this;
 	}
 
 	/**
 	 * Adds a signal pixelwise (in-place processing)
+	 * 
 	 * @param factor
 	 * @return the instance of the calling object
 	 */
 	public RealSignal plus(RealSignal factor) {
 		int nxy = nx * ny;
-		for(int k=0; k<nz; k++)
-		for(int i=0; i< nxy; i++) {
-			data[k][i] += factor.data[k][i];
-		}
+		for (int k = 0; k < nz; k++)
+			for (int i = 0; i < nxy; i++) {
+				data[k][i] += factor.data[k][i];
+			}
 		return this;
 	}
-	
+
 	/**
 	 * Subtracts by a signal pixelwise (in-place processing)
+	 * 
 	 * @param factor
 	 * @return the instance of the calling object
 	 */
 	public RealSignal minus(RealSignal factor) {
 		int nxy = nx * ny;
-		for(int k=0; k<nz; k++)
-		for(int i=0; i< nxy; i++) {
-			data[k][i] -= factor.data[k][i];
-		}
+		for (int k = 0; k < nz; k++)
+			for (int i = 0; i < nxy; i++) {
+				data[k][i] -= factor.data[k][i];
+			}
 		return this;
 	}
 
 	/**
 	 * Adds a scalar term (in-place processing)
+	 * 
 	 * @param term
 	 * @return the instance of the calling object
 	 */
 	public RealSignal plus(float term) {
 		int nxy = nx * ny;
-		for(int k=0; k<nz; k++)
-		for(int i=0; i< nxy; i++) {
-			data[k][i] += term;
-		}
+		for (int k = 0; k < nz; k++)
+			for (int i = 0; i < nxy; i++) {
+				data[k][i] += term;
+			}
 		return this;
 	}
 
 	/**
-	 * Takes the maximum  (in-place processing)
+	 * Takes the maximum (in-place processing)
+	 * 
 	 * @param factor
 	 * @return the instance of the calling object
 	 */
 	public RealSignal max(RealSignal factor) {
 		int nxy = nx * ny;
-		for(int k=0; k<nz; k++)
-		for(int i=0; i< nxy; i++) {
-			data[k][i] = Math.max(data[k][i], factor.data[k][i]);
-		}
+		for (int k = 0; k < nz; k++)
+			for (int i = 0; i < nxy; i++) {
+				data[k][i] = Math.max(data[k][i], factor.data[k][i]);
+			}
 		return this;
 	}
-	
+
 	/**
-	 * Takes the minimum  (in-place processing)
+	 * Takes the minimum (in-place processing)
+	 * 
 	 * @param factor
 	 * @return the instance of the calling object
 	 */
 	public RealSignal min(RealSignal factor) {
 		int nxy = nx * ny;
-		for(int k=0; k<nz; k++)
-		for(int i=0; i< nxy; i++) {
-			data[k][i] = Math.min(data[k][i], factor.data[k][i]);
-		}
+		for (int k = 0; k < nz; k++)
+			for (int i = 0; i < nxy; i++) {
+				data[k][i] = Math.min(data[k][i], factor.data[k][i]);
+			}
 		return this;
 	}
 
@@ -221,7 +244,7 @@ public class RealSignal extends Signal {
 	}
 
 	public RealSignal duplicate() {
-		RealSignal out = new RealSignal(nx, ny, nz);
+		RealSignal out = new RealSignal("copy(" + name + ")", nx, ny, nz);
 		int nxy = nx * ny;
 		for (int k = 0; k < nz; k++)
 			System.arraycopy(data[k], 0, out.data[k], 0, nxy);
@@ -244,40 +267,40 @@ public class RealSignal extends Signal {
 		double norm1 = 0.0;
 		double norm2 = 0.0;
 		double mean = 0.0;
-		
+
 		for (int k = 0; k < nz; k++)
-		for (int i = 0; i < nxy; i++) {
-			float v = data[k][i];
-			max = Math.max(max, v);
-			min = Math.min(min, v);
-			mean += v;
-			norm1 += (v > 0 ? v : -v);
-			norm2 += v*v;
-		}
-		mean = mean / (nz*nxy);
-		norm1 = norm1 / (nz*nxy);
-		norm2 = Math.sqrt(norm2 / (nz*nxy));
+			for (int i = 0; i < nxy; i++) {
+				float v = data[k][i];
+				max = Math.max(max, v);
+				min = Math.min(min, v);
+				mean += v;
+				norm1 += (v > 0 ? v : -v);
+				norm2 += v * v;
+			}
+		mean = mean / (nz * nxy);
+		norm1 = norm1 / (nz * nxy);
+		norm2 = Math.sqrt(norm2 / (nz * nxy));
 		double stdev = 0.0;
 		for (int k = 0; k < nz; k++)
-		for (int i = 0; i < nxy; i++) {
-			stdev += (data[k][i]-mean)*(data[k][i]-mean);
-		}
-		stdev = Math.sqrt(stdev / (nz*nxy));
-		return new float[] {(float)mean, min, max, (float)stdev, (float)norm1, (float)norm2};
+			for (int i = 0; i < nxy; i++) {
+				stdev += (data[k][i] - mean) * (data[k][i] - mean);
+			}
+		stdev = Math.sqrt(stdev / (nz * nxy));
+		return new float[] { (float) mean, min, max, (float) stdev, (float) norm1, (float) norm2 };
 	}
 
 	public float[] getExtrema() {
 		int nxy = nx * ny;
 		float min = Float.MAX_VALUE;
 		float max = -Float.MAX_VALUE;
-		
+
 		for (int k = 0; k < nz; k++)
-		for (int i = 0; i < nxy; i++) {
-			float v = data[k][i];
-			max = Math.max(max, v);
-			min = Math.min(min, v);
-		}
-		return new float[] {min, max};
+			for (int i = 0; i < nxy; i++) {
+				float v = data[k][i];
+				max = Math.max(max, v);
+				min = Math.min(min, v);
+			}
+		return new float[] { min, max };
 	}
 
 	public RealSignal normalize(double to) {
@@ -296,22 +319,22 @@ public class RealSignal extends Signal {
 		}
 		return this;
 	}
-	
+
 	public void setSlice(int z, RealSignal slice) {
 		int mx = slice.nx;
 		int my = slice.ny;
 		for (int j = 0; j < Math.min(ny, my); j++)
-		for (int i = 0; i < Math.min(nx, mx); i++)
-			data[z][i + nx * j] = slice.data[0][i + mx * j];
+			for (int i = 0; i < Math.min(nx, mx); i++)
+				data[z][i + nx * j] = slice.data[0][i + mx * j];
 	}
-	
+
 	public RealSignal getSlice(int z) {
-		RealSignal slice = new RealSignal(nx, ny, 1);
-		for (int j = 0; j < nx*ny; j++)
+		RealSignal slice = new RealSignal(name + "_z=" + z, nx, ny, 1);
+		for (int j = 0; j < nx * ny; j++)
 			slice.data[0][j] = data[z][j];
 		return slice;
 	}
-	
+
 	public void multiply(double factor) {
 		for (int k = 0; k < nz; k++)
 			for (int i = 0; i < nx * ny; i++)
@@ -321,35 +344,35 @@ public class RealSignal extends Signal {
 	public float[] getInterleaveXYZAtReal() {
 		float[] interleave = new float[2 * nz * nx * ny];
 		for (int k = 0; k < nz; k++)
-		for (int j = 0; j < ny; j++)
-		for (int i = 0; i < nx; i++)
-			interleave[2 * (k * nx * ny + j * nx + i)] = data[k][i + j * nx];
+			for (int j = 0; j < ny; j++)
+				for (int i = 0; i < nx; i++)
+					interleave[2 * (k * nx * ny + j * nx + i)] = data[k][i + j * nx];
 		return interleave;
 	}
 
 	public void setInterleaveXYZAtReal(float[] interleave) {
 		for (int k = 0; k < nz; k++)
-		for (int j = 0; j < ny; j++)
-		for (int i = 0; i < nx; i++)
-			data[k][i + nx * j] = interleave[(k * nx * ny + j * nx + i) * 2];
+			for (int j = 0; j < ny; j++)
+				for (int i = 0; i < nx; i++)
+					data[k][i + nx * j] = interleave[(k * nx * ny + j * nx + i) * 2];
 	}
 
 	public float[] getInterleaveXYAtReal(int k) {
 		float real[] = new float[nx * ny * 2];
 		for (int i = 0; i < nx; i++)
-		for (int j = 0; j < ny; j++) {
-			int index = i + j * nx;
-			real[2 * index] = data[k][index];
-		}
+			for (int j = 0; j < ny; j++) {
+				int index = i + j * nx;
+				real[2 * index] = data[k][index];
+			}
 		return real;
 	}
-	
+
 	public void setInterleaveXYAtReal(int k, float real[]) {
 		for (int i = 0; i < nx; i++)
-		for (int j = 0; j < ny; j++) {
-			int index = i + j * nx;
-			data[k][index] = real[2 * index];
-		}
+			for (int j = 0; j < ny; j++) {
+				int index = i + j * nx;
+				data[k][index] = real[2 * index];
+			}
 	}
 
 	public float[] getXYZ() {
@@ -362,12 +385,12 @@ public class RealSignal extends Signal {
 	}
 
 	public void setXYZ(float[] data) {
-		if (nx*ny*nz != data.length)
+		if (nx * ny * nz != data.length)
 			return;
 		int nxy = nx * ny;
 		for (int k = 0; k < nz; k++)
 			for (int i = 0; i < nxy; i++)
-		this.data[k][i] = data[k * nxy + i];
+				this.data[k][i] = data[k * nxy + i];
 	}
 
 	public float[] getXY(int k) {
@@ -409,7 +432,7 @@ public class RealSignal extends Signal {
 		for (int j = 0; j < ny; j++)
 			data[k][i + j * nx] = line[j];
 	}
-	
+
 	public void setZ(int i, int j, float line[]) {
 		int index = i + j * nx;
 		for (int k = 0; k < nz; k++)
@@ -424,26 +447,27 @@ public class RealSignal extends Signal {
 				else if (data[k][j] > max)
 					data[k][j] = max;
 	}
-	
+
 	public void fill(float constant) {
 		for (int k = 0; k < nz; k++)
-		for (int j = 0; j < ny * nx; j++)
-			data[k][j] = constant;
+			for (int j = 0; j < ny * nx; j++)
+				data[k][j] = constant;
 	}
 
-
 	public RealSignal changeSizeAs(RealSignal model) {
-		return size(model.nx, model.ny, model.nz); 	
+		return size(model.nx, model.ny, model.nz);
 	}
 
 	public RealSignal size(int mx, int my, int mz) {
+		String n = "resize(" + name + ")";
+
 		int ox = (mx - nx) / 2;
 		int oy = (my - ny) / 2;
-		int oz = (mz - nz) / 2;		
-		RealSignal signal = new RealSignal(mx, my, mz);
-		int vx = Math.min(nx,  mx);
-		int vy = Math.min(ny,  my);
-		int vz = Math.min(nz,  mz);
+		int oz = (mz - nz) / 2;
+		RealSignal signal = new RealSignal(n, mx, my, mz);
+		int vx = Math.min(nx, mx);
+		int vy = Math.min(ny, my);
+		int vz = Math.min(nz, mz);
 		for (int k = 0; k < vz; k++)
 			for (int j = 0; j < vy; j++)
 				for (int i = 0; i < vx; i++) {
@@ -458,17 +482,32 @@ public class RealSignal extends Signal {
 		return signal;
 	}
 
-	public RealSignal createOrthoview() {
-		return createOrthoview(nx/2, ny/2, nz/2);
+	public BufferedImage createPreviewMIPZ() {
+		RealSignal mip = createMIPZ();
+		mip.rescale(Monitors.createDefaultMonitor());
+		BufferedImage img = new BufferedImage(nx, ny, BufferedImage.TYPE_INT_ARGB);
+		int alpha = (255 << 24);
+		for (int i = 0; i < nx; i++)
+			for (int j = 0; j < ny; j++) {
+				int v = (int)data[0][i + j * nx];
+				img.setRGB(i, j, alpha | (v << 16) | (v << 8) | v);
+			}
+		return img;
 	}
-	
+
+	public RealSignal createOrthoview() {
+		return createOrthoview(nx / 2, ny / 2, nz / 2);
+	}
+
 	public RealSignal createOrthoview(int hx, int hy, int hz) {
+		String n = "ortho(" + name + ")";
+
 		int vx = nx + nz;
 		int vy = ny + nz;
-		RealSignal view = new RealSignal(vx, vy, 1);
-		hx = Math.min(nx-1, Math.max(0, hx));
-		hy = Math.min(ny-1, Math.max(0, hy));
-		hz = Math.min(nz-1, Math.max(0, hz));
+		RealSignal view = new RealSignal(n, vx, vy, 1);
+		hx = Math.min(nx - 1, Math.max(0, hx));
+		hy = Math.min(ny - 1, Math.max(0, hy));
+		hz = Math.min(nz - 1, Math.max(0, hz));
 		for (int x = 0; x < nx; x++)
 			for (int y = 0; y < ny; y++)
 				view.data[0][x + vx * y] = data[hz][x + nx * y];
@@ -482,76 +521,92 @@ public class RealSignal extends Signal {
 				view.data[0][x + vx * (ny + z)] = data[z][x + nx * hy];
 		return view;
 	}
-	
+
 	public RealSignal createFigure(int hx, int hy, int hz) {
+		String n = "figure(" + name + ")";
 		int vx = nx + nz + 4;
 		int vy = ny + 2;
 		float max = this.getExtrema()[1];
-		RealSignal view = new RealSignal(vx, vy, 1);
-		for (int i = 0; i < vx*vy; i++)
+		RealSignal view = new RealSignal(n, vx, vy, 1);
+		for (int i = 0; i < vx * vy; i++)
 			view.data[0][i] = max;
-		
-		hx = Math.min(nx-1, Math.max(0, hx));
-		hy = Math.min(ny-1, Math.max(0, hy));
-		hz = Math.min(nz-1, Math.max(0, hz));
+
+		hx = Math.min(nx - 1, Math.max(0, hx));
+		hy = Math.min(ny - 1, Math.max(0, hy));
+		hz = Math.min(nz - 1, Math.max(0, hz));
 		for (int x = 0; x < nx; x++)
 			for (int y = 0; y < ny; y++)
-				view.data[0][x+1 + vx * (y+1)] = data[hz][x + nx * y];
+				view.data[0][x + 1 + vx * (y + 1)] = data[hz][x + nx * y];
 
 		for (int z = 0; z < nz; z++)
 			for (int y = 0; y < ny; y++)
-				view.data[0][nx + 3 + z + vx * (y+1)] = data[z][hx + nx * y];
+				view.data[0][nx + 3 + z + vx * (y + 1)] = data[z][hx + nx * y];
 
 		return view;
 	}
 
-	
 	public RealSignal createMIP() {
+		String n = "mip(" + name + ")";
+
 		int vx = nx + nz + 1;
 		int vy = ny + nz + 1;
-		RealSignal view = new RealSignal(vx, vy, 1);
+		RealSignal view = new RealSignal(n, vx, vy, 1);
 
 		for (int x = 0; x < nx; x++)
-		for (int y = 0; y < ny; y++)
-		for (int k = 0; k < nz; k++) {
-			int index = x + vx * y;
-			view.data[0][index] = Math.max(view.data[0][index], data[k][x + nx * y]);
-		}
+			for (int y = 0; y < ny; y++)
+				for (int k = 0; k < nz; k++) {
+					int index = x + vx * y;
+					view.data[0][index] = Math.max(view.data[0][index], data[k][x + nx * y]);
+				}
 
 		for (int z = 0; z < nz; z++)
-		for (int y = 0; y < ny; y++)
-		for (int x = 0; x < nx; x++) {
-			int index = nx + 1 + z + vx * y;
-			view.data[0][index] = Math.max(view.data[0][index], data[z][x + nx * y]);
-		}
+			for (int y = 0; y < ny; y++)
+				for (int x = 0; x < nx; x++) {
+					int index = nx + 1 + z + vx * y;
+					view.data[0][index] = Math.max(view.data[0][index], data[z][x + nx * y]);
+				}
 
 		for (int z = 0; z < nz; z++)
+			for (int x = 0; x < nx; x++)
+				for (int y = 0; y < ny; y++) {
+					int index = x + vx * (ny + 1 + z);
+					view.data[0][index] = Math.max(view.data[0][index], data[z][x + nx * y]);
+				}
+		return view;
+	}
+
+	public RealSignal createMIPZ() {
+		String n = "mipz(" + name + ")";
+		RealSignal view = new RealSignal(n, nx, ny, 1);
 		for (int x = 0; x < nx; x++)
-		for (int y = 0; y < ny; y++) {
-			int index = x + vx * (ny + 1 + z);
-			view.data[0][index] = Math.max(view.data[0][index], data[z][x + nx * y]);
-		}
+			for (int y = 0; y < ny; y++) {
+				int index = x + nx * y;
+				for (int k = 0; k < nz; k++) {
+					view.data[0][index] = Math.max(view.data[0][index], data[k][x + nx * y]);
+				}
+			}
 		return view;
 	}
 
 	public RealSignal createMontage() {
+		String n = "planar(" + name + ")";
 		int nr = (int) Math.sqrt(nz);
 		int nc = (int) Math.ceil(nz / nr) + 1;
 		int w = nx * nr;
 		int h = ny * nc;
-		RealSignal view = new RealSignal(w, h, 1, false);
+		RealSignal view = new RealSignal(n, w, h, 1);
 		for (int k = 0; k < nz; k++) {
 			int col = k % nr;
 			int row = k / nr;
-			int offx = col*nx;
-			int offy = row*ny;
+			int offx = col * nx;
+			int offy = row * ny;
 			for (int x = 0; x < nx; x++)
-			for (int y = 0; y < ny; y++)
-				view.data[0][x + offx + w*(y + offy)] = data[k][x + nx * y];
+				for (int y = 0; y < ny; y++)
+					view.data[0][x + offx + w * (y + offy)] = data[k][x + nx * y];
 		}
 		return view;
 	}
-	
+
 	public RealSignal circular() {
 		for (int i = 0; i < nx; i++)
 			for (int j = 0; j < ny; j++)
@@ -564,8 +619,8 @@ public class RealSignal extends Signal {
 				setX(j, k, rotate(getX(j, k)));
 		return this;
 	}
-	
-	public RealSignal rescale(Monitors monitors) {		 
+
+	public RealSignal rescale(Monitors monitors) {
 		new Constraint(monitors).rescaled(this, 0, 255);
 		return this;
 	}
@@ -593,7 +648,7 @@ public class RealSignal extends Signal {
 		}
 		return buffer;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Real Signal [" + nx + ", " + ny + ", " + nz + "]";

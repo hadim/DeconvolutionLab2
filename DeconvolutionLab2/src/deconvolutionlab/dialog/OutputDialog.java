@@ -46,10 +46,11 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import deconvolutionlab.Imaging;
+import deconvolutionlab.Lab;
 import deconvolutionlab.Output;
 import deconvolutionlab.Output.Dynamic;
 import deconvolutionlab.Output.View;
-import deconvolutionlab.PlatformImager;
 import ij.gui.GUI;
 import lab.component.GridPanel;
 import lab.component.SpinnerRangeInteger;
@@ -144,7 +145,6 @@ public class OutputDialog extends JDialog implements ActionListener, ChangeListe
 		pack();
 		GUI.center(this);
 		setModal(true);
-		setVisible(true);
 	}
 
 	@Override
@@ -171,7 +171,7 @@ public class OutputDialog extends JDialog implements ActionListener, ChangeListe
 		else if (e.getSource() == bnOK) {
 			int freq = snpSnapshot.get();
 			Dynamic dynamic = Output.Dynamic.values()[cmbDynamic.getSelectedIndex()];
-			PlatformImager.Type type = PlatformImager.Type.values()[cmbType.getSelectedIndex()];
+			Imaging.Type type = Imaging.Type.values()[cmbType.getSelectedIndex()];
 			boolean show = chkShow.isSelected();
 			boolean save = chkSave.isSelected();
 			String name = txtName.getText();

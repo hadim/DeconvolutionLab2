@@ -34,6 +34,7 @@ package lab.component;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
@@ -48,10 +49,24 @@ public class JPanelImage extends JPanel {
 	
 	private Image image;
 	
+	public JPanelImage() {
+		super();
+	}
+	public JPanelImage(BufferedImage img) {
+		super();
+		image = img;
+	}
+
 	public JPanelImage(String filename) {
 		super();
 		image = ImageLoader.get(filename);
 	}
+
+	public void setImage(BufferedImage image) {
+		this.image = image;
+		repaint();
+	}
+
 
 	@Override
 	  protected void paintComponent(Graphics g) {

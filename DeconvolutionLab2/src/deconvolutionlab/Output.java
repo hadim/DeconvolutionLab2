@@ -34,7 +34,7 @@ package deconvolutionlab;
 import java.io.File;
 
 import deconvolution.algorithm.Controller;
-import deconvolutionlab.PlatformImager.ContainerImage;
+import deconvolutionlab.Imaging.ContainerImage;
 import deconvolutionlab.monitor.Monitors;
 import lab.tools.NumFormat;
 import signal.Constraint;
@@ -43,7 +43,7 @@ import signal.RealSignal;
 public class Output {
 
 	public enum View {
-		STACK, SERIES, ORTHO, MIP, PLANAR, FIGURE, STATS, PROFILE
+		STACK, SERIES, ORTHO, MIP, PLANAR, FIGURE
 	};
 
 	public enum Dynamic {
@@ -61,7 +61,7 @@ public class Output {
 	private boolean				show		= true;
 
 	private View				view		= View.STACK;
-	private PlatformImager.Type	type		= PlatformImager.Type.FLOAT;
+	private Imaging.Type	type		= Imaging.Type.FLOAT;
 	private Dynamic				dynamic		= Dynamic.INTACT;
 
 	private int					frequency	= 0;
@@ -106,7 +106,7 @@ public class Output {
 					found = true;
 				}
 			}
-			for (PlatformImager.Type t : PlatformImager.Type.values()) {
+			for (Imaging.Type t : Imaging.Type.values()) {
 				if (p.toLowerCase().equals(t.name().toLowerCase())) {
 					type = t;
 					found = true;
@@ -129,7 +129,7 @@ public class Output {
 		}
 	}
 
-	public Output(View view, boolean show, boolean save, int frequency, String name, Dynamic dynamic, PlatformImager.Type type, boolean center) {
+	public Output(View view, boolean show, boolean save, int frequency, String name, Dynamic dynamic, Imaging.Type type, boolean center) {
 		this.name = name;
 		this.show = show;
 		this.save = save;
@@ -140,7 +140,7 @@ public class Output {
 		this.frequency = frequency;
 	}
 
-	public Output(View view, boolean show, boolean save, int frequency, String name, Dynamic dynamic, PlatformImager.Type type, int px, int py, int pz) {
+	public Output(View view, boolean show, boolean save, int frequency, String name, Dynamic dynamic, Imaging.Type type, int px, int py, int pz) {
 		this.name = name;
 		this.show = show;
 		this.save = save;
@@ -191,7 +191,7 @@ public class Output {
 	}
 
 	public String[] getAsString() {
-		String t = (type == PlatformImager.Type.FLOAT ? "" : type.name().toLowerCase());
+		String t = (type == Imaging.Type.FLOAT ? "" : type.name().toLowerCase());
 		String d = (dynamic == Dynamic.INTACT ? "" : dynamic.name().toLowerCase());
 		String k = "";
 		if (!center)
@@ -201,22 +201,21 @@ public class Output {
 		String sa = save ? "\u2713" : "";
 		String sh = show ? "\u2713" : "";
 		String fr = frequency > 0 ? " @" + frequency : "";
-		return new String[] { view.name().toLowerCase() + fr, name, d, t, k, sh, sa, "" };
+		return new String[] { view.name().toLowerCase() + fr, name, d, t, k, sh, sa, "\u232B" };
 	}
 
 	public void executeStarting(Monitors monitors, RealSignal signal, Controller controller) {
 		execute(monitors, signal, controller, true, false, false, 0);
 	}
-	
+
 	public void executeFinal(Monitors monitors, RealSignal signal, Controller controller) {
 		execute(monitors, signal, controller, false, false, true, 0);
 	}
 
-
 	public void executeIterative(Monitors monitors, RealSignal signal, Controller controller, int iter) {
 		execute(monitors, signal, controller, false, true, false, iter);
 	}
-	
+
 	public void execute(Monitors monitors, RealSignal signal, Controller controller, boolean start, boolean live, boolean finish, int iter) {
 		if (signal == null)
 			return;
@@ -255,15 +254,8 @@ public class Output {
 			x = signal;
 		}
 		String filename = path + File.separator + title + ".tif";
-		
+
 		switch (view) {
-		case STATS:
-			if (start)
-				Lab.firstStats(monitors, name, controller.stats(name), show, save);
-			Lab.nextStats(monitors, title, controller.stats(name), show, save);
-			if (finish)
-				Lab.lastStats(monitors, name, controller.stats(name), show, save);
-			break;
 		case STACK:
 			if (show && !live)
 				Lab.show(monitors, x, title, type, (center ? x.nz / 2 : pz));

@@ -31,16 +31,35 @@
 
 package signal;
 
-import deconvolutionlab.Lab;
+public class ComplexSignal extends Signal implements SignalListener {
 
-public class ComplexSignal extends Signal {
+	public ComplexSignal(String name, int nx, int ny, int nz) {
+		super(name, nx, ny, nz);
+		int step = Math.max(1, nz/SignalCollector.NOTIFICATION_RATE);
+		this.data = new float[nz][];
+		notify(name, 0);
+		for(int k=0; k<nz; k++) {
+			data[k] = new float[nx * ny * 2];
+			if (k % step == 0)
+				notify(name, k*100.0/nz);
+		}
+		notify(name, 100);
+		SignalCollector.alloc(name, nx, ny, ny, true);
+	}
 
-	public ComplexSignal(int nx, int ny, int nz) {
-		allocateComplexSignal(nx, ny, nz);
+	@Override
+	public void notify(String name, double progress) {
+		SignalCollector.setProgress(progress);
 	}
 	
-	public ComplexSignal(RealSignal real) {
-		allocateComplexSignal(real.nx, real.ny, real.nz);
+	@Override
+	public void finalize() {
+		data = null;
+		System.gc();
+		SignalCollector.free(name, nx, ny, ny, true);
+	}
+
+	public void set(RealSignal real) {
 		for(int k=0; k<nz; k++) {
 			float[] s = data[k];
 			float[] r = real.getXY(k);
@@ -50,8 +69,7 @@ public class ComplexSignal extends Signal {
 		}
 	}
 
-	public ComplexSignal(RealSignal real, RealSignal imag) {
-		allocateComplexSignal(real.nx, real.ny, real.nz);
+	public void set(RealSignal real, RealSignal imag) {
 		for(int k=0; k<nz; k++) {
 			float[] s = data[k];
 			float[] re = real.getXY(k);
@@ -65,7 +83,7 @@ public class ComplexSignal extends Signal {
 
 	public void divide(ComplexSignal denominator) {
 		float a1, a2, b1, b2, mag;
-		float epsilon2 = (float)(epsilon*epsilon);
+		float epsilon2 = (float)(Operations.epsilon*Operations.epsilon);
 		int nxy = nx * ny * 2;
 
 		for(int k=0; k<nz; k++)
@@ -121,23 +139,25 @@ public class ComplexSignal extends Signal {
 		}
 	}
 	
-	public void times(float factor) {
+	public ComplexSignal times(float factor) {
 		int nxy = nx * ny * 2;
 		for (int k = 0; k < nz; k++)
 		for (int i = 0; i < nxy; i++)
-			data[k][i] *= factor;	
+			data[k][i] *= factor;
+		return this;
 	}
 	
-	public void plus(float real, float imag) {
+	public ComplexSignal plus(float real, float imag) {
 		int nxy = nx * ny * 2;
 		for (int k = 0; k < nz; k++)
 		for (int i = 0; i < nxy; i+=2) {
 			data[k][i] += real;	
 			data[k][i+1] += imag;
 		}
+		return this;
 	}
 
-	public void times(ComplexSignal factor) {
+	public ComplexSignal times(ComplexSignal factor) {
 		float a1, a2, b1, b2;
 		int nxy = nx * ny * 2;
 		for(int k=0; k<nz; k++)
@@ -149,6 +169,7 @@ public class ComplexSignal extends Signal {
 			data[k][i] = a1*a2 - b1*b2;
 			data[k][i+1] = a1*b2 + a2*b1;
 		}
+		return this;
 	}
 	
 	// this <- Ht * this
@@ -226,7 +247,8 @@ public class ComplexSignal extends Signal {
 	}
 
 	public RealSignal getRealSignal() {
-		RealSignal real = new RealSignal(nx, ny, nz);
+		String n = "real(" + name + ")";
+		RealSignal real = new RealSignal(n, nx, ny, nz);
 		int nxy = nx * ny;
 		for (int k = 0; k < nz; k++) {
 			float[] r = real.getXY(k);
@@ -237,7 +259,8 @@ public class ComplexSignal extends Signal {
 	}
 
 	public RealSignal getImagSignal() {
-		RealSignal real = new RealSignal(nx, ny, nz);
+		String n = "imag(" + name + ")";
+		RealSignal real = new RealSignal(n, nx, ny, nz);
 		int nxy = nx * ny;
 		for (int k = 0; k < nz; k++) {
 			float[] r = real.getXY(k);
@@ -249,7 +272,8 @@ public class ComplexSignal extends Signal {
 	
 	
 	public RealSignal getModule() {
-		RealSignal module = new RealSignal(nx, ny, nz);
+		String n = "mod(" + name + ")";
+		RealSignal module = new RealSignal(n, nx, ny, nz);
 		for (int k = 0; k < nz; k++)
 			module.setXY(k, getModuleXY(k));
 		return module;
@@ -270,7 +294,7 @@ public class ComplexSignal extends Signal {
 	}
 
 	public ComplexSignal duplicate() {
-		ComplexSignal out = new ComplexSignal(nx, ny, nz);
+		ComplexSignal out = new ComplexSignal("copy(" + name + ")", nx, ny, nz);
 		int nxy = nx * ny * 2;
 		for (int k = 0; k < nz; k++)
 			System.arraycopy(data[k], 0, out.data[k], 0, nxy);
@@ -278,7 +302,7 @@ public class ComplexSignal extends Signal {
 	}
 
 	public ComplexSignal replicate() {
-		return new ComplexSignal(nx, ny, nz);
+		return new ComplexSignal(">" + name, nx, ny, nz);
 	}
 
 	public float getEnergy() {

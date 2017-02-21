@@ -144,7 +144,7 @@ public class NumFormat {
 
 	public static String bytes(double bytes) {
 		if (bytes < 3000)
-			return String.format("%3.0f b", bytes);
+			return String.format("%3.0f", bytes);
 		bytes /= 1024.0;
 		if (bytes < 3000)
 			return String.format("%3.1f Kb", bytes);

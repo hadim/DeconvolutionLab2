@@ -172,7 +172,7 @@ public abstract class SignalFactory {
 		xc = fractXC * nx;
 		yc = fractYC * ny;
 		zc = fractZC * nz;
-		RealSignal signal = new RealSignal(nx, ny, nz);
+		RealSignal signal = new RealSignal(getName(), nx, ny, nz);
 		fill(signal);
 
 		return signal;

@@ -62,25 +62,25 @@ public abstract class AbstractFFT {
 	
 	public ComplexSignal transform(RealSignal x, ComplexSignal XAllocated) {
 		if (XAllocated == null)
-			XAllocated = new ComplexSignal(nx, ny, nz);
+			XAllocated = new ComplexSignal("fft(" + x.name + ")", nx, ny, nz);
 		transformInternal(x, XAllocated);
 		return XAllocated;
 	}
 
 	public ComplexSignal transform(RealSignal x) {
-		ComplexSignal X = new ComplexSignal(nx, ny, nz);
+		ComplexSignal X = new ComplexSignal("fft(" + x.name + ")", nx, ny, nz);
 		transformInternal(x, X);
 		return X;
 	}
 
 	public RealSignal inverse(ComplexSignal X, RealSignal xAllocated) {
 		if (xAllocated == null)
-			xAllocated = new RealSignal(nx, ny, nz);
+			xAllocated = new RealSignal("ifft(" + X.name + ")", nx, ny, nz);
 		inverseInternal(X, xAllocated);
 		return xAllocated;
 	}
 	public RealSignal inverse(ComplexSignal X) {
-		RealSignal x = new RealSignal(nx, ny, nz);
+		RealSignal x = new RealSignal("ifft(" + X.name + ")", nx, ny, nz);
 		inverseInternal(X, x);
 		return x;
 	}

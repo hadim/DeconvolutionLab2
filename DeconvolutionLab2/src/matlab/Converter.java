@@ -418,7 +418,7 @@ public class Converter {
 			byte[][] data = (byte[][]) object;
 			int h = data.length;
 			int w = data[0].length;
-			signal = new RealSignal(h, w, 1);
+			signal = new RealSignal("Matlab-byte2D", h, w, 1);
 			for(int i=0; i<h; i++)
 			for(int j=0; j<w; j++)
 				signal.data[0][i+j*h]= data[i][j];
@@ -428,7 +428,7 @@ public class Converter {
 			short[][] data = (short[][]) object;
 			int h = data.length;
 			int w = data[0].length;
-			signal = new RealSignal(h, w, 1);
+			signal = new RealSignal("Matlab-short2D", h, w, 1);
 			for(int i=0; i<h; i++)
 			for(int j=0; j<w; j++)
 				signal.data[0][i+j*h]= data[i][j];
@@ -439,7 +439,7 @@ public class Converter {
 			int[][] data = (int[][]) object;
 			int h = data.length;
 			int w = data[0].length;
-			signal = new RealSignal(h, w, 1);
+			signal = new RealSignal("Matlab-int2D", h, w, 1);
 			for(int i=0; i<h; i++)
 			for(int j=0; j<w; j++)
 				signal.data[0][i+j*h]= data[i][j];
@@ -450,7 +450,7 @@ public class Converter {
 			float[][] data = (float[][]) object;
 			int h = data.length;
 			int w = data[0].length;
-			signal = new RealSignal(h, w, 1);
+			signal = new RealSignal("Matlab-float3D", h, w, 1);
 			for(int i=0; i<h; i++)
 			for(int j=0; j<w; j++)
 				signal.data[0][i+j*h]= data[i][j];
@@ -461,7 +461,7 @@ public class Converter {
 			double[][] data = (double[][]) object;
 			int h = data.length;
 			int w = data[0].length;
-			signal = new RealSignal(h, w, 1);
+			signal = new RealSignal("Matlab-double2D", h, w, 1);
 			for(int i=0; i<h; i++)
 			for(int j=0; j<w; j++)
 				signal.data[0][i+j*h]= (float)data[i][j];
@@ -473,7 +473,7 @@ public class Converter {
 			int h = data.length;
 			int w = data[0].length;
 			int d = data[0][0].length;
-			signal = new RealSignal(h, w, d);
+			signal = new RealSignal("Matlab-byte3D", h, w, d);
 			for(int k=0; k<d; k++)
 			for(int i=0; i<h; i++)
 			for(int j=0; j<w; j++)
@@ -486,7 +486,7 @@ public class Converter {
 			int h = data.length;
 			int w = data[0].length;
 			int d = data[0][0].length;
-			signal = new RealSignal(h, w, d);
+			signal = new RealSignal("Matlab-short3D", h, w, d);
 			for(int k=0; k<d; k++)
 			for(int i=0; i<h; i++)
 			for(int j=0; j<w; j++)
@@ -499,7 +499,7 @@ public class Converter {
 			int h = data.length;
 			int w = data[0].length;
 			int d = data[0][0].length;
-			signal = new RealSignal(h, w, d);
+			signal = new RealSignal("Matlab-int3D", h, w, d);
 			for(int k=0; k<d; k++)
 			for(int i=0; i<h; i++)
 			for(int j=0; j<w; j++)
@@ -512,7 +512,7 @@ public class Converter {
 			int h = data.length;
 			int w = data[0].length;
 			int d = data[0][0].length;
-			signal = new RealSignal(h, w, d);
+			signal = new RealSignal("Matlab-float3D", h, w, d);
 			for(int k=0; k<d; k++)
 			for(int i=0; i<h; i++)
 			for(int j=0; j<w; j++)
@@ -525,7 +525,7 @@ public class Converter {
 			int h = data.length;
 			int w = data[0].length;
 			int d = data[0][0].length;
-			signal = new RealSignal(h, w, d);
+			signal = new RealSignal("Matlab-double3D", h, w, d);
 			for(int k=0; k<d; k++)
 			for(int i=0; i<h; i++)
 			for(int j=0; j<w; j++)

@@ -35,7 +35,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -44,11 +43,9 @@ import java.util.HashMap;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JToolBar;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
@@ -59,14 +56,11 @@ public class TableMonitor implements AbstractMonitor, ActionListener {
 
 	private CustomizedTable			table;
 	private JButton					bnClear		= new JButton("Clear");
-	private JButton					bnProlix	= new JButton("Prolix");
-	private JButton					bnVerbose	= new JButton("verbose");
-	private JButton					bnQuiet		= new JButton("Quiet");
-	private JButton					bnMute		= new JButton("Mute");
 	private HashMap<Long, Color>	colors		= new HashMap<Long, Color>();
 	private JPanel					panel;
-
-	public TableMonitor(int width, int height) {
+	private String 					name;
+	
+	public TableMonitor(String name, int width, int height) {
 		ArrayList<CustomizedColumn> columns = new ArrayList<CustomizedColumn>();
 		columns.add(new CustomizedColumn("#", Long.class, 60, false));
 		columns.add(new CustomizedColumn("Time", String.class, 100, false));
@@ -87,27 +81,10 @@ public class TableMonitor implements AbstractMonitor, ActionListener {
 
 		JScrollPane scroll = new JScrollPane(table);
 		scroll.setPreferredSize(new Dimension(width, height));
-		/*
-		JToolBar tool = new JToolBar();
-		tool.setFloatable(false);
-		tool.setLayout(new GridLayout(1, 3));
-		tool.add(bnClear);
-		tool.add(new JLabel(""));
-		tool.add(new JLabel(""));
-		tool.add(bnProlix);
-		tool.add(bnVerbose);
-		tool.add(bnQuiet);
-		tool.add(bnMute);
-		*/
 		JPanel main = new JPanel(new BorderLayout());
 
-		//main.add(tool, BorderLayout.NORTH);
 		main.add(scroll, BorderLayout.CENTER);
 		bnClear.addActionListener(this);
-		bnVerbose.addActionListener(this);
-		bnQuiet.addActionListener(this);
-		bnProlix.addActionListener(this);
-		bnMute.addActionListener(this);
 		panel = new JPanel(new BorderLayout());
 		panel.add(main);
 		panel.setBorder(BorderFactory.createEtchedBorder());
@@ -117,8 +94,8 @@ public class TableMonitor implements AbstractMonitor, ActionListener {
 		return panel;
 	}
 
-	public void show(String title) {
-		JFrame frame = new JFrame(title);
+	public void show() {
+		JFrame frame = new JFrame(name);
 		frame.getContentPane().add(panel);
 		frame.pack();
 		frame.setVisible(true);
@@ -159,7 +136,7 @@ public class TableMonitor implements AbstractMonitor, ActionListener {
 
 	@Override
 	public String getName() {
-		return "table";
+		return name;
 	}
 	
 	class RowRenderer extends DefaultTableCellRenderer {

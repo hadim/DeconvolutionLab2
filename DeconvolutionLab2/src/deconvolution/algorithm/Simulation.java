@@ -73,13 +73,13 @@ public class Simulation extends AbstractAlgorithm implements Callable<RealSignal
 	}
 
 	public void poisson(RealSignal x, double factor) {
-		if (factor < RealSignal.epsilon) 
+		if (factor < Operations.epsilon) 
 			return;
 		double f = 1.0/(factor);
 		for (int k = 0; k < x.nz; k++) {
 			float[] slice = x.getXY(k);
 			for (int j = 0; j < x.ny * x.nx; j++)
-				if (slice[j] > RealSignal.epsilon) {
+				if (slice[j] > Operations.epsilon) {
 					slice[j] = (float)(rand.nextPoissonian(f*(slice[j])) * factor);
 				}
 		}	

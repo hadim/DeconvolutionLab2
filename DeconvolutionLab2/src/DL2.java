@@ -1,11 +1,10 @@
 import java.io.File;
 
 import deconvolution.Deconvolution;
-import deconvolutionlab.Config;
+import deconvolutionlab.Imaging;
 import deconvolutionlab.Lab;
 import deconvolutionlab.dialog.LabDialog;
 import ij.ImagePlus;
-import ij.Macro;
 import ij.WindowManager;
 import matlab.Converter;
 import signal.RealSignal;
@@ -49,18 +48,17 @@ import signal.RealSignal;
 public class DL2 {
 
 	public static void lab() {
-		String config = System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config";
-		Config.getInstance(config);
-		LabDialog dialog = new LabDialog();
-		dialog.setVisible(true);
+		Lab.init(Imaging.Platform.MATLAB, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
+		LabDialog dlg = new LabDialog();
+		Lab.setVisible(dlg, false);
 	}
 
 	public static void run(String command) {
-		new Deconvolution(command).deconvolve(false);
+		new Deconvolution("Matlab", command).deconvolve();
 	}	
 	
 	public static void launch(String command) {
-		new Deconvolution(command).launch("matlab", false);
+		new Deconvolution("Matlab", command).launch();
 	}	
 
 	public static Object get(String image) {
@@ -74,8 +72,8 @@ public class DL2 {
 		RealSignal image = Converter.createRealSignal(arrayImage);
 		RealSignal psf = Converter.createRealSignal(arrayPSF);
 		String command = " -image platform input -psf platform psf -algorithm " + algo;
-		Deconvolution d = new Deconvolution(command);
-		RealSignal result = d.deconvolve(image, psf, false);
+		Deconvolution d = new Deconvolution("Matlab", command);
+		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}
 	
@@ -100,8 +98,8 @@ public class DL2 {
 		RealSignal image = Converter.createRealSignal(arrayImage);
 		RealSignal psf = Converter.createRealSignal(arrayPSF);
 		String command = " -algorithm DIV " + options;
-		Deconvolution d = new Deconvolution(command);
-		RealSignal result = d.deconvolve(image, psf, false);
+		Deconvolution d = new Deconvolution("Matlab DIV", command);
+		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}
 
@@ -113,8 +111,8 @@ public class DL2 {
 		RealSignal image = Converter.createRealSignal(arrayImage);
 		RealSignal psf = Converter.createRealSignal(arrayPSF);
 		String command = " -algorithm CONV " + options;
-		Deconvolution d = new Deconvolution(command);
-		RealSignal result = d.deconvolve(image, psf, false);
+		Deconvolution d = new Deconvolution("Matlab CONV", command);
+		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}
 
@@ -126,8 +124,8 @@ public class DL2 {
 		RealSignal image = Converter.createRealSignal(arrayImage);
 		RealSignal psf = Converter.createRealSignal(arrayPSF);
 		String command = " -algorithm NIF " + options;
-		Deconvolution d = new Deconvolution(command);
-		RealSignal result = d.deconvolve(image, psf, false);
+		Deconvolution d = new Deconvolution("Matlab NIF", command);
+		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}
 
@@ -139,8 +137,8 @@ public class DL2 {
 		RealSignal image = Converter.createRealSignal(arrayImage);
 		RealSignal psf = Converter.createRealSignal(arrayPSF);
 		String command = " -algorithm TRIF " + regularizationFactor + " " + options;
-		Deconvolution d = new Deconvolution(command);
-		RealSignal result = d.deconvolve(image, psf, false);
+		Deconvolution d = new Deconvolution("Matlab TRIF", command);
+		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}
 	
@@ -152,8 +150,8 @@ public class DL2 {
 		RealSignal image = Converter.createRealSignal(arrayImage);
 		RealSignal psf = Converter.createRealSignal(arrayPSF);
 		String command = " -algorithm RIF " + regularizationFactor + " " + options;
-		Deconvolution d = new Deconvolution(command);
-		RealSignal result = d.deconvolve(image, psf, false);
+		Deconvolution d = new Deconvolution("Matlab RIF", command);
+		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}	
 	
@@ -165,8 +163,8 @@ public class DL2 {
 		RealSignal image = Converter.createRealSignal(arrayImage);
 		RealSignal psf = Converter.createRealSignal(arrayPSF);
 		String command = " -algorithm RL " + itmax + " " + options;
-		Deconvolution d = new Deconvolution(command);
-		RealSignal result = d.deconvolve(image, psf, false);
+		Deconvolution d = new Deconvolution("Matlab RL", command);
+		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}
 	
@@ -178,8 +176,8 @@ public class DL2 {
 		RealSignal image = Converter.createRealSignal(arrayImage);
 		RealSignal psf = Converter.createRealSignal(arrayPSF);
 		String command = " -algorithm RLTV " + itmax + " " + regularizationFactor + " " + options;
-		Deconvolution d = new Deconvolution(command);
-		RealSignal result = d.deconvolve(image, psf, false);
+		Deconvolution d = new Deconvolution("Matlab RLTV", command);
+		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}	
 
@@ -191,8 +189,8 @@ public class DL2 {
 		RealSignal image = Converter.createRealSignal(arrayImage);
 		RealSignal psf = Converter.createRealSignal(arrayPSF);
 		String command = " -algorithm LW " + itmax + " " + gamma + " " + options;
-		Deconvolution d = new Deconvolution(command);
-		RealSignal result = d.deconvolve(image, psf, false);
+		Deconvolution d = new Deconvolution("Matlab LW", command);
+		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}
 
@@ -204,8 +202,8 @@ public class DL2 {
 		RealSignal image = Converter.createRealSignal(arrayImage);
 		RealSignal psf = Converter.createRealSignal(arrayPSF);
 		String command = " -algorithm LW+ " + itmax + " " + options;
-		Deconvolution d = new Deconvolution(command);
-		RealSignal result = d.deconvolve(image, psf, false);
+		Deconvolution d = new Deconvolution("Matlab NNLS", command);
+		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}
 	
@@ -217,8 +215,8 @@ public class DL2 {
 		RealSignal image = Converter.createRealSignal(arrayImage);
 		RealSignal psf = Converter.createRealSignal(arrayPSF);
 		String command = " -algorithm TM " + itmax + " " + gamma + " " + lambda + " " + options;
-		Deconvolution d = new Deconvolution(command);
-		RealSignal result = d.deconvolve(image, psf, false);
+		Deconvolution d = new Deconvolution("Matlab TM", command);
+		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}
 
@@ -230,8 +228,8 @@ public class DL2 {
 		RealSignal image = Converter.createRealSignal(arrayImage);
 		RealSignal psf = Converter.createRealSignal(arrayPSF);
 		String command = " -algorithm ICTM " + itmax + " " + gamma + " " + lambda + " " + options;
-		Deconvolution d = new Deconvolution(command);
-		RealSignal result = d.deconvolve(image, psf, false);
+		Deconvolution d = new Deconvolution("Matlab ICTM", command);
+		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}
 

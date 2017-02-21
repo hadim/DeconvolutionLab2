@@ -31,7 +31,14 @@
 
 package plugins.sage.deconvolutionlab;
 
+import java.io.File;
+import java.util.ArrayList;
+
+import javax.swing.JDialog;
+
+import deconvolutionlab.Imaging;
 import icy.file.Saver;
+import icy.gui.frame.IcyFrame;
 import icy.image.IcyBufferedImage;
 import icy.imagej.ImageJUtil;
 import icy.main.Icy;
@@ -40,24 +47,33 @@ import icy.type.DataType;
 import icy.type.collection.array.Array1DUtil;
 import ij.ImagePlus;
 import ij.io.Opener;
-
-import java.io.File;
-import java.util.ArrayList;
-
 import signal.ComplexComponent;
 import signal.ComplexSignal;
 import signal.RealSignal;
-import deconvolutionlab.PlatformImager;
-import deconvolutionlab.monitor.Monitors;
 
-public class IcyImager extends PlatformImager {
+public class IcyImager extends Imaging {
 
+	@Override
+	public Platform getPlatform() {
+		return Imaging.Platform.ICY;
+	}
+
+	@Override
+	public void setVisible(JDialog dialog, boolean modal) {
+		IcyFrame icf = new IcyFrame();
+		icf.setTitle(dialog.getTitle());
+		dialog.setModal(modal);
+		icf.add(dialog.getContentPane());	
+		icf.toFront();
+		icf.addToDesktopPane();
+		icf.setVisible(true);
+	}
 	
 	public static RealSignal create(Sequence seq) {
 		int nx = seq.getSizeX();
 		int ny = seq.getSizeY();
 		int nz = seq.getSizeZ();
-		RealSignal signal = new RealSignal(nx, ny, nz);
+		RealSignal signal = new RealSignal("icy-" + seq.getName(), nx, ny, nz);
 		for (int k = 0; k < nz; k++) {
 			float pixels[] = new float[nx * ny];
 			Array1DUtil.arrayToFloatArray(seq.getDataXY(0, k, 0), pixels, seq.isSignedDataType());
@@ -91,17 +107,6 @@ public class IcyImager extends PlatformImager {
 	}
 
 	@Override
-	public void show(RealSignal signal, String title) {
-		show(signal, title, PlatformImager.Type.FLOAT);
-	}
-	
-	@Override
-	public void show(RealSignal signal, String title, PlatformImager.Type type) {
-		Sequence sequence = build(signal, type);
-		Icy.getMainInterface().addSequence(sequence);
-	}
-
-	@Override
     public void show(ComplexSignal signal, String title, ComplexComponent complex) {
 		Sequence sequence = new Sequence();
 		for (int k = 0; k < signal.nz; k++) {
@@ -122,70 +127,60 @@ public class IcyImager extends PlatformImager {
     }
 	
 	@Override
-    public void save(RealSignal signal, String filename) {
-		save(signal, filename, PlatformImager.Type.FLOAT);
-	}	
-	
-	@Override
-	public void save(RealSignal signal, String filename, PlatformImager.Type type) {
+	public void save(RealSignal signal, String filename, Imaging.Type type) {
 		Sequence sequence = build(signal, type);
 		File file = new File(filename);
 		Saver.save(sequence, file, false, true);
 	}
 	
-	private RealSignal build(Sequence sequence) {
-		int nx = sequence.getSizeX();
-		int ny = sequence.getSizeY();
-		int nz = sequence.getSizeZ();
-		RealSignal signal = new RealSignal(nx, ny, nz);
+	private RealSignal build(Sequence seq) {
+		int nx = seq.getSizeX();
+		int ny = seq.getSizeY();
+		int nz = seq.getSizeZ();
+		RealSignal signal = new RealSignal("icy-" + seq.getName(), nx, ny, nz);
 		for (int k = 0; k < nz; k++) {
 			float pixels[] = new float[nx * ny];
-			Array1DUtil.arrayToFloatArray(sequence.getDataXY(0, k, 0), pixels, sequence.isSignedDataType());
+			Array1DUtil.arrayToFloatArray(seq.getDataXY(0, k, 0), pixels, seq.isSignedDataType());
 			signal.setXY(k, pixels);
 		}
 		return signal;
 	}
 	
-	private Sequence build(RealSignal signal, PlatformImager.Type type) {
+	private Sequence build(RealSignal signal, Imaging.Type type) {
+		int nx = signal.nx;
+		int ny = signal.ny;
+		int nz = signal.nz;
 		Sequence sequence = new Sequence();
-		for (int k = 0; k < signal.nz; k++) {
-			float[] plane = signal.getXY(k);
-			IcyBufferedImage image = null;
-			switch(type) {
-			case BYTE: 
-				byte[] b = Array1DUtil.arrayToByteArray(plane);
-				image = new IcyBufferedImage(signal.nx, signal.ny, 1, DataType.BYTE);
-				Array1DUtil.byteArrayToArray(b, image.getDataXY(0), image.isSignedDataType());
-				break;
-			case SHORT: 
-				short[] s = Array1DUtil.arrayToShortArray(plane, false);
-				image = new IcyBufferedImage(signal.nx, signal.ny, 1, DataType.SHORT);
-				Array1DUtil.shortArrayToArray(s, image.getDataXY(0), image.isSignedDataType());
-				break;
-			default: 
-				image = new IcyBufferedImage(signal.nx, signal.ny, 1, DataType.FLOAT);
-				Array1DUtil.floatArrayToArray(signal.data[k], image.getDataXY(0));
-				break;
+		for (int z = 0; z < nz; z++) {
+			if (type == Imaging.Type.SHORT) {
+				short[] plane = Array1DUtil.arrayToShortArray(signal.data[z], false);
+				IcyBufferedImage image = new IcyBufferedImage(nx, ny, 1, DataType.USHORT);
+				Array1DUtil.shortArrayToArray(plane, image.getDataXY(0), image.isSignedDataType());
+				image.dataChanged();
+				sequence.setImage(0, z, image);
 			}
-			image.dataChanged();
-			sequence.setImage(0, k, image);
+			else if (type == Imaging.Type.BYTE) {
+				byte[] plane = Array1DUtil.arrayToByteArray(signal.data[z]);
+				IcyBufferedImage image = new IcyBufferedImage(nx, ny, 1, DataType.UBYTE);
+				Array1DUtil.byteArrayToArray(plane, image.getDataXY(0), image.isSignedDataType());
+				image.dataChanged();
+				sequence.setImage(0, z, image);
+			}
+			else {
+				IcyBufferedImage image = new IcyBufferedImage(nx, ny, 1, DataType.FLOAT);
+				Array1DUtil.floatArrayToSafeArray(signal.data[z], image.getDataXY(0), image.isSignedDataType());
+				image.dataChanged();
+				sequence.setImage(0, z, image);
+			}
+
 		}
 		return sequence;
 	}
+	
 
 	@Override
 	public String getName() {
 		return "Icy";
-	}
-
-	@Override
-	public void show(RealSignal signal, String title, Type type, int z) {
-		// TODO Auto-generated method stub	
-	}
-	
-	@Override
-	public void show(ComplexSignal signal, String title) {
-		// TODO Auto-generated method stub	
 	}
 
 	@Override
@@ -194,11 +189,6 @@ public class IcyImager extends PlatformImager {
 		return null;
 	}
 
-	@Override
-	public void append(ContainerImage container, RealSignal signal, String title) {
-		// TODO Auto-generated method stub
-		
-	}
 
 	@Override
 	public void append(ContainerImage container, RealSignal signal, String title, Type type) {
@@ -206,5 +196,21 @@ public class IcyImager extends PlatformImager {
 		
 	}
 
+	@Override
+	public void show(RealSignal signal, String title, Type type, int z) {
+		Sequence sequence = build(signal, type);
+		sequence.setName(title);
+		Icy.getMainInterface().addSequence(sequence);
+	}
+
+	@Override
+	public String getSelectedImage() {
+		return null;
+	}
+
+	@Override
+	public boolean isSelectable() {
+		return false;
+	}
 
 }

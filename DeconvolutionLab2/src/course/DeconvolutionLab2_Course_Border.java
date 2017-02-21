@@ -46,52 +46,52 @@ public class DeconvolutionLab2_Course_Border implements PlugIn {
 		String cst = " -image synthetic constant 250 0 size 200 200 40";
 
 		String algo  = " -algorithm CONV -out ortho REFo (64,32,16)"; 
-		new Deconvolution(ref + " -psf synthetic impulse " + algo).deconvolve(false);
+		new Deconvolution("run", ref + " -psf synthetic impulse " + algo).deconvolve();
 
 		algo  = " -algorithm CONV -stack CONV -out ortho CONVo rescaled byte (64,32,16) -out mip CONVp rescaled byte"; 
-		new Deconvolution(ref + psf + algo).deconvolve(false);
+		new Deconvolution("run", ref + psf + algo).deconvolve();
 
 		algo  = " -algorithm CONV -pad NO NO 200 200 -out ortho PADo200 rescaled byte (64,32,16) -out mip PADp200 rescaled byte"; 
-		new Deconvolution(ref + psf + algo).deconvolve(false);
+		new Deconvolution("run", ref + psf + algo).deconvolve();
 
 		algo  = " -algorithm CONV -pad NO NO 100 100 -out ortho PADo100 rescaled byte (64,32,16) -out mip PADp100 rescaled byte"; 
-		new Deconvolution(ref + psf + algo).deconvolve(false);
+		new Deconvolution("run", ref + psf + algo).deconvolve();
 
 		algo  = " -algorithm CONV -pad NO NO 40 40 -out ortho PADo40 rescaled byte (64,32,16) -out mip PADp40 rescaled byte"; 
-		new Deconvolution(ref + psf + algo).deconvolve(false);
+		new Deconvolution("run", ref + psf + algo).deconvolve();
 
 		algo  = " -algorithm CONV -pad NO NO 20 20 -out ortho PADo20 rescaled byte (64,32,16) -out mip PADp20 rescaled byte"; 
-		new Deconvolution(ref + psf + algo).deconvolve(false);
+		new Deconvolution("run", ref + psf + algo).deconvolve();
 
 		algo  = " -algorithm CONV -pad NO NO 10 10 -out ortho PADo10 rescaled byte (64,32,16) -out mip PADp10 rescaled byte"; 
-		new Deconvolution(ref + psf + algo).deconvolve(false);
+		new Deconvolution("run", ref + psf + algo).deconvolve();
 
 		algo  = " -algorithm CONV -pad NO NO 5 5 -out ortho PADo2 rescaled byte (64,32,16) -out mip PADp2 rescaled byte"; 
-		new Deconvolution(ref + psf + algo).deconvolve(false);
+		new Deconvolution("run", ref + psf + algo).deconvolve();
 
 		algo  = " -algorithm CONV -apo HANN HANN -out ortho HANNo rescaled byte (64,32,16) -out mip HANNp rescaled byte"; 
-		new Deconvolution(ref + psf + algo).deconvolve(false);
+		new Deconvolution("run", ref + psf + algo).deconvolve();
 		
 		algo  = " -algorithm CONV -apo TUKEY TUKEY -out ortho TUKEYo rescaled byte (64,32,16) -out mip TUKEYp rescaled byte"; 
-		new Deconvolution(ref + psf + algo).deconvolve(false);
+		new Deconvolution("run", ref + psf + algo).deconvolve();
 
 		algo  = " -algorithm CONV --pad NO NO 8 8 apo HANN HANN -out ortho PAD8_HANNo rescaled byte (64,32,16)  -out mip PAD8_HANNp rescaled byte"; 
-		new Deconvolution(ref + psf + algo).deconvolve(false);
+		new Deconvolution("run", ref + psf + algo).deconvolve();
 
 		
 		algo  = " -algorithm CONV -apo HANN HANN -out ortho HANN_CSTo rescaled byte -out mip HANN_CSTp rescaled byte"; 
-		new Deconvolution(cst + psf + algo).deconvolve(false);
+		new Deconvolution("run", cst + psf + algo).deconvolve();
 		
 		algo  = " -algorithm CONV -apo TUKEY TUKEY -out ortho TUKEY_CSTo rescaled byte -out mip TUKEY_CSTp rescaled byte"; 
-		new Deconvolution(cst + psf + algo).deconvolve(false);
+		new Deconvolution("run", cst + psf + algo).deconvolve();
 
 		
 		algo  = " -algorithm CONV -pad E2 E2 -out ortho PADpPower2FFTW rescaled byte (64,32,16) -out mip PADpPower2FFTW rescaled byte"; 
 		
 		
-		new Deconvolution(cst + psf + algo + " -fft FFTW2 ").deconvolve(false);
-		new Deconvolution(cst + psf + algo + " -fft Academic ").deconvolve(false);
-		new Deconvolution(cst + psf + algo + " -fft JTransforms ").deconvolve(false);
+		new Deconvolution("run", cst + psf + algo + " -fft FFTW2 ").deconvolve();
+		new Deconvolution("run", cst + psf + algo + " -fft Academic ").deconvolve();
+		new Deconvolution("run", cst + psf + algo + " -fft JTransforms ").deconvolve();
 		
 	}
 	

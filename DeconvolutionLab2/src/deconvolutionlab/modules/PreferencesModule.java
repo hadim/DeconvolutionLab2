@@ -35,9 +35,9 @@ import java.awt.BorderLayout;
 
 import javax.swing.JPanel;
 
+import deconvolutionlab.Config;
 import lab.component.GridPanel;
 import lab.component.SpinnerRangeInteger;
-import deconvolutionlab.Config;
 
 public class PreferencesModule extends AbstractModule {
 

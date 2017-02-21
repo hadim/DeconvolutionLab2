@@ -42,9 +42,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.table.DefaultTableModel;
 
+import deconvolutionlab.system.SystemUsage;
 import lab.component.CustomizedColumn;
 import lab.component.CustomizedTable;
-import lab.system.SystemUsage;
 import lab.tools.NumFormat;
 
 public class RunningMonitor implements AbstractMonitor {

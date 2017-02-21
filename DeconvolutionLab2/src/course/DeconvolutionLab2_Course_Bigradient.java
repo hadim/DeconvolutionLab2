@@ -35,42 +35,42 @@ public class DeconvolutionLab2_Course_Bigradient implements PlugIn {
 		String psf = " -psf file " + data + "psf.tif  -reference " + data + "ref.tif ";
 		String noisy = " -image file convnoise.tif";
 	
-		new Deconvolution("-image file " + data + "ref.tif" + psf + " -algorithm SIM 0 1 1 -out stack convnoise -out stack conbnoise_8 rescaled byte noshow").deconvolve(false);
+		new Deconvolution("run", "-image file " + data + "ref.tif" + psf + " -algorithm SIM 0 1 1 -out stack convnoise -out stack conbnoise_8 rescaled byte noshow").deconvolve();
 	
-		new Deconvolution(noisy + psf + " -algorithm NIF -out stack NIF").deconvolve(false);
-		new Deconvolution(noisy + psf + " -algorithm DIV -out stack DIV").deconvolve(false);
+		new Deconvolution("run", noisy + psf + " -algorithm NIF -out stack NIF").deconvolve();
+		new Deconvolution("run", noisy + psf + " -algorithm DIV -out stack DIV").deconvolve();
 		
 		for(int i=0; i<=3; i++) {
 			double p = Math.pow(5, i-10);
 			String name = "RIF" + String.format("%02d", i);
-			new Deconvolution(noisy + psf + " -algorithm RIF " + p + out("RIF" + File.separator, name)).deconvolve(false);
+			new Deconvolution("run", noisy + psf + " -algorithm RIF " + p + out("RIF" + File.separator, name)).deconvolve();
 		}
 		for(int i=0; i<=3; i++) {
 			double p = Math.pow(5, i-10);
 			String name = "TRIF" + String.format("%02d", i);
-			new Deconvolution(noisy + psf + " -algorithm TRIF " + p + out("TRIF" + File.separator, name)).deconvolve(false);
+			new Deconvolution("run", noisy + psf + " -algorithm TRIF " + p + out("TRIF" + File.separator, name)).deconvolve();
 		}
 
 		String lw  = " -algorithm LW 20 1 -out mip @2 LW-ITER/I -out stats @1 LW nosave";
-		new Deconvolution(noisy  + psf + lw).deconvolve(false);
+		new Deconvolution("run", noisy  + psf + lw).deconvolve();
 		new File(res + "LW-ITER/I.tif").delete();
 		
 		
 		String lwp  = " -algorithm LW+ 20 1 -out mip @2 LW+-ITER/I -out stats @1 LW+ nosave";
-		new Deconvolution(noisy  + psf + lwp).deconvolve(false);
+		new Deconvolution("run", noisy  + psf + lwp).deconvolve();
 		new File(res + "LW+-ITER/I.tif").delete();
 
 
 		String rl  = " -algorithm RL 20 -out mip @2 RL-ITER/I -out stats @1 RL nosave";
-		new Deconvolution(noisy  + psf + rl).deconvolve(false);
+		new Deconvolution("run", noisy  + psf + rl).deconvolve();
 		new File(res + "RL-ITER/I.tif").delete();
 
-		String rltv  = " -algorithm RLRV 20 10 -out mip @2 RLTV-ITER/I -out stats @1 RLTV nosave";
-		new Deconvolution(noisy  + psf + rltv).deconvolve(false);
+		String rltv  = " -algorithm RLTV 20 10 -out mip @2 RLTV-ITER/I -out stats @1 RLTV nosave";
+		new Deconvolution("run", noisy  + psf + rltv).deconvolve();
 		new File(res + "RLTV-ITER/I.tif").delete();
 		
 		String fista  = " -algorithm FISTA 20 1 1 Spline3 3 -mip @2 FISTA-ITER/I -out stats @1 FISTA nosave";
-		new Deconvolution(noisy + psf + fista).deconvolve(false);
+		new Deconvolution("run", noisy + psf + fista).deconvolve();
 		new File(res + "FISTA-ITER/I.tif").delete();
 
 	}

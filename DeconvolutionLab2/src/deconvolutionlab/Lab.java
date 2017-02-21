@@ -35,17 +35,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-import javax.swing.JFrame;
+import javax.swing.JDialog;
 
-import deconvolution.algorithm.Controller;
-import deconvolutionlab.PlatformImager.ContainerImage;
+import deconvolutionlab.Imaging.ContainerImage;
 import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 import fft.FFT;
 import imagej.IJImager;
-import lab.component.CustomizedColumn;
-import lab.component.CustomizedTable;
 import lab.tools.NumFormat;
 import lab.tools.WebBrowser;
 import plugins.sage.deconvolutionlab.IcyImager;
@@ -56,63 +53,35 @@ import signal.factory.Sphere;
 
 public class Lab {
 
-	private static PlatformImager			imager;
-	private static Lab						instance	= null;
-	private static Platform					platform	= Platform.IMAGEJ;
-
-	private static CustomizedTable			tableStats	= null;
-	private static JFrame					frameStats	= null;
+	private static Imaging imaging;
 
 	static {
-		imager = new IJImager();
-		createStats();
+		imaging = new IJImager();
+		Config.init(System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
 	}
 
-	private static void createStats() {
-
-		ArrayList<CustomizedColumn> columns = new ArrayList<CustomizedColumn>();
-		columns.add(new CustomizedColumn("Name", String.class, 100, false));
-		columns.add(new CustomizedColumn("Algorithm", String.class, 100, false));
-		columns.add(new CustomizedColumn("Iterations", String.class, 100, false));
-		columns.add(new CustomizedColumn("Image Mean", String.class, 100, false));
-		columns.add(new CustomizedColumn("Image Minimum", String.class, 100, false));
-		columns.add(new CustomizedColumn("Image Maximum", String.class, 100, false));
-		columns.add(new CustomizedColumn("Image Stdev", String.class, 100, false));
-		columns.add(new CustomizedColumn("Image norm1", String.class, 100, false));
-		columns.add(new CustomizedColumn("Image norm2", String.class, 100, false));
-		columns.add(new CustomizedColumn("Time", String.class, 100, false));
-		columns.add(new CustomizedColumn("Memory", String.class, 100, false));
-		columns.add(new CustomizedColumn("Peak", String.class, 100, false));
-		columns.add(new CustomizedColumn("PSNR", String.class, 100, false));
-		columns.add(new CustomizedColumn("SNR", String.class, 100, false));
-		columns.add(new CustomizedColumn("Residu", String.class, 100, false));
-		tableStats = new CustomizedTable(columns, true);
-
+	public static Imaging.Platform getPlatform() {
+		return imaging.getPlatform();
 	}
 
-	public static Platform getPlatform() {
-		return platform;
+	public static void init(Imaging.Platform p) {
+		init(p, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
 	}
 
-	public static void getInstance(Platform p) {
-		platform = p;
-		if (instance == null) {
-			instance = new Lab();
-			switch (p) {
-			case STANDALONE:
-				imager = new LabImager();
-				break;
-			case IMAGEJ:
-				imager = new IJImager();
-				break;
-			case ICY:
-				imager = new IcyImager();
-				break;
-			default:
-				imager = new LabImager();
-				break;
-			}
+	public static void init(Imaging.Platform platform, String config) {
+		switch (platform) {
+		case IMAGEJ:
+			imaging = new IJImager();
+			break;
+		case ICY:
+			imaging = new IcyImager();
+			break;
+		default:
+			imaging = new IJImager();
+			break;
 		}
+		
+		Config.init(System.getProperty("user.dir")+File.separator+"DeconvolutionLab2.config");
 	}
 
 	public static void help() {
@@ -136,19 +105,19 @@ public class Lab {
 				monitors.log("\t computation time (" + x.nx + "x" + x.ny + "x" + x.nz + ") " + NumFormat.time(chrono));
 			}
 	}
-	
+
 	public static ContainerImage createContainer(Monitors monitors, String title) {
 		monitors.log("Create Live Real Signal " + title);
-		return imager.createContainer(title);
+		return imaging.createContainer(title);
 	}
 
 	public static void append(Monitors monitors, ContainerImage container, RealSignal signal, String title) {
-		imager.append(container, signal, title);
+		imaging.append(container, signal, title, Imaging.Type.FLOAT);
 		monitors.log("Add Live Real Signal " + title);
 	}
 
-	public static void append(Monitors monitors, ContainerImage container, RealSignal signal, String title, PlatformImager.Type type) {
-		imager.append(container, signal, title, type);
+	public static void append(Monitors monitors, ContainerImage container, RealSignal signal, String title, Imaging.Type type) {
+		imaging.append(container, signal, title, type);
 		monitors.log("Add Live Real Signal " + title);
 	}
 
@@ -158,7 +127,7 @@ public class Lab {
 			return;
 		}
 		monitors.log("Show Real Signal " + title);
-		imager.show(signal, title);
+		imaging.show(signal, title, ComplexComponent.MODULE);
 	}
 
 	public static void show(Monitors monitors, ComplexSignal signal, String title, ComplexComponent complex) {
@@ -167,87 +136,48 @@ public class Lab {
 			return;
 		}
 		monitors.log("Show Real Signal " + title);
-		imager.show(signal, title, complex);
+		imaging.show(signal, title, complex);
 	}
 
-	public static void show(Monitors monitors,  RealSignal signal, String title) {
+	public static void show(Monitors monitors, RealSignal signal, String title) {
 		if (signal == null) {
 			monitors.error("Show " + title + " this image does not exist.");
 			return;
 		}
 		monitors.log("Show Real Signal " + title);
-		imager.show(signal, title);
+		imaging.show(signal, title, Imaging.Type.FLOAT, signal.nz / 2);
 	}
 
-	public static void show(Monitors monitors, RealSignal signal, String title, PlatformImager.Type type) {
+	public static void show(Monitors monitors, RealSignal signal, String title, Imaging.Type type) {
 		if (signal == null) {
 			monitors.error("Show " + title + " this image does not exist.");
 			return;
 		}
 		monitors.log("Show Real Signal " + title);
-		imager.show(signal, title, type);
+		imaging.show(signal, title, type, signal.nz / 2);
 	}
 
-	public static void show(Monitors monitors, RealSignal signal, String title, PlatformImager.Type type, int z) {
+	public static void show(Monitors monitors, RealSignal signal, String title, Imaging.Type type, int z) {
 		if (signal == null) {
 			monitors.error("Show " + title + " this image does not exist.");
 			return;
 		}
 		monitors.log("Show Real Signal " + title);
-		imager.show(signal, title, type);
+		imaging.show(signal, title, type, z);
 	}
 
 	public static void save(Monitors monitors, RealSignal signal, String filename) {
-		imager.save(signal, filename);
+		imaging.save(signal, filename, Imaging.Type.FLOAT);
 		monitors.log("Save Real Signal " + filename);
 	}
 
-	public static void save(Monitors monitors, RealSignal signal, String filename, PlatformImager.Type type) {
-		imager.save(signal, filename, type);
+	public static void save(Monitors monitors, RealSignal signal, String filename, Imaging.Type type) {
+		imaging.save(signal, filename, type);
 		monitors.log("Save Real Signal " + filename);
-	}
-
-	public static void firstStats(Monitors monitors, String name, String[] stats, boolean show, boolean save) {
-		if (stats == null)
-			return;
-
-		Lab.createStats();
-
-		if (show) {
-			frameStats = new JFrame(name);
-			frameStats.getContentPane().add(tableStats.getPane(600, 200));
-			frameStats.pack();
-			frameStats.setVisible(true);
-		}
-	}
-
-	public static void nextStats(Monitors monitors, String name, String[] stats, boolean show, boolean save) {
-		if (tableStats == null)
-			return;
-		if (stats == null)
-			return;
-		tableStats.append(stats);
-		monitors.log("Stats " + name);
-		if (show && frameStats != null) {
-			if (!frameStats.isVisible())
-				frameStats.setVisible(true);
-			frameStats.requestFocus();
-		}
-	}
-
-	public static void lastStats(Monitors monitors, String filename, String[] stats, boolean show, boolean save) {
-		if (stats == null)
-			return;
-		if (tableStats == null)
-			return;
-		if (save) {
-			monitors.log("Stats " + filename);
-			tableStats.saveCSV(filename + ".csv");
-		}
 	}
 
 	public static RealSignal open(Monitors monitors, String filename) {
-		RealSignal signal = imager.open(filename);
+		RealSignal signal = imaging.open(filename);
 		if (signal == null)
 			monitors.error("Unable to open " + filename);
 		else
@@ -278,7 +208,7 @@ public class Lab {
 		Pattern pattern = Pattern.compile(regex);
 		for (String filename : list) {
 			if (pattern.matcher(filename).find()) {
-				RealSignal slice = imager.open(dirname + File.separator + filename);
+				RealSignal slice = imaging.open(dirname + File.separator + filename);
 				if (slice != null) {
 					slices.add(slice);
 					nx = Math.max(nx, slice.nx);
@@ -295,7 +225,7 @@ public class Lab {
 			monitors.error("Dir " + path + " do no contain valid images.");
 			return null;
 		}
-		RealSignal signal = new RealSignal(nx, ny, nz);
+		RealSignal signal = new RealSignal(file.getName(), nx, ny, nz);
 		for (int z = 0; z < slices.size(); z++)
 			signal.setSlice(z, slices.get(z));
 		return signal;
@@ -306,7 +236,7 @@ public class Lab {
 			monitors.error("Show Orthoview " + title + " this image does not exist.");
 			return;
 		}
-		imager.show(signal.createOrthoview(hx, hy, hz), title);
+		imaging.show(signal.createOrthoview(hx, hy, hz), title, Imaging.Type.FLOAT, 0);
 	}
 
 	public static void showOrthoview(Monitors monitors, RealSignal signal, String title) {
@@ -317,7 +247,7 @@ public class Lab {
 		int hx = signal.nx / 2;
 		int hy = signal.ny / 2;
 		int hz = signal.nz / 2;
-		imager.show(signal.createOrthoview(hx, hy, hz), title);
+		imaging.show(signal.createOrthoview(hx, hy, hz), title, Imaging.Type.FLOAT, 0);
 	}
 
 	public static void showMIP(Monitors monitors, RealSignal signal, String title) {
@@ -325,7 +255,7 @@ public class Lab {
 			monitors.error("Show MIP " + title + " this image does not exist.");
 			return;
 		}
-		imager.show(signal.createMIP(), title);
+		imaging.show(signal.createMIP(), title, Imaging.Type.FLOAT, 0);
 	}
 
 	public static void showMontage(Monitors monitors, RealSignal signal, String title) {
@@ -333,11 +263,11 @@ public class Lab {
 			monitors.error("Show Montage " + title + " this image does not exist.");
 			return;
 		}
-		imager.show(signal.createMontage(), title);
+		imaging.show(signal.createMontage(), title, Imaging.Type.FLOAT, 0);
 	}
 
 	public static RealSignal create(Monitors monitors, String name) {
-		RealSignal signal = imager.create(name);
+		RealSignal signal = imaging.create(name);
 		if (signal != null)
 			monitors.log("Created the real signal " + name + " " + signal.toString());
 		else
@@ -346,7 +276,7 @@ public class Lab {
 	}
 
 	public static RealSignal create(Monitors monitors) {
-		RealSignal signal = imager.create();
+		RealSignal signal = imaging.create();
 		if (signal != null)
 			monitors.log("Created the real signal from the active window " + signal.toString());
 		else
@@ -354,9 +284,20 @@ public class Lab {
 		return signal;
 	}
 
-	public static PlatformImager getImager() {
-		return imager;
+	public static Imaging getImager() {
+		return imaging;
 	}
 
+	public static String getActiveImage() {
+		if (imaging.isSelectable())
+			return imaging.getSelectedImage();
+		return "";
+	}
+	
+	public static void setVisible(JDialog dialog, boolean modal) {
+		if (dialog == null)
+			return;
+		imaging.setVisible(dialog, modal);
+	}
 
 }

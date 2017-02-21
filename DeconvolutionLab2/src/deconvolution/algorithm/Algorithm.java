@@ -88,8 +88,6 @@ public class Algorithm {
 		return list;
 	}
 
-
-
 	public static AbstractAlgorithm getDefaultAlgorithm() {
 		return new Identity();
 	}

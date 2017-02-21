@@ -55,11 +55,11 @@ import javax.swing.JToolBar;
 
 import deconvolution.Command;
 import deconvolution.Deconvolution;
+import deconvolution.modules.ImageDModule;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
-import deconvolutionlab.ImageSelector;
+import deconvolutionlab.Imaging;
 import deconvolutionlab.Lab;
-import deconvolutionlab.PlatformImageSelector;
 import deconvolutionlab.dialog.PatternDialog;
 import deconvolutionlab.dialog.SyntheticDialog;
 import deconvolutionlab.monitor.Monitors;
@@ -78,7 +78,7 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 	private JButton			bnPlatform;
 
 	public ImageModule(boolean expanded) {
-		super("Image", "-image", "Active", "Show", expanded);
+		super("Image", "-image", (Lab.getPlatform() == Imaging.Platform.IMAGEJ ? "Active" : ""), "Check", expanded);
 	}
 
 	@Override
@@ -110,12 +110,13 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 
 		JToolBar pn = new JToolBar("Controls Image");
 		pn.setBorder(BorderFactory.createEmptyBorder());
-		pn.setLayout(new GridLayout(1, 5));
+		pn.setLayout(new GridLayout(1, 4));
 		pn.setFloatable(false);
 		pn.add(bnFile);
 		pn.add(bnDirectory);
 		pn.add(bnSynthetic);
-		pn.add(bnPlatform);
+		if (Lab.getPlatform() == Imaging.Platform.IMAGEJ)
+			pn.add(bnPlatform);
 
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createEtchedBorder());
@@ -132,6 +133,9 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 		bnPlatform.addActionListener(this);
 		getAction1Button().addActionListener(this);
 		getAction2Button().addActionListener(this);
+
+		getAction2Button().setToolTipText("Click to have a preview, Shift-click or Ctrl-click to show the complete stack");
+		getAction1Button().setToolTipText("Select the active window");
 
 		Config.registerTable(getName(), "image", table);
 
@@ -155,14 +159,10 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
-		if (e.getSource() == bnFile) {
-			Deconvolution deconvolution = new Deconvolution(Command.command());
-			file(deconvolution.getPath());
-		}
-		else if (e.getSource() == bnDirectory) {
-			Deconvolution deconvolution = new Deconvolution(Command.command());
-			dir(deconvolution.getPath());
-		}
+		if (e.getSource() == bnFile)
+			file(Command.getPath());
+		else if (e.getSource() == bnDirectory) 
+			dir(Command.getPath());
 		else if (e.getSource() == bnSynthetic)
 			synthetic(false);
 		else if (e.getSource() == bnPlatform)
@@ -176,28 +176,30 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 					row = i;
 			}
 			if (row < 0) 
-				table.insert(new String[] { "active", "platform", "active", "" });
+				table.insert(new String[] { "active", "platform", "active", "\u232B" });
 			else
 				table.setRowSelectionInterval(row, row);
 		}
-		else if (e.getSource() == getAction2Button())
-			display();
+		else if (e.getSource() == getAction2Button()) {
+			boolean s = (e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK;
+			boolean c = (e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK;
+			display(s | c);
+		}
+
 		update();
 	}
 
 	public void platform() {
-		PlatformImageSelector selector = new ImageSelector(Lab.getPlatform()).getImageSelector();
-		String name = selector.getSelectedImage();
-		if (name != null)
-			if (name != "")
-				table.insert(new String[] { name, "platform", name, "" });
+		String name = Lab.getActiveImage();
+		if (name != "")
+			table.insert(new String[] { name, "platform", name, "\u232B" });
 	}
 
 	private void file(String path) {
 		File file = Files.browseFile(path);
 		if (file == null)
 			return;
-		table.insert(new String[] { file.getName(), "file", file.getAbsolutePath(), "" });
+		table.insert(new String[] { file.getName(), "file", file.getAbsolutePath(), "\u232B" });
 	}
 
 	private void dir(String path) {
@@ -205,10 +207,11 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 		if (file == null)
 			return;
 		PatternDialog dlg = new PatternDialog(file);
-		dlg.setVisible(true);
+		Lab.setVisible(dlg, true);
+
 		if (dlg.wasCancel())
 			return;
-		table.insert(new String[] { dlg.getDirName(), "directory", dlg.getCommand(), "" });
+		table.insert(new String[] { dlg.getDirName(), "directory", dlg.getCommand(), "\u232B" });
 	}
 
 	private void synthetic(boolean edit) {
@@ -220,7 +223,7 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 				dlg.setParameters(table.getCell(row, 0), table.getCell(row, 1));
 			}
 		}
-		dlg.setVisible(true);
+		Lab.setVisible(dlg, true);
 		if (dlg.wasCancel())
 			return;
 		if (edit) {
@@ -228,7 +231,7 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 			if (row <= 0)
 				table.removeRow(row);
 		}
-		table.insert(new String[] { dlg.getShapeName(), "synthetic", dlg.getCommand(), "" });
+		table.insert(new String[] { dlg.getShapeName(), "synthetic", dlg.getCommand(), "\u232B" });
 	}
 
 	private void edit() {
@@ -252,21 +255,19 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 			dir(table.getCell(row, 1));
 	}
 
-	private void display() {
+	private void display(boolean stack) {
 		int row = table.getSelectedRow();
 		if (row < 0)
 			return;
-		Thread thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				int row = table.getSelectedRow();
-				RealSignal x = new Deconvolution(getCommand()).openImage();
-				if (x != null)
-					Lab.show(Monitors.createDefaultMonitor(), x, table.getCell(row, 0));
-			}
-		});
-		thread.setPriority(Thread.MIN_PRIORITY);
-		thread.start();
+		Deconvolution deconvolution = new Deconvolution("ShowImage", getCommand());
+		if (stack) {
+			RealSignal x = deconvolution.openImage();
+			if (x != null)
+				Lab.show(Monitors.createDefaultMonitor(), x, table.getCell(row, 0));
+		} 
+		else {
+			new ImageDModule(deconvolution).show(table.getCell(row, 0));
+		}
 	}
 
 	@Override

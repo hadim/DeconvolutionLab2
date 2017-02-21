@@ -36,9 +36,9 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.JPanel;
 
-import lab.component.HTMLPane;
 import deconvolutionlab.Constants;
 import deconvolutionlab.Lab;
+import lab.component.HTMLPane;
 
 public class AboutModule extends AbstractModule {
 

@@ -53,21 +53,21 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+import deconvolution.Command;
+import deconvolution.Deconvolution;
+import deconvolution.modules.PSFDModule;
+import deconvolutionlab.Config;
+import deconvolutionlab.Constants;
+import deconvolutionlab.Imaging;
+import deconvolutionlab.Lab;
+import deconvolutionlab.dialog.PatternDialog;
+import deconvolutionlab.dialog.SyntheticDialog;
+import deconvolutionlab.monitor.Monitors;
 import lab.component.CustomizedColumn;
 import lab.component.CustomizedTable;
 import lab.tools.Files;
 import signal.RealSignal;
 import signal.factory.SignalFactory;
-import deconvolution.Command;
-import deconvolution.Deconvolution;
-import deconvolutionlab.Config;
-import deconvolutionlab.Constants;
-import deconvolutionlab.ImageSelector;
-import deconvolutionlab.Lab;
-import deconvolutionlab.PlatformImageSelector;
-import deconvolutionlab.dialog.PatternDialog;
-import deconvolutionlab.dialog.SyntheticDialog;
-import deconvolutionlab.monitor.Monitors;
 
 public class PSFModule extends AbstractModule implements ActionListener, MouseListener {
 
@@ -78,7 +78,7 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 	private JButton			bnPlatform;
 
 	public PSFModule(boolean expanded) {
-		super("PSF", "-psf", "", "Show", expanded);
+		super("PSF", "-psf", "", "Check", expanded);
 	}
 
 	@Override
@@ -129,9 +129,12 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 		bnFile.addActionListener(this);
 		bnDirectory.addActionListener(this);
 		bnSynthetic.addActionListener(this);
-		bnPlatform.addActionListener(this);
+		if (Lab.getPlatform() == Imaging.Platform.IMAGEJ)
+			bnPlatform.addActionListener(this);
 		getAction1Button().addActionListener(this);
 		getAction2Button().addActionListener(this);
+		getAction2Button().setToolTipText("Click to have a preview, Shift-click or Ctrl-click to show the complete stack");
+		getAction1Button().setToolTipText("Select the active window");
 
 		Config.registerTable(getName(), "psf", table);
 	
@@ -155,38 +158,35 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
-		if (e.getSource() == bnFile) {
-			Deconvolution deconvolution = new Deconvolution(Command.command());		
-			file(deconvolution.getPath());
-		}
-		else if (e.getSource() == bnDirectory) {
-			Deconvolution deconvolution = new Deconvolution(Command.command());		
-			dir(deconvolution.getPath());
-		}
+		if (e.getSource() == bnFile)	
+			file(Command.getPath());
+		else if (e.getSource() == bnDirectory)	
+			dir(Command.getPath());
 		else if (e.getSource() == bnSynthetic)
 			synthetic(false);
 		else if (e.getSource() == bnPlatform)
 			platform();
 		else if (e.getSource() == getAction1Button())
 			platform();
-		else if (e.getSource() == getAction2Button())
-			display();
+		else if (e.getSource() == getAction2Button()) {
+			boolean s = (e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK;
+			boolean c = (e.getModifiers() & ActionEvent.CTRL_MASK) == ActionEvent.CTRL_MASK;
+			display(s | c);
+		}
 		update();
 	}
 
 	public void platform() {
-		PlatformImageSelector selector = new ImageSelector(Lab.getPlatform()).getImageSelector();
-		String name = selector.getSelectedImage();
-		if (name != null)
-			if (name != "")
-				table.insert(new String[] {name, "platform", name, "" });
+		String name = Lab.getActiveImage();
+		if (name != "")
+			table.insert(new String[] {name, "platform", name, "\u232B" });
 	}
 	
 	private void file(String path) {
 		File file = Files.browseFile(path);
 		if (file == null) 
 			return;
-		table.insert(new String[] { file.getName(), "file", file.getAbsolutePath(), "" });
+		table.insert(new String[] { file.getName(), "file", file.getAbsolutePath(), "\u232B" });
 	}
 
 	private void dir(String path) {
@@ -194,10 +194,10 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 		if (file == null) 
 			return;
 		PatternDialog dlg = new PatternDialog(file);
-		dlg.setVisible(true);
+		Lab.setVisible(dlg, true);
 		if (dlg.wasCancel())
 			return;
-		table.insert(new String[] { dlg.getDirName(), "directory", dlg.getCommand(), "" });
+		table.insert(new String[] { dlg.getDirName(), "directory", dlg.getCommand(), "\u232B" });
 	}
 
 	private void synthetic(boolean edit) {
@@ -209,8 +209,7 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 				dlg.setParameters(table.getCell(row, 0), table.getCell(row, 1));
 			}
 		}
-		dlg.setVisible(true);
-
+		Lab.setVisible(dlg, true);
 		if (dlg.wasCancel())
 			return;
 
@@ -243,21 +242,19 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 			dir(table.getCell(row, 1));
 	}
 
-	private void display() {
+	private void display(boolean stack) {
 		int row = table.getSelectedRow();
 		if (row < 0)
 			return;
-		Thread thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				int row = table.getSelectedRow();
-				RealSignal x = new Deconvolution(getCommand()).openPSF();
-				if (x != null)
-					Lab.show(Monitors.createDefaultMonitor(), x, table.getCell(row, 0));
-			}
-		});
-		thread.setPriority(Thread.MIN_PRIORITY);
-		thread.start();
+		Deconvolution deconvolution = new Deconvolution("ShowPSF", getCommand());
+		if (stack) {
+			RealSignal x = deconvolution.openPSF();
+			if (x != null)
+				Lab.show(Monitors.createDefaultMonitor(), x, table.getCell(row, 0));
+		} 
+		else {
+			new PSFDModule(deconvolution).show(table.getCell(row, 0));
+		}
 	}
 
 	@Override

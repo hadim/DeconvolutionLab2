@@ -31,7 +31,7 @@
 
 package deconvolutionlab.monitor;
 
-import lab.system.SystemUsage;
+import deconvolutionlab.system.SystemUsage;
 import lab.tools.NumFormat;
 
 public class Message {

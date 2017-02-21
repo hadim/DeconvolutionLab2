@@ -42,16 +42,15 @@ import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import lab.component.HTMLPane;
 import deconvolution.Command;
 import deconvolution.algorithm.AbstractAlgorithmPanel;
 import deconvolution.algorithm.Algorithm;
 import deconvolutionlab.Config;
+import lab.component.HTMLPane;
 
 public class AlgorithmModule extends AbstractModule implements ActionListener, ChangeListener {
 

@@ -45,7 +45,6 @@ public abstract class AbstractWavelets {
 		this.scales = scales;
 	}
 	
-	
 	public abstract void setScale(int scale);
 	public abstract RealSignal analysis1(RealSignal in);
 	public abstract RealSignal synthesis1(RealSignal in);
@@ -63,8 +62,10 @@ public abstract class AbstractWavelets {
 	}
 
 	public void analysis(RealSignal in, RealSignal out) {
+		String name = "w(" + in.name + ")";
+
 		if (out == null)
-			out = new RealSignal(in.nx, in.ny, in.nz);	
+			out = new RealSignal(name, in.nx, in.ny, in.nz);	
 		int nxfine = in.nx;
 		int nyfine = in.ny;
 		int nzfine = in.nz;
@@ -72,7 +73,7 @@ public abstract class AbstractWavelets {
 		int ny = nyfine;
 		int nz = nzfine;
 		for ( int i=0; i<scales; i++) {
-			RealSignal sub = new RealSignal(nx, ny, nz, false);
+			RealSignal sub = new RealSignal("sub" + i, nx, ny, nz);
 			if (i==0)
 				in.getSignal(sub);
 			else
@@ -86,8 +87,9 @@ public abstract class AbstractWavelets {
 	}
 
 	public void synthesis(RealSignal in, RealSignal out) {
+		String name = "iw(" + in.name + ")";
 		if (out == null)
-			out = new RealSignal(in.nx, in.ny, in.nz);	
+			out = new RealSignal(name, in.nx, in.ny, in.nz);	
 		int div = (int)Math.pow(2.0, (double)(scales-1));
 		int nxcoarse = Math.max(1, in.nx / div);
 		int nycoarse = Math.max(1, in.ny / div);
@@ -98,7 +100,7 @@ public abstract class AbstractWavelets {
 		out.copy(in);
 		
 		for ( int i=0; i<scales; i++) {
-			RealSignal sub = new RealSignal(nx, ny, nz, false);
+			RealSignal sub = new RealSignal("sub" + i, nx, ny, nz);
 			out.getSignal(sub);
 			sub = synthesis1(sub);
 			out.setSignal(sub);

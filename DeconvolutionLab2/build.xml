@@ -1,27 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="DeconvolutionLab2" default="build" basedir=".">
-
+<project name="Test" default="build" basedir=".">
 	<property name="imagej"		location="${user.home}/Desktop/ImageJ/plugins"/>		
-	<property name="fiji"		location="${user.home}/Desktop/Fiji-deconv.app/plugins"/>		
-	<property name="matlab"		location="/Applications/MATLAB_R2016a.app/java/"/>		
+	<property name="fiji"		location="${user.home}/Desktop/Fiji.app/plugins"/>		
 
 	<target name="build">
 		<mkdir dir="bin"/>
-		<copy todir="bin"><fileset dir="ij"></fileset></copy>
-		<copy file="plugins.config" toDir="bin" />
-			
-		<zip destfile="../DeconvolutionLab2-src.zip" basedir="src" />
-        <zip destfile="../DeconvolutionLab2-cls.zip" basedir="bin" />
-        <jar destfile="../DeconvolutionLab_2.jar" basedir="bin">
-			<manifest>
-			<attribute name="Main-Class" value="DeconvolutionLab2"/>
-			<attribute name="Class-Path" value="."/>
-			</manifest>
-		</jar>		
-		
-		<copy toDir="${fiji}" file="../DeconvolutionLab_2.jar" />
-		<copy toDir="${matlab}" file="../DeconvolutionLab_2.jar" />
-		<copy toDir="${imagej}" file="../DeconvolutionLab_2.jar" />
-
+		<copy toDir="${fiji}" file="./bin/Test_Orientation.class" />
+		<copy toDir="${imagej}" file="./bin/Test_Orientation.class" />
+		<copy toDir="${fiji}" file="./bin/Test_Cytoplasm_Segmentation.class" />
+		<copy toDir="${imagej}" file="./bin/Test_Cytoplasm_Segmentation.class" />
+		<copy toDir="${fiji}" file="./bin/Test_Tracing_Axon.class" />
+		<copy toDir="${imagej}" file="./bin/Test_Tracing_Axon.class" />
+		<copy toDir="${fiji}" file="./bin/Test_Tracing_Axon$Path.class" />
+		<copy toDir="${imagej}" file="./bin/Test_Tracing_Axon$Path.class" />
 	</target>
 </project>

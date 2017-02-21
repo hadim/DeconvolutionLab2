@@ -32,7 +32,6 @@
 package deconvolutionlab.modules;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
@@ -61,6 +60,11 @@ public class LanguageModule extends AbstractModule implements ActionListener {
 		super("Language", "", "", "", expanded);
 	}
 
+	public String getJobName() {
+		if (txt != null)
+			return txt.getText();
+		return "";
+	}
 	@Override
 	public JPanel buildExpandedPanel() {
 		language = new HTMLPane("Monaco", 100, 100);
@@ -140,7 +144,7 @@ public class LanguageModule extends AbstractModule implements ActionListener {
 	
 		String script = "";
 		String cmd = Command.command();
-		Deconvolution d = new Deconvolution(cmd);
+		Deconvolution d = new Deconvolution("Matlab", cmd);
 		String options = Command.extractOptions(cmd);
 		AbstractAlgorithm algo = d.getAlgo();
 		if (algo == null)

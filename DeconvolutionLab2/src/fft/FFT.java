@@ -73,8 +73,7 @@ public class FFT {
 		}
 		else {
 			monitors.log("FFTW not found");
-		}
-		
+		}	
 		registers.add(academic);
 		registers.add(jtransform);
 		registers.add(jfftw);
@@ -89,10 +88,21 @@ public class FFT {
 		return libraries;
 	}
 
-	public static String[] getLibrariesAsArray() {
-		String[] libs = new String[libraries.size()];
+	public static AbstractFFTLibrary getFastestFFT() {
 		for (int i = 0; i < libraries.size(); i++)
-			libs[i] = libraries.get(i).getLibraryName();
+			if (libraries.get(i).getLibraryName().equals("FFTW2"))
+				return libraries.get(i);
+		for (int i = 0; i < libraries.size(); i++)
+			if (libraries.get(i).getLibraryName().equals("JTransforms"))
+				return libraries.get(i);
+		return libraries.get(0);
+	}
+	
+	public static String[] getLibrariesAsArray() {
+		String[] libs = new String[libraries.size()+1];
+		libs[0] = "Fastest";
+		for (int i = 0; i < libraries.size(); i++)
+			libs[i+1] = libraries.get(i).getLibraryName();
 		return libs;
 	}
 
@@ -119,12 +129,13 @@ public class FFT {
 	}
 
 	public static AbstractFFTLibrary getLibraryByName(String name) {
+		if (name.equalsIgnoreCase("fastest"))
+			return getFastestFFT();
 		for (AbstractFFTLibrary library : getInstalledLibraries())
 			if (library.getLibraryName().equals(name))
 				return library;
 		return new AcademicLibrary();
 	}
-
 
 	public static AbstractFFT createDefaultFFT(Monitors monitors, int nx, int ny, int nz) {
 		AbstractFFT fft = new Academic();

@@ -47,6 +47,8 @@ import javax.swing.JTextField;
 
 import deconvolution.Command;
 import deconvolution.Deconvolution;
+import deconvolutionlab.Constants;
+import deconvolutionlab.Lab;
 import deconvolutionlab.modules.BatchModule;
 import ij.gui.GUI;
 import lab.component.GridPanel;
@@ -69,8 +71,8 @@ public class BatchDialog extends JDialog implements ActionListener, WindowListen
 
 		txt.setText("job" + module.getCountJob());
 
-		Deconvolution deconvolution = new Deconvolution(Command.command());
-		pnCommand = new HTMLPane("Monaco", 300, 100);
+		Deconvolution deconvolution = new Deconvolution(txt.getText(), Command.command());
+		pnCommand = new HTMLPane("Monaco", Constants.widthGUI, 100);
 		pnCommand.append("p", deconvolution.getCommand());
 		pnCommand.setEditable(true);
 
@@ -95,11 +97,7 @@ public class BatchDialog extends JDialog implements ActionListener, WindowListen
 		add(panel);
 		pack();
 		addWindowListener(this);
-		GUI.center(this);
-		setModal(true);
-		setVisible(true);
 		setMinimumSize(new Dimension(400, 300));
-
 	}
 
 	private void addJob() {

@@ -89,7 +89,7 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 	public RealSignal run(Monitors monitors, 
 			RealSignal image, RealSignal psf, 
 			AbstractFFTLibrary fftlib, Padding pad, Apodization apo, double norm, boolean threaded) {
-
+		
 		if (image == null)
 			return null;
 		if (psf == null)
@@ -156,9 +156,9 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 
 		controller.finish(x);
 		monitors.log(getName() + " is finished");
-
+	
 		RealSignal result = pad.crop(monitors, x);
-
+	
 		return result;
 	}
 

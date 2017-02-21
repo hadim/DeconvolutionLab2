@@ -32,9 +32,8 @@
 import java.io.File;
 
 import deconvolution.Deconvolution;
-import deconvolutionlab.Config;
+import deconvolutionlab.Imaging;
 import deconvolutionlab.Lab;
-import deconvolutionlab.Platform;
 import deconvolutionlab.dialog.LabDialog;
 import ij.IJ;
 import ij.Macro;
@@ -44,12 +43,12 @@ public class DeconvolutionLab2_Launch implements PlugIn {
 
 	@Override
 	public void run(String arg) {
-		Lab.getInstance(Platform.IMAGEJ);
-		String config = IJ.getDirectory("plugins") + File.separator + "DeconvolutionLab2.config"; 
-		Config.getInstance(config);
-		if (Macro.getOptions() == null)
-			new LabDialog().setVisible(true);
+		Lab.init(Imaging.Platform.IMAGEJ, IJ.getDirectory("plugins") + File.separator + "DeconvolutionLab2.config");
+		if (Macro.getOptions() == null) {
+			LabDialog dlg = new LabDialog();
+			Lab.setVisible(dlg, false);
+		}
 		else
-			new Deconvolution(Macro.getOptions()).launch("", false);
+			new Deconvolution("Macro", Macro.getOptions()).launch();
 	}
 }

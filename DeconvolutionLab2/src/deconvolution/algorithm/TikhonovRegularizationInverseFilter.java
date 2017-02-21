@@ -34,6 +34,7 @@ package deconvolution.algorithm;
 import java.util.concurrent.Callable;
 
 import signal.ComplexSignal;
+import signal.Operations;
 import signal.RealSignal;
 
 public class TikhonovRegularizationInverseFilter extends AbstractAlgorithm implements Callable<RealSignal> {
@@ -60,8 +61,8 @@ public class TikhonovRegularizationInverseFilter extends AbstractAlgorithm imple
 		int nz = H.nz;
 		int nxy = nx * ny*2;
 		double ya, yb, ha, hb, fa, fb, mag, ta, tb;
-		double epsilon2 = RealSignal.epsilon * RealSignal.epsilon;
-		ComplexSignal result = new ComplexSignal(nx, ny, nz);
+		double epsilon2 = Operations.epsilon * Operations.epsilon;
+		ComplexSignal result = new ComplexSignal("TM", nx, ny, nz);
 		for(int k=0; k<nz; k++)
 		for(int i=0; i< nxy; i+=2) {
 			ha = H.data[k][i];

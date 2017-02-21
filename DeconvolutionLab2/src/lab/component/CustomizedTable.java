@@ -33,6 +33,7 @@ package lab.component;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -124,6 +125,11 @@ public class CustomizedTable extends JTable {
 			((DefaultTableModel) getModel()).removeRow(row);
 	}
 
+	public void removeRows() {
+		while(getRowCount() > 0)
+			((DefaultTableModel) getModel()).removeRow(0);
+	}
+
 	public String[] getRow(int row) {
 		if (row >= 0) {
 			int ncol = getColumnCount();
@@ -136,10 +142,16 @@ public class CustomizedTable extends JTable {
 	}
 
 	public String getCell(int row, int col) {
-		if (row >= 0) {
+		if (row >= 0 && col >= 0) {
 			return (String) getModel().getValueAt(row, col);
 		}
 		return "";
+	}
+	
+	public void setCell(int row, int col, String value) {
+		if (row >= 0 && col >= 0) {
+			getModel().setValueAt(value, row, col);
+		}
 	}
 
 	public String getRowCSV(int row, String seperator) {
@@ -277,7 +289,8 @@ public class CustomizedTable extends JTable {
 	public class ButtonRenderer extends JButton implements TableCellRenderer {
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-			setText(columns.get(column).button);
+			setText((String)value);
+			setMargin(new Insets(1, 1, 1, 1));
 			return this;
 		}
 	}
