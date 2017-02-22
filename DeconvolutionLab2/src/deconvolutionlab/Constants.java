@@ -58,7 +58,7 @@ public class Constants {
 			"<h1>" + name + "</h1>" +
 			"<h2>" + version + "</h2>";
 
-	public static int widthGUI = 500;
+	public static int widthGUI = 600;
 	public static Dimension dimParameters = new Dimension(88, 25);
 
 

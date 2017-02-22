@@ -11,7 +11,7 @@ import javax.swing.JButton;
 import deconvolution.DeconvolutionDialog;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
-import deconvolutionlab.dialog.LabPanel;
+import deconvolutionlab.LabPanel;
 import icy.gui.frame.IcyFrame;
 import icy.gui.frame.IcyFrameEvent;
 import icy.gui.frame.IcyFrameListener;

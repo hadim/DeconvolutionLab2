@@ -147,8 +147,8 @@ public class ISTAPanel extends AbstractAlgorithmPanel implements KeyListener, Ac
 	}
 
 	@Override
-	public String getShortname() {
-		return algo.getShortname();
+	public String[] getShortname() {
+		return new String[] {"ISTA"};
 	}
 
 	@Override

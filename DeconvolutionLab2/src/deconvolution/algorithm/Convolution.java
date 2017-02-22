@@ -54,12 +54,7 @@ public class Convolution extends AbstractAlgorithm implements Callable<RealSigna
 
 	@Override
 	public String getName() {
-		return "Convolution";
-	}
-
-	@Override
-	public String getShortname() {
-		return "CONV";
+		return "Convolution Noiseless [CONV]";
 	}
 
 	@Override

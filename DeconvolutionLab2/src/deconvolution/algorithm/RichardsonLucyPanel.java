@@ -74,8 +74,8 @@ public class RichardsonLucyPanel extends AbstractAlgorithmPanel implements Chang
 	}
 
 	@Override
-	public String getShortname() {
-		return algo.getShortname();
+	public String[] getShortname() {
+		return new String[] {"RL"};
 	}
 
 	@Override

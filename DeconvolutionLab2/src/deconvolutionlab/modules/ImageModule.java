@@ -55,6 +55,7 @@ import javax.swing.JToolBar;
 
 import deconvolution.Command;
 import deconvolution.Deconvolution;
+import deconvolution.DeconvolutionDialog;
 import deconvolution.modules.ImageDModule;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
@@ -259,14 +260,15 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 		int row = table.getSelectedRow();
 		if (row < 0)
 			return;
-		Deconvolution deconvolution = new Deconvolution("ShowImage", getCommand());
+		Deconvolution deconvolution = new Deconvolution("Check Image", Command.command());
 		if (stack) {
 			RealSignal x = deconvolution.openImage();
 			if (x != null)
 				Lab.show(Monitors.createDefaultMonitor(), x, table.getCell(row, 0));
 		} 
 		else {
-			new ImageDModule(deconvolution).show(table.getCell(row, 0));
+			DeconvolutionDialog d = new DeconvolutionDialog(DeconvolutionDialog.Module.IMAGE, deconvolution, null, null);
+			Lab.setVisible(d, false);
 		}
 	}
 

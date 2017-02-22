@@ -59,14 +59,21 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 	protected RealSignal	h			= null;
 	protected Controller	controller	= null;
 	protected AbstractFFT	fft			= null;
+	protected String		shortname	= "I";
 
 	public AbstractAlgorithm() {
 		this.controller = new Controller();
 	}
 
-	public abstract String getName();
+	public void setShortname(String shortname) {
+		this.shortname = shortname;
+	}
 
-	public abstract String getShortname();
+	public String getShortname() {
+		return shortname;
+	}
+
+	public abstract String getName();
 
 	public abstract boolean isRegularized();
 
@@ -176,7 +183,6 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 
 	public void setController(Controller controller) {
 		this.controller = controller;
-		controller.setAlgorithm(getName());
 	}
 
 	public int getIterations() {

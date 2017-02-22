@@ -105,19 +105,19 @@ public class TikhonovRegularizationInverseFilterPanel extends AbstractAlgorithmP
 	}
 
 	@Override
-	public String getShortname() {
-		return algo.getShortname();
+	public String[] getShortname() {
+		return new String[] {"TRIF"};
 	}
 
 	@Override
 	public String getDocumentation() {
 		String s = "";
 		s += "<h1>" + getName() + "</h1>";
+		s += "<h2>Shortname TRIF</h2>";
 		s += "<p>Iterative: " + algo.isIterative() + "</p>";
 		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
 		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
 		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		s += "<p>Shortname: " + getShortname() + "</p>";
 		return s;
 	}
 }

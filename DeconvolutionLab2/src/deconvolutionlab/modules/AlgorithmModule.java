@@ -47,9 +47,12 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import deconvolution.Command;
+import deconvolution.Deconvolution;
+import deconvolution.DeconvolutionDialog;
 import deconvolution.algorithm.AbstractAlgorithmPanel;
 import deconvolution.algorithm.Algorithm;
 import deconvolutionlab.Config;
+import deconvolutionlab.Lab;
 import lab.component.HTMLPane;
 
 public class AlgorithmModule extends AbstractModule implements ActionListener, ChangeListener {
@@ -59,7 +62,7 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 	private JPanel				cards;
 
 	public AlgorithmModule(boolean expanded) {
-		super("Algorithm", "-algorithm", "", "", expanded);
+		super("Algorithm", "-algorithm", "", "Check", expanded);
 		ArrayList<AbstractAlgorithmPanel> deconv = Algorithm.getAvailableAlgorithms();
 		for (AbstractAlgorithmPanel panel : deconv)
 			cmb.addItem(panel.getName());
@@ -70,7 +73,7 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 	public String getCommand() {
 		String name = (String) cmb.getSelectedItem();
 		AbstractAlgorithmPanel algo = Algorithm.getPanel(name);
-		String cmd = "-algorithm " + algo.getShortname() + " " + algo.getCommand();
+		String cmd = "-algorithm " + algo.getShortname()[0] + " " + algo.getCommand();
 		String synopsis = name;
 		setSynopsis(synopsis);
 		setCommand(cmd);
@@ -109,7 +112,8 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 		panel.add(control, BorderLayout.NORTH);
 		panel.add(doc.getPane(), BorderLayout.CENTER);
 		// cmb.addActionListener(this);
-
+		getAction2Button().setToolTipText("Human readable of the command line");
+		getAction2Button().addActionListener(this);
 		Config.register(getName(), "algorithm", cmb, Algorithm.getDefaultAlgorithm());
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		return panel;
@@ -126,11 +130,16 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 			CardLayout cl = (CardLayout) (cards.getLayout());
 			cl.show(cards, name);
 		}
+		if (e.getSource() == getAction2Button()) {
+			Deconvolution deconvolution = new Deconvolution("Check Algorithm", Command.command());
+			DeconvolutionDialog d = new DeconvolutionDialog(DeconvolutionDialog.Module.ALGO, deconvolution, null, null);
+			Lab.setVisible(d, false);
+		}
 		setSynopsis((String) cmb.getSelectedItem());
 		setCommand(getCommand());
 		Command.command();
 	}
-
+	
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		setSynopsis((String) cmb.getSelectedItem());

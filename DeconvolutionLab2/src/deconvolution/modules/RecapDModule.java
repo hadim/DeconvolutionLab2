@@ -30,6 +30,10 @@ public class RecapDModule extends AbstractDModule implements KeyListener {
 	public void update() {
 		if (table == null)
 			return;
+		table.removeRows();
+		for (String[] feature : deconvolution.recap())
+			table.append(feature);
+
 		split.setDividerLocation(0.5);
 		split.repaint();
 	}
@@ -37,9 +41,10 @@ public class RecapDModule extends AbstractDModule implements KeyListener {
 	public String getCommand() {
 		return pnCommand.getText();
 	}
+	
 	@Override
 	public String getName() {
-		return "Command";
+		return "Recap";
 	}
 
 	@Override

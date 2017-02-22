@@ -98,8 +98,8 @@ public class SimulationPanel extends AbstractAlgorithmPanel implements KeyListen
 	}
 
 	@Override
-	public String getShortname() {
-		return algo.getShortname();
+	public String[] getShortname() {
+		return new String[] {"SIM", "SIMU"};
 	}
 
 	@Override
@@ -107,6 +107,7 @@ public class SimulationPanel extends AbstractAlgorithmPanel implements KeyListen
 		String s = "";
 		s += "<h1>" + getName() + "</h1>";
 		s += "<p>This algorithm is only used for simulation. It convolves the input image with the PSF and adds some noise.</p>";
+		s += "<p>The noise has a Gaussian distribution (mean, stdev) and a Poisson distribution (poisson).</p>";
 		return s;
 	}
 

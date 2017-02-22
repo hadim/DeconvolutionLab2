@@ -91,8 +91,8 @@ public class LandweberPositivityPanel extends AbstractAlgorithmPanel implements 
 	}
 
 	@Override
-	public String getShortname() {
-		return algo.getShortname();
+	public String[] getShortname() {
+		return new String[] {"NNLS", "LW+"};
 	}
 
 	@Override

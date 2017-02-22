@@ -88,10 +88,10 @@ public class VanCittertPanel extends AbstractAlgorithmPanel implements ChangeLis
 	}
 
 	@Override
-	public String getShortname() {
-		return algo.getShortname();
+	public String[] getShortname() {
+		return new String[] {"VC"};
 	}
-
+	
 	@Override
 	public String getDocumentation() {
 		String s = "";

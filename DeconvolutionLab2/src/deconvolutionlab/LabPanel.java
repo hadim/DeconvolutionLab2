@@ -29,7 +29,7 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package deconvolutionlab.dialog;
+package deconvolutionlab;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -51,8 +51,7 @@ import javax.swing.event.ChangeListener;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolution.DeconvolutionDialog;
-import deconvolutionlab.Config;
-import deconvolutionlab.Lab;
+import deconvolutionlab.dialog.BatchDialog;
 import deconvolutionlab.modules.AboutModule;
 import deconvolutionlab.modules.AbstractModule;
 import deconvolutionlab.modules.AlgorithmModule;
@@ -104,8 +103,6 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 	private GroupedModulePanel	panelScript;
 	private GroupedModulePanel	panelAbout;
 	private AbstractModule		modules[];
-
-	private ArrayList<Deconvolution> deconvolutions = new ArrayList<Deconvolution>();
 	
 	public LabPanel(JButton bnClose) {
 		this.bnClose = bnClose;
@@ -168,7 +165,7 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 
 		Config.load();
 		running.init();
-		sizeModule();
+		//sizeModule();
 		Command.command();
 		running.update();
 		image.update();
@@ -197,13 +194,12 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 			String job = language.getJobName() + " " + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
 			Deconvolution d = new Deconvolution(job, Command.command(), Deconvolution.Finish.ALIVE);
 			d.launch();
-			deconvolutions.add(d);
 		}
 		else if (e.getSource() == bnRun) {
 			String job = language.getJobName() + " " + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
 			Deconvolution d = new Deconvolution(job, Command.command());
 			d.deconvolve();
-			deconvolutions.add(d);
+//			deconvolutions.add(d);
 		}
 	}
 
@@ -256,8 +252,7 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		bnClose.removeActionListener(this);
 		bnHelp.removeActionListener(this);
 		
-		for(Deconvolution deconvolution : deconvolutions)
-			deconvolution.close();
+		Lab.close();
 	}
 
 	public void sizeModule() {

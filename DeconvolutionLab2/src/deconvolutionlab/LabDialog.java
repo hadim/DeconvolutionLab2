@@ -29,8 +29,9 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package deconvolutionlab.dialog;
+package deconvolutionlab;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -45,10 +46,6 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 
 import deconvolution.DeconvolutionDialog;
-import deconvolutionlab.Config;
-import deconvolutionlab.Constants;
-import deconvolutionlab.Imaging;
-import deconvolutionlab.Lab;
 import deconvolutionlab.system.SystemInfo;
 
 public class LabDialog extends JDialog implements ComponentListener, ActionListener, WindowListener {
@@ -69,6 +66,8 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 		Rectangle rect = Config.getDialog("DeconvolutionLab.MainDialog");
 		if (rect.x > 0 && rect.y > 0)
 			setLocation(rect.x, rect.y);
+		if (rect.width > 0 && rect.height > 0)
+			setPreferredSize(new Dimension(rect.width, rect.height));
 
 	}
 

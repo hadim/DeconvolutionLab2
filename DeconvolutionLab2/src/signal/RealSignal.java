@@ -34,6 +34,7 @@ package signal;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
+import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
 
 public class RealSignal extends Signal implements SignalListener {
@@ -267,7 +268,7 @@ public class RealSignal extends Signal implements SignalListener {
 		double norm1 = 0.0;
 		double norm2 = 0.0;
 		double mean = 0.0;
-
+		
 		for (int k = 0; k < nz; k++)
 			for (int i = 0; i < nxy; i++) {
 				float v = data[k][i];
@@ -489,7 +490,7 @@ public class RealSignal extends Signal implements SignalListener {
 		int alpha = (255 << 24);
 		for (int i = 0; i < nx; i++)
 			for (int j = 0; j < ny; j++) {
-				int v = (int)data[0][i + j * nx];
+			int v = (int)mip.data[0][i + j * nx];
 				img.setRGB(i, j, alpha | (v << 16) | (v << 8) | v);
 			}
 		return img;

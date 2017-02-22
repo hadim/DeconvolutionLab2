@@ -38,7 +38,6 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -50,26 +49,29 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
-import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 
 import deconvolution.modules.AlgorithmDModule;
-import deconvolution.modules.RecapDModule;
 import deconvolution.modules.ImageDModule;
 import deconvolution.modules.PSFDModule;
+import deconvolution.modules.RecapDModule;
 import deconvolution.modules.ReportDModule;
 import deconvolutionlab.Config;
+import deconvolutionlab.Constants;
 import deconvolutionlab.Lab;
 import deconvolutionlab.TableStats;
 import deconvolutionlab.monitor.TableMonitor;
 import lab.component.BorderToggledButton;
-import lab.component.CustomizedTable;
 import lab.component.JPanelImage;
 
 public class DeconvolutionDialog extends JDialog implements ActionListener, Runnable, DeconvolutionListener {
 
 	public enum State {
 		NOTDEFINED, READY, RUN, FINISH
+	};
+	
+	public enum Module {
+		ALL, RECAP, IMAGE, PSF, ALGO
 	};
 
 	private JButton				bnStart		= new JButton("Run");
@@ -106,7 +108,7 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 	private AlgorithmDModule		algorithm;
 	private ReportDModule			report;
 	
-	public DeconvolutionDialog(Deconvolution deconvolution, TableMonitor tableMonitor, TableStats tableStats) {
+	public DeconvolutionDialog(Module module, Deconvolution deconvolution, TableMonitor tableMonitor, TableStats tableStats) {
 		super(new JFrame(), deconvolution.getName());
 
 		this.deconvolution = deconvolution;
@@ -117,27 +119,6 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		algorithm = new AlgorithmDModule(deconvolution);
 		report = new ReportDModule(deconvolution);
 		
-		// Panel tool with all buttons
-		JToolBar tool = new JToolBar();
-		tool.setFloatable(false);
-		tool.setLayout(new GridLayout(1, 6));
-		tool.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-		tool.add(bnRecap);
-		tool.add(bnImage);
-		tool.add(bnPSF);
-		tool.add(bnAlgo);
-		tool.add(bnMonitor);
-		tool.add(bnStats);
-		tool.add(bnReport);
-
-		// Panel buttons
-		JPanelImage buttons = new JPanelImage("celegans.jpg");
-		buttons.setLayout(new FlowLayout());
-		buttons.setBorder(BorderFactory.createEtchedBorder());
-		buttons.add(bnReset);
-		buttons.add(bnStop);
-		buttons.add(bnStart);
-
 		// Panel status bar on bottom
 		progress.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		progress.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -152,9 +133,19 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		// Panel bottom
 		JPanel bottom = new JPanel();
 		bottom.setLayout(new BoxLayout(bottom, BoxLayout.PAGE_AXIS));
-		bottom.add(buttons);
 		bottom.add(statusBar);
 
+		// Panel buttons
+		if (module == Module.ALL) {
+			JPanelImage buttons = new JPanelImage("celegans.jpg");
+			buttons.setLayout(new FlowLayout());
+			buttons.setBorder(BorderFactory.createEtchedBorder());
+			buttons.add(bnReset);
+			buttons.add(bnStop);
+			buttons.add(bnStart);
+			bottom.add(buttons);
+		}
+		
 		// Panel Image
 		cards.add(recap.getName(), recap.getPane());
 		cards.add(image.getName(), image.getPane());
@@ -169,28 +160,45 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		// Panel Main
 		JPanel panel = new JPanel();
 		panel.setLayout(new BorderLayout());
-		panel.add(tool, BorderLayout.NORTH);
 		panel.add(cards, BorderLayout.CENTER);
 		panel.add(bottom, BorderLayout.SOUTH);
+
+		// Panel tool with all buttons
+		if (module == Module.ALL) {
+			JToolBar tool = new JToolBar();
+			tool.setFloatable(false);
+			tool.setLayout(new GridLayout(1, 6));
+			tool.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+			tool.add(bnRecap);
+			tool.add(bnImage);
+			tool.add(bnPSF);
+			tool.add(bnAlgo);
+			tool.add(bnMonitor);
+			tool.add(bnStats);
+			tool.add(bnReport);
+			panel.add(tool, BorderLayout.NORTH);
+		}
 
 		add(panel);
 		bnReset.addActionListener(this);
 		bnQuit.addActionListener(this);
 		bnStart.addActionListener(this);
 		bnStop.addActionListener(this);
-		bnPSF.addActionListener(this);
+		bnHelp.addActionListener(this);
+
 		bnImage.addActionListener(this);
+		bnPSF.addActionListener(this);
 		bnAlgo.addActionListener(this);
 		bnRecap.addActionListener(this);
-		bnHelp.addActionListener(this);
 		bnMonitor.addActionListener(this);
 		bnStats.addActionListener(this);
+		bnReport.addActionListener(this);
 		deconvolution.addDeconvolutionListener(this);
 
-		setMinimumSize(new Dimension(400, 200));
+		setMinimumSize(new Dimension(Constants.widthGUI, 400));
+		setPreferredSize(new Dimension(Constants.widthGUI, 400));
 		pack();
 		Config.registerFrame("DeconvolutionLab", "DeconvolutionDialog", this);
-		
 		
 		Rectangle rect = Config.getDialog("DeconvolutionLab.DeconvolutionDialog");
 		if (rect.x > 0 && rect.y > 0)
@@ -198,7 +206,16 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 
 		bnStop.setEnabled(false);
 
-		toggle(bnRecap);
+		if (module == Module.ALL)
+			toggle(bnRecap);
+		if (module == Module.IMAGE)
+			toggle(bnImage);
+		if (module == Module.PSF)
+			toggle(bnPSF);
+		if (module == Module.ALGO)
+			toggle(bnAlgo);
+		if (module == Module.RECAP)
+			toggle(bnPSF);
 		state = State.READY;
 		
 	}
@@ -224,15 +241,6 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 			finish();
 			if (deconvolution != null)
 				deconvolution.abort();
-		}
-		else if (e.getSource() == bnRecap) {
-			toggle(bnRecap);
-			if (thread == null) {
-				job = bnRecap.getText();
-				thread = new Thread(this);
-				thread.setPriority(Thread.MIN_PRIORITY);
-				thread.start();
-			}
 		}
 		else if (e.getSource() == bnImage) {
 			toggle(bnImage);
@@ -261,7 +269,7 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 				thread.start();
 			}
 		}
-		else if (job.equals(bnRecap.getText())) {
+		else if (e.getSource() == bnRecap) {
 			toggle(bnRecap);
 			recap.update();
 		}
@@ -314,6 +322,8 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		bnPSF.setEnabled(true);
 		bnImage.setEnabled(true);
 		thread = null;
+		toggle(bnReport);
+		report.update();
 	}
 	
 	@Override
@@ -344,7 +354,6 @@ public class DeconvolutionDialog extends JDialog implements ActionListener, Runn
 		bnStats.setSelected(false);
 		bnReport.setSelected(false);
 		bn.setSelected(true);
-
 	}
 
 }

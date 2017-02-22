@@ -32,17 +32,30 @@
 package deconvolutionlab.modules;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+import deconvolution.Command;
+import deconvolution.Deconvolution;
+import deconvolution.DeconvolutionDialog;
+import deconvolutionlab.Lab;
+import deconvolutionlab.dialog.PatternDialog;
+import deconvolutionlab.dialog.SyntheticDialog;
+import deconvolutionlab.monitor.Monitors;
 import lab.component.HTMLPane;
+import lab.tools.Files;
+import signal.RealSignal;
+import signal.factory.SignalFactory;
 
 public class CommandModule extends AbstractModule {
 
 	private HTMLPane window;
 	
 	public CommandModule() {
-		super("Command", "", "", "", true);
+		super("Command", "", "", "Check", true);
 	}
 
 	public HTMLPane getPane() {
@@ -54,10 +67,21 @@ public class CommandModule extends AbstractModule {
 		window = new HTMLPane("Monaco", 100, 100);
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(window.getPane(), BorderLayout.CENTER);
+		getAction2Button().setToolTipText("Human readable of the command line");
+		getAction2Button().addActionListener(this);
 		return panel;
 	}
-	
-	
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		super.actionPerformed(e);
+		if (e.getSource() == getAction2Button()) {
+			Deconvolution deconvolution = new Deconvolution("Check Command", Command.command());
+			DeconvolutionDialog d = new DeconvolutionDialog(DeconvolutionDialog.Module.RECAP, deconvolution, null, null);
+			Lab.setVisible(d, false);
+		}
+	}
+
 	@Override
 	public void close() {
 	}

@@ -159,14 +159,9 @@ public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<Real
 	
 	@Override
 	public String getName() {
-		return "Richardson-Lucy TV";
+		return "Richardson-Lucy Total Variation [RLTV]";
 	}
 	
-	@Override
-	public String getShortname() {
-		return "RLTV";
-	}
-
 	@Override
 	public boolean isRegularized() {
 		return true;

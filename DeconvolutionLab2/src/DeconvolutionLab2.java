@@ -37,7 +37,7 @@ import deconvolutionlab.Constants;
 import deconvolutionlab.Imaging;
 import deconvolutionlab.Imaging.Platform;
 import deconvolutionlab.Lab;
-import deconvolutionlab.dialog.LabDialog;
+import deconvolutionlab.LabDialog;
 import deconvolutionlab.monitor.Monitors;
 
 public class DeconvolutionLab2 {

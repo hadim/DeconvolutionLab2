@@ -21,17 +21,17 @@ public class ImageDModule extends AbstractDModule {
 		pnImage = new JPanelImage();
 		table = new CustomizedTable(new String[] { "Features", "Values" }, false);
 		pnImage.setPreferredSize(new Dimension(300, 300));
-		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(300, 200), pnImage);
-		
+		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(300, 300), pnImage);
 		update();
 	}
 	
 	public void update() {
+		split.setDividerLocation(300);
 		if (pnImage == null)
 			return;
 		if (table == null)
 			return;
-	
+		
 		RealSignal signal = deconvolution.openImage();
 		table.removeRows();
 		if (signal == null) {
@@ -40,15 +40,12 @@ public class ImageDModule extends AbstractDModule {
 		}
 		img = signal.createPreviewMIPZ();
 		pnImage.setImage(img);
-		for (String[] feature : deconvolution.checkImage())
+		for (String[] feature : deconvolution.checkImage(signal))
 			table.append(feature);
-		split.setDividerLocation(0.5);
 	}
 
 	@Override
 	public String getName() {
 		return "Image";
 	}
-
-
 }

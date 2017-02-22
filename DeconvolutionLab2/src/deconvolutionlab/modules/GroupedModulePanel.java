@@ -38,7 +38,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
-import deconvolutionlab.dialog.LabPanel;
+import deconvolutionlab.LabPanel;
 
 public class GroupedModulePanel extends JPanel {
 	private ArrayList<AbstractModule>	modules;

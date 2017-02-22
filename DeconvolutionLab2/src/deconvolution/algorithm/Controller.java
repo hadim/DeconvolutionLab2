@@ -46,6 +46,7 @@ import signal.Assessment;
 import signal.ComplexSignal;
 import signal.Constraint;
 import signal.RealSignal;
+import signal.SignalCollector;
 
 public class Controller {
 
@@ -70,8 +71,6 @@ public class Controller {
 	private Constraint.Mode		constraint			= Constraint.Mode.NO;
 	private OutputCollection	outs				= null;
 	private String				referenceName		= "";
-	private String				showstatsName		= "";
-	private String				savestatsName		= "";
 	private RealSignal			refImage;
 	private RealSignal			prevImage;
 	private RealSignal			x;
@@ -79,7 +78,6 @@ public class Controller {
 	private Timer				timer;
 	private AbstractFFT			fft;
 
-	private String				algo				= "";
 	private TableStats			tableStats;
 	private float[]				statsInput;
 	
@@ -99,10 +97,6 @@ public class Controller {
 
 	public void setMonitors(Monitors monitors) {
 		this.monitors = monitors;
-	}
-
-	public void setAlgorithm(String algo) {
-		this.algo = algo;
 	}
 
 	public void setFFT(AbstractFFT fft) {
@@ -261,7 +255,6 @@ public class Controller {
 			prevImage = x.duplicate();
 			monitors.log("@" + iterations + " Residu: " + NumFormat.nice(residu));
 		}
-
 	}
 
 	public String[] stats() {
@@ -270,22 +263,19 @@ public class Controller {
 		float params[] = null;
 		if (x != null)
 			params = x.getStats();
-		String[] row = new String[15];
-		row[0] = tableStats.getName();
-		row[1] = algo;
-		row[2] = "" + iterations;
-		row[3] = (params == null ? "-" : "" + params[0]);
-		row[4] = (params == null ? "-" : "" + params[1]);
-		row[5] = (params == null ? "-" : "" + params[2]);
-		row[6] = (params == null ? "-" : "" + params[3]);
-		row[7] = (params == null ? "-" : "" + params[4]);
-		row[8] = (params == null ? "-" : "" + params[5]);
-		row[9] = NumFormat.seconds(getTimeNano());
-		row[10] = NumFormat.bytes(SystemUsage.getHeapUsed());
-		row[11] = NumFormat.bytes(memoryPeak);
-		row[12] = doReference ? NumFormat.nice(psnr) : "n/a";
-		row[13] = doReference ? NumFormat.nice(snr) : "n/a";
-		row[14] = doResidu ? NumFormat.nice(residu) : "n/a";
+		String[] row = new String[12];
+		row[0] = "" + iterations;
+		row[1] = (params == null ? "-" : "" + params[0]);
+		row[2] = (params == null ? "-" : "" + params[1]);
+		row[3] = (params == null ? "-" : "" + params[2]);
+		row[4] = (params == null ? "-" : "" + params[3]);
+		row[5] = (params == null ? "-" : "" + params[5]);
+		row[6] = NumFormat.seconds(getTimeNano());
+		row[7] = NumFormat.bytes(SystemUsage.getHeapUsed());
+		row[8] = SignalCollector.sumarize();
+		row[9] = doReference ? NumFormat.nice(psnr) : "n/a";
+		row[10] = doReference ? NumFormat.nice(snr) : "n/a";
+		row[11] = doResidu ? NumFormat.nice(residu) : "n/a";
 		return row;
 	}
 

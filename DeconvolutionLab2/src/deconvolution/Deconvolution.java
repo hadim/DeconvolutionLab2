@@ -47,6 +47,7 @@ import deconvolutionlab.monitor.StatusMonitor;
 import deconvolutionlab.monitor.TableMonitor;
 import deconvolutionlab.monitor.Verbose;
 import deconvolutionlab.system.SystemInfo;
+import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 import lab.tools.NumFormat;
 import signal.RealSignal;
@@ -84,10 +85,11 @@ public class Deconvolution implements Runnable {
 
 	private String								name				= "";
 
-	private ArrayList<DeconvolutionListener>	listeners			= new ArrayList<DeconvolutionListener>();	private boolean								imageLoaded			= false;
+	private ArrayList<DeconvolutionListener>	listeners			= new ArrayList<DeconvolutionListener>();	
+	private boolean								imageLoaded			= false;
 	private RealSignal							image;
 	private RealSignal							psf;
-	private RealSignal							result;
+	private RealSignal							deconvolvedImage;
 
 	private Finish								finish				= Finish.DIE;
 	private DeconvolutionDialog					dialog;
@@ -146,7 +148,7 @@ public class Deconvolution implements Runnable {
 		this.psf = psf;
 		imageLoaded = true;
 		runDeconvolve();
-		return result;
+		return deconvolvedImage;
 	}
 
 	public RealSignal deconvolve() {
@@ -154,7 +156,7 @@ public class Deconvolution implements Runnable {
 		this.psf = null;
 		imageLoaded = false;
 		runDeconvolve();
-		return result;
+		return deconvolvedImage;
 	}
 
 	/**
@@ -200,7 +202,7 @@ public class Deconvolution implements Runnable {
 	 *            Name of the job of deconvolution
 	 */
 	public void launch() {
-		dialog = new DeconvolutionDialog(this, tableMonitor, tableStats);
+		dialog = new DeconvolutionDialog(DeconvolutionDialog.Module.ALL, this, tableMonitor, tableStats);
 
 		Lab.setVisible(dialog, false);
 		monitors = new Monitors();
@@ -291,7 +293,8 @@ public class Deconvolution implements Runnable {
 		monitors.log("Algorithm: " + algo.getName());
 		report.add("Algorithm", algo.getName());
 		algo.setController(controller);
-		result = algo.run(monitors, image, psf, fft, pad, apo, norm, true);
+		
+		deconvolvedImage = algo.run(monitors, image, psf, fft, pad, apo, norm, true);
 
 		live = false;
 		for (DeconvolutionListener listener : listeners)
@@ -300,7 +303,7 @@ public class Deconvolution implements Runnable {
 		report.add("End", algo.getName() + " in " + NumFormat.time(System.nanoTime() - chrono));
 
 		if (flagDisplay)
-			Lab.show(monitors, result, "Result of " + algo.getShortname());
+			Lab.show(monitors, deconvolvedImage, "Result of " + algo.getShortname());
 
 		if (finish == Finish.KILL) {
 			System.out.println("End");
@@ -407,19 +410,26 @@ public class Deconvolution implements Runnable {
 		}
 
 		algo.setController(controller);
-		int iter = controller.getIterationMax();
-		controller.setIterationMax(1);
-		RealSignal x = algo.run(monitors, image, psf, fft, pad, apo, norm, true);
-		Lab.show(monitors, x, "Estimate after 1 iteration");
-		features.add("Time", NumFormat.seconds(controller.getTimeNano()));
-		features.add("Peak Memory", controller.getMemoryAsString());
-		controller.setIterationMax(iter);
+		double chrono = System.nanoTime(); 
+		AbstractFFT f = fft.getDefaultFFT();
+		RealSignal slice = image.getSlice(0);
+		if (slice != null) {
+			f.init(Monitors.createDefaultMonitor(), slice.nx, slice.ny, 1);
+			f.transform(slice);
+			int n = algo.isIterative() ? controller.getIterationMax() : 1;
+			chrono = (System.nanoTime() - chrono) * 2 * slice.nz * n;
+		
+			features.add("Estimated Time", NumFormat.time(chrono) );
+		}
+		else 
+			features.add("Estimated Time", "Error" );
+		features.add("Estimated Memory", controller.getMemoryAsString());
+		features.add("Iterative", algo.isIterative()  ? "" + controller.getIterationMax() : "Direct");
 		return features;
 	}
 
-	public Features checkImage() {
+	public Features checkImage(RealSignal image) {
 		Features features = new Features();
-		RealSignal image = openImage();
 		if (image == null) {
 			features.add("Image", "No valid input image");
 			return features;
@@ -436,18 +446,33 @@ public class Deconvolution implements Runnable {
 		RealSignal signal = pad.pad(monitors, getApodization().apodize(monitors, image));
 		float stats[] = signal.getStats();
 		float stati[] = image.getStats();
-		features.add("Size", image.dimAsString() + " padded to " + signal.dimAsString());
-		features.add("Mean", NumFormat.nice(stati[0]) + " > " + NumFormat.nice(stats[0]));
-		features.add("Minimun", NumFormat.nice(stati[1]) + " > " + NumFormat.nice(stats[1]));
-		features.add("Maximum", NumFormat.nice(stati[2]) + " > " + NumFormat.nice(stats[2]));
-		features.add("Stdev", NumFormat.nice(stati[3]) + " > " + NumFormat.nice(stats[3]));
-		features.add("Energy", NumFormat.nice(stati[5]) + " > " + NumFormat.nice(stats[5]));
+		int sizi = image.nx * image.ny * image.nz;
+		int sizs = signal.nx * signal.ny * signal.nz;
+		float totali = stati[0] * sizi;
+		float totals = stats[0] * sizs;
+		features.add("<html><b>Orignal Image</b></html>", "");
+		features.add("Size", image.dimAsString() + " " + NumFormat.bytes(sizi*4));
+		features.add("Mean (stdev)", NumFormat.nice(stati[0])  + " (" + NumFormat.nice(stati[3]) + ")");
+		features.add("Min ... Max", NumFormat.nice(stati[1]) + " ... " + NumFormat.nice(stati[2]));
+		features.add("Energy (int)", NumFormat.nice(stati[5])  + " (" + NumFormat.nice(totali) + ")");
+		
+		features.add("<html><b>Working Image</b></html>", "");
+		features.add("Size", signal.dimAsString() + " " + NumFormat.bytes(sizs*4));
+		features.add("Mean (stdev)", NumFormat.nice(stats[0])  + " (" + NumFormat.nice(stats[3]) + ")");
+		features.add("Min Max", NumFormat.nice(stats[1]) + " " + NumFormat.nice(stats[2]));
+		features.add("Energy (int)", NumFormat.nice(stats[5])  + " (" + NumFormat.nice(totals) + ")");
+		features.add("<html><b>Information</b></html>", "");
+		features.add("Size Increase ", NumFormat.nice((double)(sizs-sizi)/sizi*100.0));
+		features.add("Energy Lost", NumFormat.nice((stats[5]-stati[5])/stati[5]*100));
+	
 		return features;
 	}
 
-	public Features checkPSF() {
+	public Features checkPSF(RealSignal psf) {
 		Features features = new Features();
-		RealSignal image = openImage();
+		if (!imageLoaded)
+			image = openImage();
+
 		if (image == null) {
 			features.add("Image", "No valid input image");
 			return features;
@@ -461,36 +486,60 @@ public class Deconvolution implements Runnable {
 			return features;
 		}
 
-		RealSignal psf = openPSF();
 		if (psf == null) {
 			features.add("PSF", "No valid PSF");
 			return features;
 		}
 
-		RealSignal signal = pad.pad(monitors, getApodization().apodize(monitors, image));
-		RealSignal h = psf.changeSizeAs(signal);
-		features.add("Original size", psf.dimAsString() + " padded to " + h.dimAsString());
-
-		String e = NumFormat.nice(h.getEnergy());
-
+		RealSignal h = psf.changeSizeAs(image);
 		h.normalize(norm);
 
-		float stath[] = h.getStats();
-		float statp[] = psf.getStats();
-
-		// return new float[] { (float) mean, min, max, (float) stdev, (float)
-		// norm1, (float) norm2 };
-
-		features.add("Size", psf.dimAsString() + " padded to " + h.dimAsString());
-		features.add("Mean", NumFormat.nice(statp[0]) + " > " + NumFormat.nice(stath[0]));
-		features.add("Minimun", NumFormat.nice(statp[1]) + " > " + NumFormat.nice(stath[1]));
-		features.add("Maximum", NumFormat.nice(statp[2]) + " > " + NumFormat.nice(stath[2]));
-		features.add("Stdev", NumFormat.nice(statp[3]) + " > " + NumFormat.nice(stath[3]));
-		features.add("Energy", NumFormat.nice(statp[5]) + " > " + NumFormat.nice(stath[5]));
-		features.add("Total", NumFormat.nice(statp[4]) + " > " + NumFormat.nice(stath[4]));
+		float stats[] = h.getStats();
+		float stati[] = psf.getStats();
+		int sizi = psf.nx * psf.ny * psf.nz;
+		int sizs = h.nx * h.ny * h.nz;
+		float totali = stati[0] * sizi;
+		float totals = stats[0] * sizs;
+		features.add("<html><b>Orignal PSF</b></html>", "");
+		features.add("Size", psf.dimAsString() + " " + NumFormat.bytes(sizi*4));
+		features.add("Mean (stdev)", NumFormat.nice(stati[0])  + " (" + NumFormat.nice(stati[3]) + ")");
+		features.add("Min ... Max", NumFormat.nice(stati[1]) + " ... " + NumFormat.nice(stati[2]));
+		features.add("Energy (int)", NumFormat.nice(stati[5])  + " (" + NumFormat.nice(totali) + ")");
+		
+		features.add("<html><b>Working PSF</b></html>", "");
+		features.add("Size", h.dimAsString() + " " + NumFormat.bytes(sizs*4));
+		features.add("Mean (stdev)", NumFormat.nice(stats[0])  + " (" + NumFormat.nice(stats[3]) + ")");
+		features.add("Min Max", NumFormat.nice(stats[1]) + " " + NumFormat.nice(stats[2]));
+		features.add("Energy (int)", NumFormat.nice(stats[5])  + " (" + NumFormat.nice(totals) + ")");
+		features.add("<html><b>Information</b></html>", "");
+		features.add("Size Increase ", NumFormat.nice((double)(sizs-sizi)/sizi*100.0));
+		features.add("Energy Lost", NumFormat.nice((stats[5]-stati[5])/stati[5]*100));
 		return features;
 	}
 
+	public Features checkOutput() {
+		Features features = new Features();
+		if (deconvolvedImage == null) {
+			features.add("Image", "No valid output image");
+			return features;
+		}
+
+		float stati[] = deconvolvedImage.getStats();
+		int sizi = deconvolvedImage.nx * deconvolvedImage.ny * deconvolvedImage.nz;
+		float totali = stati[0] * sizi;
+		features.add("<html><b>Deconvolved Image</b></html>", "");
+		features.add("Size", image.dimAsString() + " " + NumFormat.bytes(sizi*4));
+		features.add("Mean (stdev)", NumFormat.nice(stati[0])  + " (" + NumFormat.nice(stati[3]) + ")");
+		features.add("Min ... Max", NumFormat.nice(stati[1]) + " ... " + NumFormat.nice(stati[2]));
+		features.add("Energy (int)", NumFormat.nice(stati[5])  + " (" + NumFormat.nice(totali) + ")");
+	
+		return features;
+	}
+	
+	public RealSignal getOutput() {
+		return deconvolvedImage;
+	}
+	
 	public Features getDeconvolutionReports() {
 		return report;
 	}

@@ -73,12 +73,7 @@ public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
 
 	@Override
 	public String getName() {
-		return "Iterative Contraint Tikhonov-Miller";
-	}
-
-	@Override
-	public String getShortname() {
-		return "ICTM";
+		return "Iterative Contraint Tikhonov-Miller [ICTM]";
 	}
 
 	@Override

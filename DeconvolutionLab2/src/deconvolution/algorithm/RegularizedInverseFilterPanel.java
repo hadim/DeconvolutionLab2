@@ -96,19 +96,19 @@ public class RegularizedInverseFilterPanel extends AbstractAlgorithmPanel implem
 	}
 
 	@Override
-	public String getShortname() {
-		return algo.getShortname();
+	public String[] getShortname() {
+		return new String[] {"RIF", "LRIF"};
 	}
 
 	@Override
 	public String getDocumentation() {
 		String s = "";
 		s += "<h1>" + getName() + "</h1>";
-		s += "<p>Iterative: " + algo.isIterative() + "</p>";
-		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
-		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
-		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		s += "<p>Shortname: " + getShortname() + "</p>";
+		s += "<h2>Shortname RIF or LRIF</h2>";
+		s += "<p>Laplacian Regularized Inverse Filter</p>";
+		s += "<p>This is a inverse filter with a Laplacian regularization that tends to have an effect on high frequency</p>";
+		s += "<p>It is very fast, non-iterative algorithm</p>";
+		s += "<p>The regularization blurs the noise and the image. It is controlled by &lambda;</p>";
 		return s;
 	}
 

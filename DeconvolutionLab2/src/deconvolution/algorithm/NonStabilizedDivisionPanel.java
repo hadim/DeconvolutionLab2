@@ -57,8 +57,8 @@ public class NonStabilizedDivisionPanel extends AbstractAlgorithmPanel {
 	}
 
 	@Override
-	public String getShortname() {
-		return algo.getShortname();
+	public String[] getShortname() {
+		return new String[] {"DIV"};
 	}
 
 	@Override

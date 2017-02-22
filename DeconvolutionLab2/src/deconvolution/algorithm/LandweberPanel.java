@@ -91,8 +91,8 @@ public class LandweberPanel extends AbstractAlgorithmPanel implements ChangeList
 	}
 
 	@Override
-	public String getShortname() {
-		return algo.getShortname();
+	public String[] getShortname() {
+		return new String[] {"LW", "LLS"};
 	}
 
 	@Override

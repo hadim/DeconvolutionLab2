@@ -125,9 +125,10 @@ public class ICTMPanel extends AbstractAlgorithmPanel implements KeyListener, Ac
 	}
 
 	@Override
-	public String getShortname() {
-		return algo.getShortname();
+	public String[] getShortname() {
+		return new String[] {"ICTM"};
 	}
+
 
 	@Override
 	public String getDocumentation() {

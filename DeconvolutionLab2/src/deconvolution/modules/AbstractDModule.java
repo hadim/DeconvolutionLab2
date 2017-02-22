@@ -4,6 +4,7 @@ import javax.swing.JFrame;
 import javax.swing.JSplitPane;
 
 import deconvolution.Deconvolution;
+import deconvolutionlab.Lab;
 
 public abstract class AbstractDModule {
 	
@@ -23,7 +24,7 @@ public abstract class AbstractDModule {
 		update();
 		frame.getContentPane().add(split);
 		frame.pack();
-		frame.setVisible(true);
+		Lab.setVisible(frame);
 	}
 	
 	public abstract void update();

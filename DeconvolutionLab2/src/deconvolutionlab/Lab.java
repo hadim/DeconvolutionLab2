@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 import deconvolutionlab.Imaging.ContainerImage;
 import deconvolutionlab.monitor.Monitors;
@@ -54,8 +55,12 @@ import signal.factory.Sphere;
 public class Lab {
 
 	private static Imaging imaging;
+	private static ArrayList<JFrame> frames;
+	private static ArrayList<JDialog> dialogs;
 
 	static {
+		frames = new ArrayList<JFrame>();
+		dialogs = new ArrayList<JDialog>();
 		imaging = new IJImager();
 		Config.init(System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
 	}
@@ -297,7 +302,21 @@ public class Lab {
 	public static void setVisible(JDialog dialog, boolean modal) {
 		if (dialog == null)
 			return;
+		dialogs.add(dialog);
 		imaging.setVisible(dialog, modal);
 	}
-
+	
+	public static void setVisible(JFrame frame) {
+		frames.add(frame);
+		frame.setVisible(true);
+	}
+	
+	public static void close() {
+		for(JFrame frame : frames)
+			if (frame != null)
+				frame.dispose();
+		for(JDialog dialog : dialogs)
+			if (dialog != null)
+				dialog.dispose();
+	}
 }

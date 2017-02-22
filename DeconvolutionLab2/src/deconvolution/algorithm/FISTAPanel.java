@@ -146,19 +146,21 @@ public class FISTAPanel extends AbstractAlgorithmPanel implements KeyListener, A
 	}
 
 	@Override
-	public String getShortname() {
-		return algo.getShortname();
+	public String[] getShortname() {
+		return new String[] {"FISTA"};
 	}
 
 	@Override
 	public String getDocumentation() {
 		String s = "";
 		s += "<h1>" + getName() + "</h1>";
+		s += "<h2>Shortname: FISTA</h2>";
 		s += "<p>Iterative: " + algo.isIterative() + "</p>";
 		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
 		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
 		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		s += "<p>Shortname: " + getShortname() + "</p>";
+		s += "<p></p>";
+		s += "<h3>Reference: Beck and Teboulle, SIAM <b>2</b> 2009</h3>";
 		return s;
 	}
 

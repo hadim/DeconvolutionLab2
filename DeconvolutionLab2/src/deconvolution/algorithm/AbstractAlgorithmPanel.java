@@ -41,15 +41,17 @@ public abstract class AbstractAlgorithmPanel {
 
 	public abstract String getName();
 
-	public abstract String getShortname();
+	public abstract String[] getShortname();
 
 	public abstract String getDocumentation();
 
 	public boolean isNamed(String name) {
-		if (name.equals(getShortname().toLowerCase()))
-			return true;
-		if (name.equals(getName().toLowerCase()))
-			return true;
+		for(String sn : getShortname()) {
+			if (name.equals(sn.toLowerCase()))
+				return true;
+			if (name.equals(getName().toLowerCase()))
+				return true;
+		}
 		return false;
 	}
 

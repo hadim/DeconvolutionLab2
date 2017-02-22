@@ -55,6 +55,7 @@ import javax.swing.JToolBar;
 
 import deconvolution.Command;
 import deconvolution.Deconvolution;
+import deconvolution.DeconvolutionDialog;
 import deconvolution.modules.PSFDModule;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
@@ -246,14 +247,15 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 		int row = table.getSelectedRow();
 		if (row < 0)
 			return;
-		Deconvolution deconvolution = new Deconvolution("ShowPSF", getCommand());
+		Deconvolution deconvolution = new Deconvolution("Check PSF", Command.command());
 		if (stack) {
 			RealSignal x = deconvolution.openPSF();
 			if (x != null)
 				Lab.show(Monitors.createDefaultMonitor(), x, table.getCell(row, 0));
 		} 
 		else {
-			new PSFDModule(deconvolution).show(table.getCell(row, 0));
+			DeconvolutionDialog d = new DeconvolutionDialog(DeconvolutionDialog.Module.PSF, deconvolution, null, null);
+			Lab.setVisible(d, false);
 		}
 	}
 

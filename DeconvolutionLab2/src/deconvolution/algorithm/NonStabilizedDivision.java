@@ -54,12 +54,7 @@ public class NonStabilizedDivision extends AbstractAlgorithm implements Callable
 
 	@Override
 	public String getName() {
-		return "Non Stablized Division";
-	}
-
-	@Override
-	public String getShortname() {
-		return "DIV";
+		return "Non Stablized Division [DIV]";
 	}
 
 	@Override

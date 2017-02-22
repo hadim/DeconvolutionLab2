@@ -111,19 +111,20 @@ public class RichardsonLucyTVPanel extends AbstractAlgorithmPanel implements Key
 	}
 
 	@Override
-	public String getShortname() {
-		return algo.getShortname();
+	public String[] getShortname() {
+		return new String[] {"RLTV"};
 	}
 
 	@Override
 	public String getDocumentation() {
 		String s = "";
 		s += "<h1>" + getName() + "</h1>";
-		s += "<p>Iterative: " + algo.isIterative() + "</p>";
-		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
-		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
-		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		s += "<p>Shortname: " + getShortname() + "</p>";
+		s += "<h2> Shortname: RLTV</h2>";
+		s += "<p>This algorithm is a combinaison of the Richardson–Lucy algorithm with a regularization constraint based on Total Variation, which tends to reduce unstable oscillations while preserving object edges.</p>";
+		s += "<p>It is a iterative algorithm, relative slow to compute the Total Variation at every iteration.s</p>";
+		s += "<p>It has a weighted parameter &lamdba; to control the effect of the total variation.</p>";
+		s += "<p></p>";
+		s += "<h3>Reference: Dey et al., Microscopy Research and Technics, 2006 " + getShortname() + "</p>";
 		return s;
 	}
 }

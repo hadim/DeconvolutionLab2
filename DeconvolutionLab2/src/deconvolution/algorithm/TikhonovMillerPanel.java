@@ -124,8 +124,8 @@ public class TikhonovMillerPanel extends AbstractAlgorithmPanel implements KeyLi
 	}
 
 	@Override
-	public String getShortname() {
-		return algo.getShortname();
+	public String[] getShortname() {
+		return new String[] {"TM"};
 	}
 
 	@Override

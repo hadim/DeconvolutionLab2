@@ -46,6 +46,7 @@ public class Algorithm {
 		list.add(new ISTAPanel());
 		list.add(new LandweberPanel());
 		list.add(new LandweberPositivityPanel());
+		list.add(new StarkParkerPanel());
 		list.add(new RichardsonLucyPanel());
 		list.add(new RichardsonLucyTVPanel());
 		list.add(new TikhonovMillerPanel());
@@ -61,82 +62,62 @@ public class Algorithm {
 		return list;
 	}
 	
-	public static ArrayList<AbstractAlgorithmPanel> getAvailableDeconvolutionAlgorithms() {
-		ArrayList<AbstractAlgorithmPanel> list = new ArrayList<AbstractAlgorithmPanel>();
-		list = new ArrayList<AbstractAlgorithmPanel>();
-		list.add(new RegularizedInverseFilterPanel());
-		list.add(new TikhonovRegularizationInverseFilterPanel());
-		list.add(new NaiveInverseFilterPanel());
-		list.add(new FISTAPanel());
-		list.add(new ISTAPanel());
-		list.add(new LandweberPanel());
-		list.add(new LandweberPositivityPanel());
-		list.add(new RichardsonLucyPanel());
-		list.add(new RichardsonLucyTVPanel());
-		list.add(new TikhonovMillerPanel());
-		list.add(new ICTMPanel());
-		list.add(new VanCittertPanel());
-		return list;
-	}
-	
-	public static ArrayList<AbstractAlgorithmPanel> getAvailableSimulationAlgorithms() {
-		ArrayList<AbstractAlgorithmPanel> list = new ArrayList<AbstractAlgorithmPanel>();
-		list.add(new IdentityPanel());
-		list.add(new ConvolutionPanel());
-		list.add(new SimulationPanel());
-		list.add(new NonStabilizedDivisionPanel());
-		return list;
-	}
-
 	public static AbstractAlgorithm getDefaultAlgorithm() {
 		return new Identity();
 	}
 
 	public static AbstractAlgorithm createAlgorithm(String name) {
-		if (name == null)
-			return getDefaultAlgorithm();
+		AbstractAlgorithm algo = getDefaultAlgorithm();
 		String n = name.trim().toLowerCase();
 		int i = 0;
 
 		if (list.get(i++).isNamed(n))
-			return new RegularizedInverseFilter(0.1);
-		if (list.get(i++).isNamed(n))
-			return new TikhonovRegularizationInverseFilter(1.0);
-		if (list.get(i++).isNamed(n))
-			return new NaiveInverseFilter();
-		if (list.get(i++).isNamed(n))
-			return new FISTA(10, 1, 1, "Haar", 3);
-		if (list.get(i++).isNamed(n))
-			return new ISTA(10, 1, 1, "Haar", 3);
-		if (list.get(i++).isNamed(n))
-			return new Landweber(10, 1);
-		if (list.get(i++).isNamed(n))
-			return new LandweberPositivity(10, 1);
-		if (list.get(i++).isNamed(n))
-			return new RichardsonLucy(10);
-		if (list.get(i++).isNamed(n))
-			return new RichardsonLucyTV(10, 1);
-		if (list.get(i++).isNamed(n))
-			return new TikhonovMiller(10, 1, 0.1);
-		if (list.get(i++).isNamed(n))
-			return new ICTM(10, 1, 0.1);
-		if (list.get(i++).isNamed(n))
-			return new VanCittert(10, 1);
-		if (list.get(i++).isNamed(n))
-			return new Identity();
-		if (list.get(i++).isNamed(n))
-			return new Convolution();
-		if (list.get(i++).isNamed(n))
-			return new Simulation(0, 1, 0);
-		if (list.get(i++).isNamed(n))
-			return new NonStabilizedDivision();
-		return getDefaultAlgorithm();
+			algo = new RegularizedInverseFilter(0.1);
+		else if (list.get(i++).isNamed(n))
+			algo =  new TikhonovRegularizationInverseFilter(1.0);
+		else if (list.get(i++).isNamed(n))
+			algo =  new NaiveInverseFilter();
+		else if (list.get(i++).isNamed(n))
+			algo =  new FISTA(10, 1, 1, "Haar", 3);
+		else if (list.get(i++).isNamed(n))
+			algo =  new ISTA(10, 1, 1, "Haar", 3);
+		else if (list.get(i++).isNamed(n))
+			algo =  new Landweber(10, 1);
+		else if (list.get(i++).isNamed(n))
+			algo =  new LandweberPositivity(10, 1);
+		else if (list.get(i++).isNamed(n))
+			algo =  new StarkParker(10, 1);
+		else if (list.get(i++).isNamed(n))
+			algo =  new RichardsonLucy(10);
+		else if (list.get(i++).isNamed(n))
+			algo =  new RichardsonLucyTV(10, 1);
+		else if (list.get(i++).isNamed(n))
+			algo =  new TikhonovMiller(10, 1, 0.1);
+		else if (list.get(i++).isNamed(n))
+			algo =  new ICTM(10, 1, 0.1);
+		else if (list.get(i++).isNamed(n))
+			algo =  new VanCittert(10, 1);
+		else if (list.get(i++).isNamed(n))
+			algo =  new Identity();
+		else if (list.get(i++).isNamed(n))
+			algo =  new Convolution();
+		else if (list.get(i++).isNamed(n))
+			algo =  new Simulation(0, 1, 0);
+		else if (list.get(i++).isNamed(n))
+			algo =  new NonStabilizedDivision();
+		else
+			algo =  getDefaultAlgorithm();
+		
+		if (algo != null)
+			algo.setShortname(name);
+		return algo;
 	}
 
 	public static AbstractAlgorithmPanel getPanel(String name) {
 		for (AbstractAlgorithmPanel panel : getAvailableAlgorithms()) {
-			if (panel.getShortname().equals(name.trim()))
-				return panel;
+			for(String sn : panel.getShortname())
+				if (sn.equals(name.trim()))
+					return panel;
 			if (panel.getName().equals(name.trim()))
 				return panel;
 
@@ -147,7 +128,8 @@ public class Algorithm {
 	public static ArrayList<String> getShortnames() {
 		ArrayList<String> list = new ArrayList<String>();
 		for (AbstractAlgorithmPanel algo : getAvailableAlgorithms()) {
-			list.add(algo.getShortname());
+			for(String sn : algo.getShortname())
+				list.add(sn);
 		}
 		return list;
 	}

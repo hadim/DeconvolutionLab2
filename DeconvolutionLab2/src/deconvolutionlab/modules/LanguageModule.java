@@ -150,8 +150,6 @@ public class LanguageModule extends AbstractModule implements ActionListener {
 		if (algo == null)
 			return "ERROR";
 		String s = algo.getShortname();
-		if (s.equalsIgnoreCase("lw+"))
-			s = "NNLW";
 		String param = algo.getParametersAsString();
 		script += p("% this function returns the deconvolved image as an 3D matrix");
 		script += p("% image is a 3D matrix containing the image");

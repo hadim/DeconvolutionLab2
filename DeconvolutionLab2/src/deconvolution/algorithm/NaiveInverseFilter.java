@@ -53,13 +53,8 @@ public class NaiveInverseFilter extends AbstractAlgorithm implements Callable<Re
 	}
 
 	@Override
-	public String getShortname() {
-		return "NIF";
-	}
-
-	@Override
 	public String getName() {
-		return "Naive Inverse Filter";
+		return "Naive Inverse Filter [NIF | IF]";
 	}
 
 	@Override

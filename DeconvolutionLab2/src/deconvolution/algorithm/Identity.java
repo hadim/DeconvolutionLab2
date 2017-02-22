@@ -48,12 +48,7 @@ public class Identity extends AbstractAlgorithm implements Callable<RealSignal> 
 
 	@Override
 	public String getName() {
-		return "Identity";
-	}
-	
-	@Override
-	public String getShortname() {
-		return "I";
+		return "Identity (copy)";
 	}
 	
 	@Override

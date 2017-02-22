@@ -53,11 +53,8 @@ import lab.component.CustomizedTable;
 public class BatchModule extends AbstractModule implements MouseListener, ActionListener {
 
 	private CustomizedTable	table;
-	private JButton			bnScript;
-	private JButton			bnRunAll;
-	private JButton			bnRunJob;
-	private JButton			bnLaunchAll;
-	private JButton			bnLaunchJob;
+	private JButton			bnRun;
+	private JButton			bnLaunch;
 
 	public BatchModule(boolean expanded) {
 		super("Batch", "", "", "", expanded);
@@ -71,11 +68,8 @@ public class BatchModule extends AbstractModule implements MouseListener, Action
 	@Override
 	public JPanel buildExpandedPanel() {
 
-		bnScript = new JButton("Create Script (not yet implemented)");
-		bnRunAll = new JButton("Run All Jobs");
-		bnRunJob = new JButton("Run Selected Jobs");
-		bnLaunchAll = new JButton("Launch All Jobs");
-		bnLaunchJob = new JButton("Launch Selected Jobs");
+		bnRun = new JButton("Run Jobs");
+		bnLaunch = new JButton("Launch Jobs");
 
 		ArrayList<CustomizedColumn> columns = new ArrayList<CustomizedColumn>();
 		columns.add(new CustomizedColumn("Job", String.class, 120, false));
@@ -90,51 +84,37 @@ public class BatchModule extends AbstractModule implements MouseListener, Action
 
 		JToolBar pn = new JToolBar("Controls Batch");
 		pn.setBorder(BorderFactory.createEmptyBorder());
-		pn.setLayout(new GridLayout(1, 5));
+		pn.setLayout(new GridLayout(1, 2));
 		pn.setFloatable(false);
-		pn.add(bnScript);
-		pn.add(bnRunAll);
-		pn.add(bnRunJob);
-		pn.add(bnLaunchAll);
-		pn.add(bnLaunchJob);
+		pn.add(bnRun);
+		pn.add(bnLaunch);
 
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(table.getPane(100, 100), BorderLayout.CENTER);
 		panel.add(pn, BorderLayout.SOUTH);
 		getAction1Button().addActionListener(this);
 
-		bnScript.addActionListener(this);
-		bnRunAll.addActionListener(this);
-		bnRunJob.addActionListener(this);
-		bnLaunchAll.addActionListener(this);
-		bnLaunchJob.addActionListener(this);
+		bnRun.addActionListener(this);
+		bnLaunch.addActionListener(this);
 		return panel;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
-		if (e.getSource() == bnRunJob) {
+		if (e.getSource() == bnRun) {
+			if (table.getSelectedRows().length == 0)
+				table.setColumnSelectionInterval(0, table.getRowCount());
 			int rows[] = table.getSelectedRows();
-			for (int row : rows) {
+			for (int row : rows)
 				new Deconvolution("Batch" + table.getCell(row, 0), table.getCell(row, 1)).deconvolve();
-			}
 		}
-		else if (e.getSource() == bnLaunchJob) {
+		else if (e.getSource() == bnLaunch) {
+			if (table.getSelectedRows().length == 0)
+				table.setColumnSelectionInterval(0, table.getRowCount());
 			int rows[] = table.getSelectedRows();
-			for (int row : rows) {
+			for (int row : rows)
 				new Deconvolution("Batch " + table.getCell(row, 0), table.getCell(row, 1)).launch();
-			}
-		}
-		else if (e.getSource() == bnRunAll) {
-			for (int row = 0; row < table.getRowCount(); row++) {
-				new Deconvolution("Batch " + table.getCell(row, 0), table.getCell(row, 1)).deconvolve();
-			}
-		}
-		else if (e.getSource() == bnLaunchAll) {
-			for (int row = 0; row < table.getRowCount(); row++) {
-				new Deconvolution("Batch " + table.getCell(row, 0), table.getCell(row, 1)).launch();
-			}
 		}
 	}
 
