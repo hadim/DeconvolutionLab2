@@ -91,8 +91,8 @@ public class Command {
 		boolean flagSystem = true;
 		boolean flagDisplay = true;
 		boolean flagMultithreading = true;
-		int monitor = 4;
-		int stats = 4;
+		int monitor = 3;
+		int stats = 0;
 		Verbose verbose = Verbose.Log;
 		String path = System.getProperty("user.dir");
 		Controller controller = new Controller();
@@ -100,7 +100,7 @@ public class Command {
 		Padding pad = new Padding();
 		Apodization apo = new Apodization();
 		double norm = 1.0;
-		AbstractFFTLibrary fft = FFT.getLibraryByName("Academic");
+		AbstractFFTLibrary fft = FFT.getFastestFFT();
 
 		ArrayList<Token> tokens = parse(command);
 		for (Token token : tokens) {
@@ -372,18 +372,6 @@ public class Command {
 				m += 2;
 		}
 		return m;
-	}
-
-	
-	public static boolean decodeMonitorConsole(Token token) {
-		String p = token.parameters.toLowerCase();
-		if (p.startsWith("no"))
-			return false;
-		if (p.equals("0"))
-			return false;
-		if (p.equals("false"))
-			return false;
-		return true;
 	}
 
 	public static boolean decodeSystem(Token token) {

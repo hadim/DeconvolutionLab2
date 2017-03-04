@@ -31,14 +31,14 @@
 
 package signal;
 
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 
-import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
 
 public class RealSignal extends Signal implements SignalListener {
 
+	private BufferedImage preview;
+	
 	public RealSignal(String name, int nx, int ny, int nz) {
 		super(name, nx, ny, nz);
 		this.data = new float[nz][];
@@ -50,20 +50,12 @@ public class RealSignal extends Signal implements SignalListener {
 				notify(name, k * 100.0 / nz);
 		}
 		notify(name, 100);
-		SignalCollector.alloc(name, nx, ny, ny, false);
-		this.addSignalListener(this);
+		SignalCollector.alloc(this);//name, nx, ny, ny, false);
 	}
 
 	@Override
 	public void notify(String name, double progress) {
 		SignalCollector.setProgress(progress);
-	}
-
-	@Override
-	public void finalize() {
-		data = null;
-		System.gc();
-		SignalCollector.free(name, nx, ny, ny, false);
 	}
 
 	public void copy(RealSignal source) {
@@ -483,19 +475,6 @@ public class RealSignal extends Signal implements SignalListener {
 		return signal;
 	}
 
-	public BufferedImage createPreviewMIPZ() {
-		RealSignal mip = createMIPZ();
-		mip.rescale(Monitors.createDefaultMonitor());
-		BufferedImage img = new BufferedImage(nx, ny, BufferedImage.TYPE_INT_ARGB);
-		int alpha = (255 << 24);
-		for (int i = 0; i < nx; i++)
-			for (int j = 0; j < ny; j++) {
-			int v = (int)mip.data[0][i + j * nx];
-				img.setRGB(i, j, alpha | (v << 16) | (v << 8) | v);
-			}
-		return img;
-	}
-
 	public RealSignal createOrthoview() {
 		return createOrthoview(nx / 2, ny / 2, nz / 2);
 	}
@@ -576,19 +555,6 @@ public class RealSignal extends Signal implements SignalListener {
 		return view;
 	}
 
-	public RealSignal createMIPZ() {
-		String n = "mipz(" + name + ")";
-		RealSignal view = new RealSignal(n, nx, ny, 1);
-		for (int x = 0; x < nx; x++)
-			for (int y = 0; y < ny; y++) {
-				int index = x + nx * y;
-				for (int k = 0; k < nz; k++) {
-					view.data[0][index] = Math.max(view.data[0][index], data[k][x + nx * y]);
-				}
-			}
-		return view;
-	}
-
 	public RealSignal createMontage() {
 		String n = "planar(" + name + ")";
 		int nr = (int) Math.sqrt(nz);
@@ -653,6 +619,34 @@ public class RealSignal extends Signal implements SignalListener {
 	@Override
 	public String toString() {
 		return "Real Signal [" + nx + ", " + ny + ", " + nz + "]";
+	}
+	
+	public BufferedImage preview() {
+		if (preview != null)
+			return preview;
+		int nxy = nx*ny;
+		float[] pixels = new float[nx*ny];
+		for (int i = 0; i < nxy; i++) 
+			for (int k = 0; k < nz; k++) {
+				pixels[i] = Math.max(pixels[i], data[k][i]);
+		}
+		float max = -Float.MAX_VALUE;
+		float min = Float.MAX_VALUE;
+		for (int i = 0; i < nxy; i++) {
+			if (pixels[i] > max)
+				max = pixels[i];
+			if (pixels[i] < min)
+				min = pixels[i];
+		}
+		float a = 255f / Math.max(max-min, (float)Operations.epsilon);
+		preview = new BufferedImage(nx, ny, BufferedImage.TYPE_INT_ARGB);
+		int alpha = (255 << 24);
+		for (int i = 0; i < nx; i++)
+		for (int j = 0; j < ny; j++) {
+			int v = (int)(a*(pixels[i+j*nx] - min));
+			preview.setRGB(i, j, alpha | (v << 16) | (v << 8) | v);
+		}
+		return preview;
 	}
 
 }

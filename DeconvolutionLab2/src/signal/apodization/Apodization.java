@@ -118,36 +118,27 @@ public class Apodization {
 	public static AbstractApodization getDefault() {
 		return new UniformApodization();
 	}
-	
-	public double estimateLostEnergy(int size) {
-		RealSignal in = new Constant().intensity(0, 1).generate(size, size, size);
-		double ein = size * size * size;
-		double eout = apodize(Monitors.createDefaultMonitor(), in).getEnergy();
-		return 1.0 - (ein - eout) / ein;
-	}
-	
-	public RealSignal apodize(Monitors monitors, RealSignal input) {
+		
+	public void apodize(Monitors monitors, RealSignal signal) {
 		if (apoX instanceof UniformApodization && 
 			apoY instanceof UniformApodization && 
 			apoZ instanceof UniformApodization) {
-			return input;
+			return;
 		}
 		if (monitors != null)
 			monitors.log("Apodization (" + apoX.getName() + ", " + apoY.getName() + ", " + apoZ.getName() + ")");
-		String name = " apo( " + input.name + ")";
-		RealSignal out = new RealSignal(name, input.nx, input.ny, input.nz);
-		for(int i=0; i<input.nx; i++) {
-			double cx = apoX.apodize(i, input.nx);
-			for(int j=0; j<input.ny; j++) {
-				double cy =  apoY.apodize(j, input.ny);
-				int index = i + input.nx*j;
-				for(int k=0; k<input.nz; k++) {
-					double cz = apoZ.apodize(k, input.nz);
-					out.data[k][index] = (float)(cx * cy * cz * input.data[k][index]);
+		signal.setName("apo(" + signal.name + ")");
+		for(int i=0; i<signal.nx; i++) {
+			double cx = apoX.apodize(i, signal.nx);
+			for(int j=0; j<signal.ny; j++) {
+				double cy =  apoY.apodize(j, signal.ny);
+				int index = i + signal.nx*j;
+				for(int k=0; k<signal.nz; k++) {
+					double cz = apoZ.apodize(k, signal.nz);
+					signal.data[k][index] = (float)(cx * cy * cz * signal.data[k][index]);
 				}
 			}
 		}
-		return out;
 	}
 	
 	@Override

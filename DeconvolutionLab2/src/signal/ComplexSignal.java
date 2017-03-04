@@ -44,19 +44,12 @@ public class ComplexSignal extends Signal implements SignalListener {
 				notify(name, k*100.0/nz);
 		}
 		notify(name, 100);
-		SignalCollector.alloc(name, nx, ny, ny, true);
+		SignalCollector.alloc(this);//name, nx, ny, ny, true);
 	}
 
 	@Override
 	public void notify(String name, double progress) {
 		SignalCollector.setProgress(progress);
-	}
-	
-	@Override
-	public void finalize() {
-		data = null;
-		System.gc();
-		SignalCollector.free(name, nx, ny, ny, true);
 	}
 
 	public void set(RealSignal real) {

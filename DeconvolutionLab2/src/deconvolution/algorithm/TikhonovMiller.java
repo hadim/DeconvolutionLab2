@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;
+import signal.SignalCollector;
 import signal.factory.complex.ComplexSignalFactory;
 
 public class TikhonovMiller extends AbstractAlgorithm implements Callable<RealSignal> {
@@ -57,20 +58,38 @@ public class TikhonovMiller extends AbstractAlgorithm implements Callable<RealSi
 		ComplexSignal A = Operations.delta(gamma, H);
 		ComplexSignal L = ComplexSignalFactory.laplacian(Y.nx, Y.ny, Y.nz);
 		ComplexSignal L2 = Operations.multiplyConjugate(lambda*gamma, L, L);
+		SignalCollector.free(L);
 		A.minus(L2);
+		SignalCollector.free(L2);
 		ComplexSignal G = Operations.multiplyConjugate(gamma, H, Y);
+		SignalCollector.free(H);
+		SignalCollector.free(Y);
 		ComplexSignal X = G.duplicate();
 		while(!controller.ends(X)) {
 			X.times(A);
 			X.plus(G);
 		}
+		SignalCollector.free(A);
+		SignalCollector.free(G);
 		RealSignal x = fft.inverse(X);
+		SignalCollector.free(X);
+
 		return x;
 	}
-	
+
+	@Override
+	public int getComplexityNumberofFFT() {
+		return 3 + (controller.needSpatialComputation() ? 2 * controller.getIterationMax() : 0);
+	}
+
 	@Override
 	public String getName() {
 		return "Tikhonov-Miller [TM]";
+	}
+
+	@Override
+	public double getMemoryFootprintRatio() {
+		return 10.0;
 	}
 
 	@Override

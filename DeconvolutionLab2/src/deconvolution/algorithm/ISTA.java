@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;
+import signal.SignalCollector;
 import wavelets.AbstractWavelets;
 import wavelets.Wavelets;
 
@@ -64,6 +65,8 @@ public class ISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 		ComplexSignal H = fft.transform(h);
 		ComplexSignal A = Operations.delta(gamma, H);
 		ComplexSignal G = Operations.multiplyConjugate(gamma, H, Y);
+		SignalCollector.free(Y);
+		SignalCollector.free(H);
 	
 		ComplexSignal Z = G.duplicate();
 		RealSignal x  = fft.inverse(G);
@@ -77,6 +80,11 @@ public class ISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 			fft.inverse(Z, z);
 			wavelets.shrinkage(threshold, z, x, buffer);
 		}
+		SignalCollector.free(A);
+		SignalCollector.free(Z);
+		SignalCollector.free(G);
+		SignalCollector.free(z);
+		SignalCollector.free(buffer);
 		return x;
 	}
 	
@@ -93,6 +101,16 @@ public class ISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 	@Override
 	public String getName() {
 		return "Iterative Shrinkage-Thresholding [ISTA]";
+	}
+
+	@Override
+	public int getComplexityNumberofFFT() {
+		return 3 + 4 * controller.getIterationMax();
+	}
+	
+	@Override
+	public double getMemoryFootprintRatio() {
+		return 13.0;
 	}
 
 	@Override

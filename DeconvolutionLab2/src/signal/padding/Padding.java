@@ -35,6 +35,7 @@ import java.util.ArrayList;
 
 import deconvolutionlab.monitor.Monitors;
 import signal.RealSignal;
+import signal.SignalCollector;
 
 public class Padding {
 	
@@ -179,10 +180,8 @@ public class Padding {
 		int ox = (lx - nx) / 2;
 		int oy = (ly - ny) / 2;
 		int oz = (lz - nz) / 2;
-		String name = " pad( " + input.name + ")";
-
+		String name = "pad(" + input.name + ")";
 		RealSignal large = new RealSignal(name, lx, ly, lz);
-		
 		for(int k=0; k<nz; k++) {
 			float in[] = input.data[k];
 			float lpix[] = large.data[k+oz];
@@ -195,7 +194,7 @@ public class Padding {
 	
 	public RealSignal crop(Monitors monitors, RealSignal large) {
 		if (nx == -1 || ny == -1  || nz == -1) {
-			return large;
+			return large.duplicate();
 		}
 		int lx = large.nx;
 		int ly = large.ny;

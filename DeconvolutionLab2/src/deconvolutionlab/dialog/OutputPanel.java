@@ -39,7 +39,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -56,7 +55,7 @@ import lab.component.GridPanel;
 import lab.component.HTMLPane;
 import lab.component.SpinnerRangeInteger;
 
-public class OutputDialog extends JDialog implements ActionListener, ChangeListener {
+public class OutputPanel extends JPanel implements ActionListener, ChangeListener {
 
 	private JComboBox<String>	cmbDynamic	= new JComboBox<String>(new String[] { "intact", "rescaled", "normalized", "clipped" });
 	private JComboBox<String>	cmbType		= new JComboBox<String>(new String[] { "float", "short", "byte" });
@@ -86,8 +85,7 @@ public class OutputDialog extends JDialog implements ActionListener, ChangeListe
 	
 	private static int count	= 1;
 	
-	public OutputDialog(View view) {
-		super(new JFrame(), "Create a new output");
+	public OutputPanel(View view) {
 		this.view = view;
 		lblBit.setBorder(BorderFactory.createEtchedBorder());
 		lblIter.setBorder(BorderFactory.createEtchedBorder());
@@ -115,7 +113,7 @@ public class OutputDialog extends JDialog implements ActionListener, ChangeListe
 
 		GridPanel main = new GridPanel(false);
 		main.place(1, 0, 2, 1, pn);
-	
+
 		if (view == View.ORTHO || view == View.FIGURE) {
 			pn.place(9, 1, 3, 1, chkCenter);
 			pnOrtho = new GridPanel("Keypoint");
@@ -147,11 +145,9 @@ public class OutputDialog extends JDialog implements ActionListener, ChangeListe
 		bnCancel.addActionListener(this);
 		add(main);
 		update();
-		pack();
-		GUI.center(this);
-		setModal(true);
-	}
 	
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == chkCenter) {
@@ -169,7 +165,6 @@ public class OutputDialog extends JDialog implements ActionListener, ChangeListe
 				lblBit.setText("8-bits");
 		}
 		else if (e.getSource() == bnCancel) {
-			dispose();
 			cancel = true;
 			return;
 		}
@@ -189,7 +184,6 @@ public class OutputDialog extends JDialog implements ActionListener, ChangeListe
 				int pz = spnZ.get();
 				out = new Output(view, show, save, freq, name, dynamic, type, px, py, pz);
 			}
-			dispose();
 			cancel = false;
 		}
 	}
@@ -223,7 +217,7 @@ public class OutputDialog extends JDialog implements ActionListener, ChangeListe
 			for (Component c : pnOrtho.getComponents())
 				c.setEnabled(b);
 		}
-		pack();
+		//pack();
 	}
 
 	@Override

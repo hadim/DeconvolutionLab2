@@ -41,8 +41,6 @@ public class Signal {
 	public float	data[][];
 	public String	name = "untitled";
 	
-	private ArrayList<SignalListener> listeners = new ArrayList<SignalListener>();
-	
 	public Signal(String name, int nx, int ny, int nz) {
 		this.name = name;
 		this.nx = nx;
@@ -50,17 +48,12 @@ public class Signal {
 		this.nz = nz;
 	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 	public String dimAsString() {
 		return nx + "x" + ny + "x" + nz + " ";
-	}
-	
-	public void addSignalListener(SignalListener listener) {
-		listeners.add(listener);
-	}
-	
-	public void notify(String name, double progress) {
-		for(SignalListener listener : listeners)
-			listener.notify(name, progress);
 	}
 	
 }

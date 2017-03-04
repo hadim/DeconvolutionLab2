@@ -33,10 +33,13 @@ package deconvolutionlab;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Pattern;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import deconvolutionlab.Imaging.ContainerImage;
 import deconvolutionlab.monitor.Monitors;
@@ -50,6 +53,7 @@ import plugins.sage.deconvolutionlab.IcyImager;
 import signal.ComplexComponent;
 import signal.ComplexSignal;
 import signal.RealSignal;
+import signal.factory.SignalFactory;
 import signal.factory.Sphere;
 
 public class Lab {
@@ -181,7 +185,50 @@ public class Lab {
 		monitors.log("Save Real Signal " + filename);
 	}
 
-	public static RealSignal open(Monitors monitors, String filename) {
+	public static RealSignal createRealSignal(Monitors monitors, String arg, String cmd, String path) {
+
+		RealSignal signal = null;
+		if (arg.equalsIgnoreCase("synthetic")) {
+			signal = SignalFactory.createFromCommand(cmd);
+		}
+
+		if (arg.equalsIgnoreCase("platform")) {
+			signal = getImager().create(cmd);
+		}
+	
+		if (arg.equalsIgnoreCase("file")) {
+			File file = new File(path + File.separator + cmd);
+			if (file != null) {
+				if (file.isFile())
+					signal = Lab.openFile(monitors, path + File.separator + cmd);
+			}
+			if (signal == null) {
+				File local = new File(cmd);
+				if (local != null) {
+					if (local.isFile())
+						signal = Lab.openFile(monitors, cmd);
+				}
+			}
+		}
+		
+		if (arg.equalsIgnoreCase("dir") || arg.equalsIgnoreCase("directory")) {
+			File file = new File(path + File.separator + cmd);
+			if (file != null) {
+				if (file.isDirectory())
+					signal = Lab.openDir(monitors, path + File.separator + cmd);
+			}
+			if (signal == null) {
+				File local = new File(cmd);
+				if (local != null) {
+					if (local.isDirectory())
+						signal = Lab.openDir(monitors, cmd);
+				}
+			}
+		}
+		return signal;
+	}
+
+	public static RealSignal openFile(Monitors monitors, String filename) {
 		RealSignal signal = imaging.open(filename);
 		if (signal == null)
 			monitors.error("Unable to open " + filename);
@@ -190,8 +237,9 @@ public class Lab {
 		return signal;
 	}
 
+	
 	public static RealSignal openDir(Monitors monitors, String path) {
-
+		
 		String parts[] = path.split(" pattern ");
 		String dirname = path;
 		String regex = "";
@@ -199,9 +247,7 @@ public class Lab {
 			dirname = parts[0].trim();
 			regex = parts[1].trim();
 		}
-
 		File file = new File(dirname + File.separator);
-
 		if (!file.isDirectory()) {
 			monitors.error("Dir " + dirname + " is not a directory.");
 			return null;
@@ -306,6 +352,15 @@ public class Lab {
 		imaging.setVisible(dialog, modal);
 	}
 	
+	public static void setVisible(JPanel panel, String name, int x, int y) {
+		JFrame frame = new JFrame(name);
+		frame.getContentPane().add(panel);
+		frame.pack();
+		frame.setLocation(x, y);
+		frame.setVisible(true);
+		frames.add(frame);
+	}
+
 	public static void setVisible(JFrame frame) {
 		frames.add(frame);
 		frame.setVisible(true);
@@ -319,4 +374,8 @@ public class Lab {
 			if (dialog != null)
 				dialog.dispose();
 	}
+
+
+	
+
 }

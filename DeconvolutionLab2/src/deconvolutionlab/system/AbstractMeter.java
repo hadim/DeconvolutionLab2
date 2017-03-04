@@ -92,10 +92,8 @@ public abstract class AbstractMeter extends JButton {
 	
 	public void update() {
 		if (table == null)
-			return;
-		
+			return;		
 		setDetail();
-		System.out.println("SetDetail" + getName());
 	}
 	
 	protected void add(int i, String row[]) {	

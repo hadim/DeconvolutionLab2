@@ -43,11 +43,11 @@ import lab.component.SpinnerRangeDouble;
 import lab.component.SpinnerRangeInteger;
 import lab.tools.NumFormat;
 
-public class LandweberPositivityPanel extends AbstractAlgorithmPanel implements ChangeListener {
+public class StarkParkerPanel extends AbstractAlgorithmPanel implements ChangeListener {
 
 	private SpinnerRangeInteger	spnIter	= new SpinnerRangeInteger(10, 1, 99999, 1);
 	private SpinnerRangeDouble	spnStep	= new SpinnerRangeDouble(1, 0, 2, 0.1);
-	private LandweberPositivity	algo	= new LandweberPositivity(10, 1);
+	private StarkParker			algo	= new StarkParker(10, 1);
 
 	@Override
 	public JPanel getPanelParameters() {
@@ -92,18 +92,19 @@ public class LandweberPositivityPanel extends AbstractAlgorithmPanel implements 
 
 	@Override
 	public String[] getShortname() {
-		return new String[] {"NLLS", "LW+"};
+		return new String[] { "BVLS", "SP" };
 	}
 
 	@Override
 	public String getDocumentation() {
 		String s = "";
 		s += "<h1>" + getName() + "</h1>";
-		s += "<p>Iterative: " + algo.isIterative() + "</p>";
-		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
-		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
-		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		s += "<p>Shortname: " + getShortname() + "</p>";
+		s += "<h1>Stark-Parker Algorithm</p>";
+		s += "<h2>Shortname: BVLS or SP</p>";
+		s += "<p>This algorithm also known as Stark-Parker algorithm is a least squares variant with a bounded-variable constraint.</p>";
+		s += "<p>In this implementation, the bounds are the bounds of the input image.</p>";
+		s += "<p></p>";
+		s += "<p>Reference: Stark and Parker, Computational Statistics <b>10</b>, 1995.</p>";
 		return s;
 	}
 }

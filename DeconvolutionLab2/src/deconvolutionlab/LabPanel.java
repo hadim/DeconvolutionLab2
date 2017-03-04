@@ -199,7 +199,6 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 			String job = language.getJobName() + " " + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
 			Deconvolution d = new Deconvolution(job, Command.command());
 			d.deconvolve();
-//			deconvolutions.add(d);
 		}
 	}
 
@@ -268,10 +267,11 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 
 	private void sizePanel(GroupedModulePanel panel) {
 		Dimension dim = getSize();
-		int hpc = 60;
+		int hpc = 70;
 		int npc = hpc * panel.getModules().size();
 		Dimension small = new Dimension(dim.width, hpc);
 		Dimension large = new Dimension(dim.width, dim.height - npc);
+		setMinimumSize(new Dimension(Constants.widthGUI, 4*hpc));
 		for (AbstractModule module : panel.getModules()) {
 			if (module.isExpanded()) {
 				module.setPreferredSize(large);
@@ -280,7 +280,6 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 				module.getExpandedPanel().setPreferredSize(large);
 				module.getExpandedPanel().setMaximumSize(large);
 				module.getExpandedPanel().setMinimumSize(small);
-
 			}
 			else {
 				module.setPreferredSize(small);

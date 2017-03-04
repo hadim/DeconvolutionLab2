@@ -52,6 +52,16 @@ public class Identity extends AbstractAlgorithm implements Callable<RealSignal> 
 	}
 	
 	@Override
+	public double getMemoryFootprintRatio() {
+		return 5.0;
+	}
+	
+	@Override
+	public int getComplexityNumberofFFT() {
+		return 1;
+	}
+	
+	@Override
 	public boolean isRegularized() {
 		return false;
 	}

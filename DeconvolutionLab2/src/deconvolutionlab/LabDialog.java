@@ -68,7 +68,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 			setLocation(rect.x, rect.y);
 		if (rect.width > 0 && rect.height > 0)
 			setPreferredSize(new Dimension(rect.width, rect.height));
-
+		this.setMinimumSize(new Dimension(500, 400));
 	}
 
 	@Override
@@ -135,6 +135,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 	@Override
 	public void componentShown(ComponentEvent e) {
 		panel.sizeModule();
+		pack();
 	}
 
 	@Override

@@ -35,6 +35,7 @@ import java.util.ArrayList;
 
 import javax.swing.SwingWorker;
 
+import deconvolution.Command;
 import signal.RealSignal;
 
 public abstract class SignalFactory {
@@ -65,6 +66,39 @@ public abstract class SignalFactory {
 				return factory;
 		}
 		return null;
+	}
+	
+	public static RealSignal createFromCommand(String cmd) {
+		String parts[] = cmd.split(" ");
+		if (parts.length <= 0)
+			return null;
+		String shape = parts[0];
+		for (String name : SignalFactory.getAllName()) {
+			if (shape.equalsIgnoreCase(name.toLowerCase())) {
+				double params[] = Command.parseNumeric(cmd);
+				SignalFactory factory = SignalFactory.getFactoryByName(shape);
+				if (factory == null)
+					return null;
+				double amplitude = params.length > 0 ? params[0] : 1;
+				double background = params.length > 1 ? params[1] : 0;
+				factory.intensity(background, amplitude);
+				int np = factory.getParameters().length;
+				double[] features = new double[np];
+				for (int i = 0; i < Math.min(np, params.length); i++)
+					features[i] = params[i + 2];
+				factory.setParameters(features);
+				int nx = params.length > np + 2 ? (int) Math.round(params[np + 2]) : 128;
+				int ny = params.length > np + 3 ? (int) Math.round(params[np + 3]) : 128;
+				int nz = params.length > np + 4 ? (int) Math.round(params[np + 4]) : 128;
+				double cx = params.length > np + 5 ? params[np + 5] : 0.5;
+				double cy = params.length > np + 6 ? params[np + 6] : 0.5;
+				double cz = params.length > np + 7 ? params[np + 7] : 0.5;
+				factory = factory.center(cx, cy, cz);
+				return factory.generate(nx, ny, nz);
+			}
+		}
+		return null;
+
 	}
 
 	public static ArrayList<String> getAllName() {

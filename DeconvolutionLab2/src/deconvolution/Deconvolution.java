@@ -47,12 +47,11 @@ import deconvolutionlab.monitor.StatusMonitor;
 import deconvolutionlab.monitor.TableMonitor;
 import deconvolutionlab.monitor.Verbose;
 import deconvolutionlab.system.SystemInfo;
-import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 import lab.tools.NumFormat;
 import signal.RealSignal;
+import signal.SignalCollector;
 import signal.apodization.Apodization;
-import signal.factory.SignalFactory;
 import signal.padding.Padding;
 
 public class Deconvolution implements Runnable {
@@ -61,12 +60,12 @@ public class Deconvolution implements Runnable {
 		DIE, ALIVE, KILL
 	};
 
-	private AbstractAlgorithm					algo				= null;
+	public AbstractAlgorithm					algo				= null;
 
 	private String								path;
-	private double								norm				= 1.0;
-	private Padding								pad					= new Padding();
-	private Apodization							apo					= new Apodization();
+	public double								norm				= 1.0;
+	public Padding								pad					= new Padding();
+	public Apodization							apo					= new Apodization();
 	private OutputCollection					outs;
 	private Verbose								verbose				= Verbose.Log;
 	private AbstractFFTLibrary					fft;
@@ -76,7 +75,7 @@ public class Deconvolution implements Runnable {
 	private boolean								flagMultithreading	= true;
 	private boolean								flagSystem			= true;
 
-	private Monitors							monitors			= new Monitors();
+	public Monitors								monitors			= new Monitors();
 
 	private String								command				= "";
 	private boolean								live				= false;
@@ -86,31 +85,27 @@ public class Deconvolution implements Runnable {
 	private String								name				= "";
 
 	private ArrayList<DeconvolutionListener>	listeners			= new ArrayList<DeconvolutionListener>();	
-	private boolean								imageLoaded			= false;
-	private RealSignal							image;
-	private RealSignal							psf;
+	public RealSignal							image;
+	public RealSignal							psf;
 	private RealSignal							deconvolvedImage;
 
 	private Finish								finish				= Finish.DIE;
 	private DeconvolutionDialog					dialog;
 	
 	private TableStats tableStats;
-	private TableMonitor tableMonitor;
-
+	
 	public Deconvolution(String name, String command) {
 		this.name = name; 
-		tableStats = new TableStats(name, Constants.widthGUI, 240, path, (flagStats & 2) == 2);
-		tableMonitor = new TableMonitor(name , Constants.widthGUI, 240);
 		this.finish = Finish.DIE;
 		setCommand(command);
+		tableStats = new TableStats(name, Constants.widthGUI, 240, path, (flagStats & 2) == 2);
 	}
 
 	public Deconvolution(String name, String command, Finish finish) {
 		this.name = name;
-		tableStats = new TableStats(name, Constants.widthGUI, 240, path, (flagStats & 2) == 2);
-		tableMonitor = new TableMonitor(name , Constants.widthGUI, 240);
 		this.finish = finish;
 		setCommand(command);
+		tableStats = new TableStats(name, Constants.widthGUI, 240, path, (flagStats & 2) == 2);
 	}
 
 	public void setCommand(String command) {
@@ -119,22 +114,7 @@ public class Deconvolution implements Runnable {
 		this.command = command;
 		if (name.equals("") && algo != null)
 			name = algo.getShortname();
-		monitors = Monitors.createDefaultMonitor();
 		live = false;
-	}
-
-	public void close() {
-		if (dialog != null)
-			dialog.dispose();
-		finalize();
-	}
-	
-	public void finalize() {
-		algo = null;
-		image = null;
-		psf = null;
-		monitors = null;
-		System.gc();
 	}
 
 	/**
@@ -146,7 +126,6 @@ public class Deconvolution implements Runnable {
 	public RealSignal deconvolve(RealSignal image, RealSignal psf) {
 		this.image = image;
 		this.psf = psf;
-		imageLoaded = true;
 		runDeconvolve();
 		return deconvolvedImage;
 	}
@@ -154,7 +133,6 @@ public class Deconvolution implements Runnable {
 	public RealSignal deconvolve() {
 		this.image = null;
 		this.psf = null;
-		imageLoaded = false;
 		runDeconvolve();
 		return deconvolvedImage;
 	}
@@ -167,12 +145,16 @@ public class Deconvolution implements Runnable {
 	 */
 	private void runDeconvolve() {
 		if ((flagMonitor & 2) == 2) {
+			TableMonitor tableMonitor = new TableMonitor(name , Constants.widthGUI, 240);
 			monitors.add(tableMonitor);
-			tableMonitor.show();
+			Lab.setVisible(tableMonitor.getPanel(), "Monitor of " + name, 10, 10);
 		}
 
+		if ((flagMonitor & 1) == 1) 
+			monitors.add(new ConsoleMonitor());
+
 		if ((flagStats & 1) == 1) {
-			tableStats.show();
+			Lab.setVisible(tableStats.getPanel(), "Stats of " + name, 50, 50);
 		}
 
 		if (fft == null) {
@@ -193,6 +175,7 @@ public class Deconvolution implements Runnable {
 		else {
 			run();
 		}
+		
 	}
 
 	/**
@@ -202,29 +185,27 @@ public class Deconvolution implements Runnable {
 	 *            Name of the job of deconvolution
 	 */
 	public void launch() {
-		dialog = new DeconvolutionDialog(DeconvolutionDialog.Module.ALL, this, tableMonitor, tableStats);
-
-		Lab.setVisible(dialog, false);
 		monitors = new Monitors();
-		monitors.add(new StatusMonitor(dialog.getProgressBar()));
-
+		TableMonitor tableMonitor = null;
 		if ((flagMonitor & 2) == 2) {
+			tableMonitor = new TableMonitor(name , Constants.widthGUI, 240);
 			monitors.add(tableMonitor);
 		}
+		if ((flagMonitor & 1) == 1)
+			monitors.add(new ConsoleMonitor());
+		if (flagStats == 0) {
+			tableStats = null;
+		}
 
-	}
+		dialog = new DeconvolutionDialog(DeconvolutionDialog.Module.ALL, this, tableMonitor, tableStats);
+		monitors.add(new StatusMonitor(dialog.getProgressBar()));
 
-	public Monitors createMonitors1() {
-		Monitors monitors = new Monitors();
-		return monitors;
+		Lab.setVisible(dialog, false);
 	}
 
 	@Override
 	public void run() {
 		double chrono = System.nanoTime();
-
-		if ((flagMonitor & 1) == 1) 
-			monitors.add(new ConsoleMonitor());
 
 		if (flagSystem)
 			SystemInfo.activate();
@@ -238,8 +219,8 @@ public class Deconvolution implements Runnable {
 
 		report.add("Path", checkPath(path));
 		monitors.log("Path: " + checkPath(path));
-
-		if (!imageLoaded)
+		
+		if (image == null)
 			image = openImage();
 
 		if (image == null) {
@@ -252,8 +233,7 @@ public class Deconvolution implements Runnable {
 		report.add("Image", image.dimAsString());
 		monitors.log("Image: " + image.dimAsString());
 
-		if (!imageLoaded)
-			psf = openPSF();
+		psf = openPSF();
 
 		if (psf == null) {
 			monitors.error("PSF: not valid");
@@ -300,7 +280,7 @@ public class Deconvolution implements Runnable {
 		for (DeconvolutionListener listener : listeners)
 			listener.finish();
 
-		report.add("End", algo.getName() + " in " + NumFormat.time(System.nanoTime() - chrono));
+		report.add("End", NumFormat.time(System.nanoTime() - chrono));
 
 		if (flagDisplay)
 			Lab.show(monitors, deconvolvedImage, "Result of " + algo.getShortname());
@@ -311,8 +291,29 @@ public class Deconvolution implements Runnable {
 		}
 
 		if (finish == Finish.DIE)
-			finalize();
+			die();
 	}
+
+	
+	public void close() {
+		if (dialog != null)
+			dialog.dispose();
+		SignalCollector.free(image);
+		SignalCollector.free(psf);
+		SignalCollector.free(deconvolvedImage);
+		algo = null;
+		image = null;
+		psf = null;
+		deconvolvedImage = null;
+		monitors = null;
+		System.gc();
+	}
+	
+	public void die() {
+		SignalCollector.free(image);
+		SignalCollector.free(psf);
+	}
+
 
 	/**
 	 * This methods make a recap of the deconvolution. Useful before starting
@@ -340,30 +341,30 @@ public class Deconvolution implements Runnable {
 			features.add("Constraint", controller.getConstraintAsString());
 			features.add("Padding", pad.toString());
 			features.add("Apodization", apo.toString());
-			features.add("FFT", algo.getFFT() == null ? "" : algo.getFFT().getName());
+			features.add("FFT", fft == null ? "null" : fft.getLibraryName());
 		}
 		features.add("Path", path);
 
 		String monitor = "";
 		if (flagMonitor == 0)
-			monitor = " monitor: no ";
+			monitor = "no ";
 		if (flagMonitor == 1)
-			monitor = " monitor: console (" + verbose.name().toLowerCase() + ")";
+			monitor = "console (" + verbose.name().toLowerCase() + ")";
 		if (flagMonitor == 2)
-			monitor = " monitor: table (" + verbose.name().toLowerCase() + ")";
+			monitor = "table (" + verbose.name().toLowerCase() + ")";
 		if (flagMonitor == 3)
-			monitor = " monitor: console table (" + verbose.name().toLowerCase() + ")";
+			monitor = "console table (" + verbose.name().toLowerCase() + ")";
 		String stats = "";
 		if (flagStats == 0)
-			stats = " stats: no ";
+			stats = "no ";
 		if (flagStats == 1)
-			stats = " stats: show ";
+			stats = "show ";
 		if (flagStats == 2)
-			stats = " stats: save ";
+			stats = "save ";
 		if (flagStats == 3)
-			stats = " stats: show save";
+			stats = "show save";
 		String running = "";
-		running += " multithreading: " + (flagMultithreading ? "on " : "off ");
+		running += "multithreading: " + (flagMultithreading ? "on " : "off ");
 		running += " display: " + (flagDisplay ? "on " : "off ");
 		running += " system: " + (flagSystem ? "shown" : "hidden ");
 
@@ -378,144 +379,6 @@ public class Deconvolution implements Runnable {
 		return features;
 	}
 
-	public Features checkAlgo() {
-		Features features = new Features();
-		RealSignal image = openImage();
-		if (image == null) {
-			features.add("Image", "No valid input image");
-			return features;
-		}
-		if (pad == null) {
-			features.add("Padding", "No valid padding");
-			return features;
-		}
-		if (apo == null) {
-			features.add("Apodization", "No valid apodization");
-			return features;
-		}
-		RealSignal psf = openPSF();
-		if (psf == null) {
-			features.add("Image", "No valid PSF");
-			return features;
-		}
-		if (algo == null) {
-			features.add("Algorithm", "No valid algorithm");
-			return features;
-		}
-
-		Controller controller = algo.getController();
-		if (controller == null) {
-			features.add("Controller", "No valid controller");
-			return features;
-		}
-
-		algo.setController(controller);
-		double chrono = System.nanoTime(); 
-		AbstractFFT f = fft.getDefaultFFT();
-		RealSignal slice = image.getSlice(0);
-		if (slice != null) {
-			f.init(Monitors.createDefaultMonitor(), slice.nx, slice.ny, 1);
-			f.transform(slice);
-			int n = algo.isIterative() ? controller.getIterationMax() : 1;
-			chrono = (System.nanoTime() - chrono) * 2 * slice.nz * n;
-		
-			features.add("Estimated Time", NumFormat.time(chrono) );
-		}
-		else 
-			features.add("Estimated Time", "Error" );
-		features.add("Estimated Memory", controller.getMemoryAsString());
-		features.add("Iterative", algo.isIterative()  ? "" + controller.getIterationMax() : "Direct");
-		return features;
-	}
-
-	public Features checkImage(RealSignal image) {
-		Features features = new Features();
-		if (image == null) {
-			features.add("Image", "No valid input image");
-			return features;
-		}
-		if (pad == null) {
-			features.add("Padding", "No valid padding");
-			return features;
-		}
-		if (apo == null) {
-			features.add("Apodization", "No valid apodization");
-			return features;
-		}
-
-		RealSignal signal = pad.pad(monitors, getApodization().apodize(monitors, image));
-		float stats[] = signal.getStats();
-		float stati[] = image.getStats();
-		int sizi = image.nx * image.ny * image.nz;
-		int sizs = signal.nx * signal.ny * signal.nz;
-		float totali = stati[0] * sizi;
-		float totals = stats[0] * sizs;
-		features.add("<html><b>Orignal Image</b></html>", "");
-		features.add("Size", image.dimAsString() + " " + NumFormat.bytes(sizi*4));
-		features.add("Mean (stdev)", NumFormat.nice(stati[0])  + " (" + NumFormat.nice(stati[3]) + ")");
-		features.add("Min ... Max", NumFormat.nice(stati[1]) + " ... " + NumFormat.nice(stati[2]));
-		features.add("Energy (int)", NumFormat.nice(stati[5])  + " (" + NumFormat.nice(totali) + ")");
-		
-		features.add("<html><b>Working Image</b></html>", "");
-		features.add("Size", signal.dimAsString() + " " + NumFormat.bytes(sizs*4));
-		features.add("Mean (stdev)", NumFormat.nice(stats[0])  + " (" + NumFormat.nice(stats[3]) + ")");
-		features.add("Min Max", NumFormat.nice(stats[1]) + " " + NumFormat.nice(stats[2]));
-		features.add("Energy (int)", NumFormat.nice(stats[5])  + " (" + NumFormat.nice(totals) + ")");
-		features.add("<html><b>Information</b></html>", "");
-		features.add("Size Increase ", NumFormat.nice((double)(sizs-sizi)/sizi*100.0));
-		features.add("Energy Lost", NumFormat.nice((stats[5]-stati[5])/stati[5]*100));
-	
-		return features;
-	}
-
-	public Features checkPSF(RealSignal psf) {
-		Features features = new Features();
-		if (!imageLoaded)
-			image = openImage();
-
-		if (image == null) {
-			features.add("Image", "No valid input image");
-			return features;
-		}
-		if (pad == null) {
-			features.add("Padding", "No valid padding");
-			return features;
-		}
-		if (apo == null) {
-			features.add("Apodization", "No valid apodization");
-			return features;
-		}
-
-		if (psf == null) {
-			features.add("PSF", "No valid PSF");
-			return features;
-		}
-
-		RealSignal h = psf.changeSizeAs(image);
-		h.normalize(norm);
-
-		float stats[] = h.getStats();
-		float stati[] = psf.getStats();
-		int sizi = psf.nx * psf.ny * psf.nz;
-		int sizs = h.nx * h.ny * h.nz;
-		float totali = stati[0] * sizi;
-		float totals = stats[0] * sizs;
-		features.add("<html><b>Orignal PSF</b></html>", "");
-		features.add("Size", psf.dimAsString() + " " + NumFormat.bytes(sizi*4));
-		features.add("Mean (stdev)", NumFormat.nice(stati[0])  + " (" + NumFormat.nice(stati[3]) + ")");
-		features.add("Min ... Max", NumFormat.nice(stati[1]) + " ... " + NumFormat.nice(stati[2]));
-		features.add("Energy (int)", NumFormat.nice(stati[5])  + " (" + NumFormat.nice(totali) + ")");
-		
-		features.add("<html><b>Working PSF</b></html>", "");
-		features.add("Size", h.dimAsString() + " " + NumFormat.bytes(sizs*4));
-		features.add("Mean (stdev)", NumFormat.nice(stats[0])  + " (" + NumFormat.nice(stats[3]) + ")");
-		features.add("Min Max", NumFormat.nice(stats[1]) + " " + NumFormat.nice(stats[2]));
-		features.add("Energy (int)", NumFormat.nice(stats[5])  + " (" + NumFormat.nice(totals) + ")");
-		features.add("<html><b>Information</b></html>", "");
-		features.add("Size Increase ", NumFormat.nice((double)(sizs-sizi)/sizi*100.0));
-		features.add("Energy Lost", NumFormat.nice((stats[5]-stati[5])/stati[5]*100));
-		return features;
-	}
 
 	public Features checkOutput() {
 		Features features = new Features();
@@ -523,31 +386,17 @@ public class Deconvolution implements Runnable {
 			features.add("Image", "No valid output image");
 			return features;
 		}
-
 		float stati[] = deconvolvedImage.getStats();
 		int sizi = deconvolvedImage.nx * deconvolvedImage.ny * deconvolvedImage.nz;
 		float totali = stati[0] * sizi;
 		features.add("<html><b>Deconvolved Image</b></html>", "");
-		features.add("Size", image.dimAsString() + " " + NumFormat.bytes(sizi*4));
+		features.add("Size", deconvolvedImage.dimAsString() + " " + NumFormat.bytes(sizi*4));
 		features.add("Mean (stdev)", NumFormat.nice(stati[0])  + " (" + NumFormat.nice(stati[3]) + ")");
 		features.add("Min ... Max", NumFormat.nice(stati[1]) + " ... " + NumFormat.nice(stati[2]));
 		features.add("Energy (int)", NumFormat.nice(stati[5])  + " (" + NumFormat.nice(totali) + ")");
-	
 		return features;
 	}
 	
-	public RealSignal getOutput() {
-		return deconvolvedImage;
-	}
-	
-	public Features getDeconvolutionReports() {
-		return report;
-	}
-
-	public String getName() {
-		return name;
-	}
-
 	public boolean isLive() {
 		return live;
 	}
@@ -581,7 +430,10 @@ public class Deconvolution implements Runnable {
 			return null;
 		if (token.parameters.startsWith(">>>"))
 			return null;
-		return getImage(monitors, token);
+		String arg = token.option.trim();
+		String cmd = token.parameters.substring(arg.length(), token.parameters.length()).trim();
+		image = Lab.createRealSignal(monitors, arg, cmd, path);
+		return image;
 	}
 
 	public RealSignal openPSF() {
@@ -590,72 +442,12 @@ public class Deconvolution implements Runnable {
 			return null;
 		if (token.parameters.startsWith(">>>"))
 			return null;
-		return getImage(monitors, token);
-	}
-
-	private RealSignal getImage(Monitors monitors, Token token) {
 		String arg = token.option.trim();
 		String cmd = token.parameters.substring(arg.length(), token.parameters.length()).trim();
-
-		if (arg.equalsIgnoreCase("synthetic")) {
-			String parts[] = cmd.split(" ");
-			if (parts.length <= 0)
-				return null;
-			String shape = parts[0];
-			for (String name : SignalFactory.getAllName()) {
-				if (shape.equalsIgnoreCase(name.toLowerCase())) {
-					double params[] = Command.parseNumeric(cmd);
-					SignalFactory factory = SignalFactory.getFactoryByName(shape);
-					if (factory == null)
-						return null;
-					double amplitude = params.length > 0 ? params[0] : 1;
-					double background = params.length > 1 ? params[1] : 0;
-					factory.intensity(background, amplitude);
-					int np = factory.getParameters().length;
-					double[] features = new double[np];
-					for (int i = 0; i < Math.min(np, params.length); i++)
-						features[i] = params[i + 2];
-					factory.setParameters(features);
-					int nx = params.length > np + 2 ? (int) Math.round(params[np + 2]) : 128;
-					int ny = params.length > np + 3 ? (int) Math.round(params[np + 3]) : 128;
-					int nz = params.length > np + 4 ? (int) Math.round(params[np + 4]) : 128;
-					double cx = params.length > np + 5 ? params[np + 5] : 0.5;
-					double cy = params.length > np + 6 ? params[np + 6] : 0.5;
-					double cz = params.length > np + 7 ? params[np + 7] : 0.5;
-					factory = factory.center(cx, cy, cz);
-					RealSignal x = factory.generate(nx, ny, nz);
-					return x;
-				}
-			}
-		}
-		if (arg.equalsIgnoreCase("file") || arg.equalsIgnoreCase("dir") || arg.equalsIgnoreCase("directory")) {
-			RealSignal signal = null;
-			File file = new File(path + File.separator + cmd);
-			if (file != null) {
-				if (file.isFile())
-					signal = Lab.open(monitors, path + File.separator + cmd);
-				if (file.isDirectory())
-					signal = Lab.openDir(monitors, path + File.separator + cmd);
-			}
-			if (signal == null) {
-				File local = new File(cmd);
-				if (local != null) {
-					if (local.isFile())
-						signal = Lab.open(monitors, cmd);
-					if (local.isDirectory())
-						signal = Lab.openDir(monitors, cmd);
-				}
-			}
-			return signal;
-
-		}
-
-		if (arg.equalsIgnoreCase("platform")) {
-			return Lab.getImager().create(cmd);
-		}
-
-		return null;
+		psf = Lab.createRealSignal(monitors, arg, cmd, path);
+		return psf;
 	}
+
 
 	public void addDeconvolutionListener(DeconvolutionListener listener) {
 		listeners.add(listener);
@@ -695,7 +487,27 @@ public class Deconvolution implements Runnable {
 	public Padding getPadding() {
 		return pad;
 	}
+	
+	public RealSignal getOutput() {
+		return deconvolvedImage;
+	}
 
+	public RealSignal getImage() {
+		return image;
+	}
+
+	public RealSignal getPSF() {
+		return psf;
+	}
+
+	public Features getDeconvolutionReports() {
+		return report;
+	}
+
+	public String getName() {
+		return name;
+	}
+	
 	public void setApodization(Apodization apo) {
 		this.apo = apo;
 	}
@@ -733,4 +545,6 @@ public class Deconvolution implements Runnable {
 	public String getCommand() {
 		return command;
 	}
+
+
 }

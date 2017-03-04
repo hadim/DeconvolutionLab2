@@ -1,13 +1,3 @@
-import java.io.File;
-
-import deconvolution.Deconvolution;
-import deconvolutionlab.Imaging;
-import deconvolutionlab.Lab;
-import deconvolutionlab.LabDialog;
-import ij.ImagePlus;
-import ij.WindowManager;
-import matlab.Converter;
-import signal.RealSignal;
 
 /*
  * DeconvolutionLab2
@@ -40,8 +30,22 @@ import signal.RealSignal;
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.File;
+
+import deconvolution.Deconvolution;
+import deconvolutionlab.Imaging;
+import deconvolutionlab.Lab;
+import deconvolutionlab.LabDialog;
+import ij.ImagePlus;
+import ij.WindowManager;
+import matlab.Converter;
+import signal.RealSignal;
+
 /**
- * This class is dedicated to the Matlab interface for DeconvolutionLab2
+ * This class allows Matlab interface for DeconvolutionLab2
+ * 
+ * A Matlab 3D variable in converted to a RealSignal and vice-versa.
+ * 
  * @author sage
  *
  */
@@ -195,18 +199,31 @@ public class DL2 {
 	}
 
 	public static Object NNLS(Object arrayImage, Object arrayPSF, double itmax, double gamma) {
-		return LW(arrayImage, arrayPSF, itmax, gamma, "");
+		return NNLS(arrayImage, arrayPSF, itmax, gamma, "");
 	}
 	
 	public static Object NNLS(Object arrayImage, Object arrayPSF, double itmax, double gamma, String options) {
 		RealSignal image = Converter.createRealSignal(arrayImage);
 		RealSignal psf = Converter.createRealSignal(arrayPSF);
-		String command = " -algorithm LW+ " + itmax + " " + options;
+		String command = " -algorithm NNLS " + itmax + " " + options;
 		Deconvolution d = new Deconvolution("Matlab NNLS", command);
 		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}
 	
+	public static Object BVLS(Object arrayImage, Object arrayPSF, double itmax, double gamma) {
+		return BVLS(arrayImage, arrayPSF, itmax, gamma, "");
+	}
+	
+	public static Object BVLS(Object arrayImage, Object arrayPSF, double itmax, double gamma, String options) {
+		RealSignal image = Converter.createRealSignal(arrayImage);
+		RealSignal psf = Converter.createRealSignal(arrayPSF);
+		String command = " -algorithm BVLS " + itmax + " " + options;
+		Deconvolution d = new Deconvolution("Matlab BVLS", command);
+		RealSignal result = d.deconvolve(image, psf);
+		return Converter.createObject(result);
+	}
+
 	public static Object TM(Object arrayImage, Object arrayPSF, double itmax, double gamma, double lambda) {
 		return TM(arrayImage, arrayPSF, itmax, gamma, lambda, "");
 	}
@@ -232,6 +249,4 @@ public class DL2 {
 		RealSignal result = d.deconvolve(image, psf);
 		return Converter.createObject(result);
 	}
-
-
 }

@@ -35,6 +35,7 @@ import java.util.ArrayList;
 
 public class Algorithm {
 
+	/** This is the static list of all available algorithms. */
 	private static ArrayList<AbstractAlgorithmPanel> list;
 
 	static {
@@ -66,9 +67,15 @@ public class Algorithm {
 		return new Identity();
 	}
 
-	public static AbstractAlgorithm createAlgorithm(String name) {
+	/** 
+	 * This static method return the algorithm specify by one of its shortname,
+	 * 
+	 * @param shortname
+	 * @return an algorithm
+	 */
+	public static AbstractAlgorithm createAlgorithm(String shortname) {
 		AbstractAlgorithm algo = getDefaultAlgorithm();
-		String n = name.trim().toLowerCase();
+		String n = shortname.trim().toLowerCase();
 		int i = 0;
 
 		if (list.get(i++).isNamed(n))
@@ -109,16 +116,23 @@ public class Algorithm {
 			algo =  getDefaultAlgorithm();
 		
 		if (algo != null)
-			algo.setShortname(name);
+			algo.setShortname(shortname);
 		return algo;
 	}
 
-	public static AbstractAlgorithmPanel getPanel(String name) {
+	/** 
+	 * This static method return the panel associated with 
+	 * the algorithm specify by one of its shortname,
+	 * 
+	 * @param shortname
+	 * @return an algorithm's panel
+	 */
+	public static AbstractAlgorithmPanel getPanel(String shortname) {
 		for (AbstractAlgorithmPanel panel : getAvailableAlgorithms()) {
 			for(String sn : panel.getShortname())
-				if (sn.equals(name.trim()))
+				if (sn.equals(shortname.trim()))
 					return panel;
-			if (panel.getName().equals(name.trim()))
+			if (panel.getName().equals(shortname.trim()))
 				return panel;
 
 		}

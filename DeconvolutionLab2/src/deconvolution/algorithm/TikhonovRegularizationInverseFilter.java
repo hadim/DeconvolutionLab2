@@ -36,6 +36,8 @@ import java.util.concurrent.Callable;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;
+import signal.SignalCollector;
+import signal.factory.complex.ComplexSignalFactory;
 
 public class TikhonovRegularizationInverseFilter extends AbstractAlgorithm implements Callable<RealSignal> {
 
@@ -48,41 +50,82 @@ public class TikhonovRegularizationInverseFilter extends AbstractAlgorithm imple
 
 	@Override
 	public RealSignal call() {
+		if (optimizedMemoryFootprint)
+			return runOptimizedMemoryFootprint();
+		else
+			return runTextBook();
+	}
+
+	public RealSignal runTextBook() {
 		ComplexSignal Y = fft.transform(y);
 		ComplexSignal H = fft.transform(h);
-		ComplexSignal X = compute(Y, H);
+		ComplexSignal H2 = Operations.multiply(H, H);
+		ComplexSignal I = ComplexSignalFactory.identity(Y.nx, Y.ny, Y.nz);
+		I.times((float)lambda);
+		ComplexSignal FA = Operations.add(H2, I);
+		ComplexSignal FT = Operations.divideStabilized(H, FA);
+		ComplexSignal X = Operations.multiply(Y, FT);
 		RealSignal x = fft.inverse(X);
+		SignalCollector.free(FT);
+		SignalCollector.free(Y);
+		SignalCollector.free(H);
+		SignalCollector.free(FA);
+		SignalCollector.free(I);
+		SignalCollector.free(H2);
+		SignalCollector.free(X);
 		return x;
 	}
 	
-	private  ComplexSignal compute(ComplexSignal Y, ComplexSignal H) {
+	public RealSignal runOptimizedMemoryFootprint() {
+		ComplexSignal Y = fft.transform(y);
+		ComplexSignal H = fft.transform(h);
+		ComplexSignal X = filter(Y, H);
+		SignalCollector.free(H);
+		SignalCollector.free(Y);
+		RealSignal x = fft.inverse(X);
+		SignalCollector.free(X);
+		return x;		
+	}
+	
+	private  ComplexSignal filter(ComplexSignal Y, ComplexSignal H) {
 		int nx = H.nx;
 		int ny = H.ny;
 		int nz = H.nz;
 		int nxy = nx * ny*2;
-		double ya, yb, ha, hb, fa, fb, mag, ta, tb;
-		double epsilon2 = Operations.epsilon * Operations.epsilon;
-		ComplexSignal result = new ComplexSignal("TM", nx, ny, nz);
+		float ya, yb, ha, hb, fa, fb, mag, ta, tb;
+		float epsilon2 = (float)(Operations.epsilon * Operations.epsilon);
+		ComplexSignal result = new ComplexSignal("TRIF", nx, ny, nz);
+		float l = (float)lambda;
 		for(int k=0; k<nz; k++)
 		for(int i=0; i< nxy; i+=2) {
 			ha = H.data[k][i];
 			hb = H.data[k][i+1];
 			ya = Y.data[k][i];
 			yb = Y.data[k][i+1];
-			fa = ha*ha - hb*hb + lambda;
+			fa = ha*ha - hb*hb + l;
 			fb = 2f * ha * hb;
 			mag = fa*fa + fb*fb;
 			ta = (ha*fa + hb*fb) / (mag >= epsilon2 ? mag : epsilon2);
 			tb = (hb*fa - ha*fb) / (mag >= epsilon2 ? mag : epsilon2);
-			result.data[k][i] = (float)(ya*ta - yb*tb);
-			result.data[k][i+1] = (float)(ya*tb + ta*yb);
+			result.data[k][i] = ya*ta - yb*tb;
+			result.data[k][i+1] = ya*tb + ta*yb;
 		}
 		return result;
 	}
-	
+
+	@Override
+	public int getComplexityNumberofFFT() {
+		return 3;
+	}
+
 	@Override
 	public String getName() {
 		return "Tikhonov Regularization [TRIF]";
+	}
+
+	@Override
+	public double getMemoryFootprintRatio() {
+		return 8.0;
 	}
 
 	@Override

@@ -41,14 +41,10 @@ public class SplineWaveletsTool {
 		this.filters = new SplineFilter(order);
 	}
 
-	public RealSignal analysis1(RealSignal in) {
-		String name = "w(" + in.name + ")";
-
+	public void analysis1(RealSignal in, RealSignal out) {
 		int nx = in.nx;
 		int ny = in.ny;
 		int nz = in.nz;
-		RealSignal out = new RealSignal(name, nx, ny, nz);
-
 		float ux[] = new float[nx];
 		float vx[] = new float[nx];
 		for (int z = 0; z < nz; z++)
@@ -77,17 +73,12 @@ public class SplineWaveletsTool {
 					out.setZ(x, y, vz);
 				}
 		}
-
-		return out;
 	}
 
-	public RealSignal synthesis1(RealSignal in) {
-		String name = "iw(" + in.name + ")";
+	public void synthesis1(RealSignal in, RealSignal out) {
 		int nx = in.nx;
 		int ny = in.ny;
 		int nz = in.nz;
-		RealSignal out = new RealSignal(name, nx, ny, nz);
-
 		float ux[] = new float[nx];
 		float vx[] = new float[nx];
 		for (int z = 0; z < nz; z++)
@@ -116,7 +107,6 @@ public class SplineWaveletsTool {
 					out.setZ(x, y, vz);
 				}
 		}
-		return out;
 	}
 
 	private void splitMirror(float vin[], float vout[], double h[], double g[]) {

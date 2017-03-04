@@ -31,7 +31,6 @@
 
 import java.io.File;
 
-import deconvolutionlab.Config;
 import deconvolutionlab.Imaging;
 import deconvolutionlab.Lab;
 import deconvolutionlab.LabDialog;

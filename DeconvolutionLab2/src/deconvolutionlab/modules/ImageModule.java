@@ -261,8 +261,9 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 		if (row < 0)
 			return;
 		Deconvolution deconvolution = new Deconvolution("Check Image", Command.command());
+		deconvolution.openImage();
 		if (stack) {
-			RealSignal x = deconvolution.openImage();
+			RealSignal x = deconvolution.getImage();
 			if (x != null)
 				Lab.show(Monitors.createDefaultMonitor(), x, table.getCell(row, 0));
 		} 

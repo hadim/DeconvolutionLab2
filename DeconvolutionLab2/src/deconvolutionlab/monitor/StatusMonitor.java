@@ -72,7 +72,7 @@ public class StatusMonitor implements AbstractMonitor {
 			}
 			m += "...";
 		}
-		double p = message.getProgress();
+		double p = message.getProgress() % 100;
 		progress.setString(m);
 		progress.setValue((int) Math.round(p));
 	}

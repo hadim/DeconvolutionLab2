@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;
+import signal.SignalCollector;
 
 public class Landweber extends AbstractAlgorithm implements Callable<RealSignal> {
 
@@ -59,18 +60,34 @@ public class Landweber extends AbstractAlgorithm implements Callable<RealSignal>
 		ComplexSignal H = fft.transform(h);
 		ComplexSignal A = Operations.delta(gamma, H);
 		ComplexSignal G = Operations.multiplyConjugate(gamma, H, Y);
+		SignalCollector.free(Y);
+		SignalCollector.free(H);
 		ComplexSignal X = G.duplicate();
+		X.setName("X");
 		while (!controller.ends(X)) {
 			X.times(A);
 			X.plus(G);
 		}
-		RealSignal x = fft.inverse(X);
+		SignalCollector.free(A);
+		SignalCollector.free(G);
+		RealSignal x = fft.inverse(X);	
+		SignalCollector.free(X);
 		return x;
 	}
 
 	@Override
 	public String getName() {
 		return "Landweber [LW | LLS]";
+	}
+
+	@Override
+	public int getComplexityNumberofFFT() {
+		return 3 + (controller.needSpatialComputation() ? 2 * controller.getIterationMax() : 0);
+	}
+
+	@Override
+	public double getMemoryFootprintRatio() {
+		return 9.0;
 	}
 
 	@Override

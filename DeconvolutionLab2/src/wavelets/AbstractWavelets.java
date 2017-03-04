@@ -32,6 +32,7 @@
 package wavelets;
 
 import signal.RealSignal;
+import signal.SignalCollector;
 
 public abstract class AbstractWavelets {
 
@@ -46,8 +47,8 @@ public abstract class AbstractWavelets {
 	}
 	
 	public abstract void setScale(int scale);
-	public abstract RealSignal analysis1(RealSignal in);
-	public abstract RealSignal synthesis1(RealSignal in);
+	public abstract void analysis1(RealSignal in, RealSignal out);
+	public abstract void synthesis1(RealSignal in, RealSignal out);
 	public abstract String getName();
 	public abstract String getDocumentation();
 	
@@ -78,8 +79,11 @@ public abstract class AbstractWavelets {
 				in.getSignal(sub);
 			else
 				out.getSignal(sub);
-			sub = analysis1(sub);
-			out.setSignal(sub);
+			RealSignal subout = new RealSignal("subout" + i, nx, ny, nz);
+			analysis1(sub, subout);
+			out.setSignal(subout);
+			SignalCollector.free(sub);
+			SignalCollector.free(subout);
 			nx = Math.max(1, nx / 2);
 			ny = Math.max(1, ny / 2);
 			nz = Math.max(1, nz / 2);
@@ -102,12 +106,15 @@ public abstract class AbstractWavelets {
 		for ( int i=0; i<scales; i++) {
 			RealSignal sub = new RealSignal("sub" + i, nx, ny, nz);
 			out.getSignal(sub);
-			sub = synthesis1(sub);
-			out.setSignal(sub);
+			RealSignal subout = new RealSignal("subout" + i, nx, ny, nz);
+			synthesis1(sub, subout);
+			out.setSignal(subout);
+			SignalCollector.free(sub);
+			SignalCollector.free(subout);
 			nx = nx * 2;
 			ny = ny * 2;
 			if (nz > 1) 
-				nz = nz * 2;
+				nz = nz * 2;			
 		}
 	}
 

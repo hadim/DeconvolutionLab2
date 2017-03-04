@@ -37,6 +37,7 @@ import lab.tools.PsRandom;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;
+import signal.SignalCollector;
 
 public class Simulation extends AbstractAlgorithm implements Callable<RealSignal> {
 
@@ -58,7 +59,10 @@ public class Simulation extends AbstractAlgorithm implements Callable<RealSignal
 		ComplexSignal Y = fft.transform(y);
 		ComplexSignal H = fft.transform(h);
 		ComplexSignal X = Operations.multiply(H, Y);
+		SignalCollector.free(Y);
+		SignalCollector.free(H);
 		RealSignal x = fft.inverse(X);
+		SignalCollector.free(X);
 		gaussian(x, mean, stdev);
 		poisson(x, poisson);
 		return x;
@@ -88,6 +92,16 @@ public class Simulation extends AbstractAlgorithm implements Callable<RealSignal
 	@Override
 	public String getName() {
 		return "Simulation with noise [SIM]";
+	}
+
+	@Override
+	public int getComplexityNumberofFFT() {
+		return 3;
+	}
+
+	@Override
+	public double getMemoryFootprintRatio() {
+		return 8.0;
 	}
 
 	@Override

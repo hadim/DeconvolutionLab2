@@ -216,8 +216,8 @@ public class BorderModule extends AbstractModule implements ActionListener, Chan
 						return;
 					}
 					Monitors m = Monitors.createDefaultMonitor();
-					RealSignal y = pad.pad(m, apo.apodize(m, x));
-										
+					RealSignal y = pad.pad(m, x);
+					apo.apodize(m, y);
 					lblPad.setText(x.dimAsString() + " > " + y.dimAsString());
 					lblApo.setText(NumFormat.nice(x.getStats()[5]) + " > " + NumFormat.nice(y.getStats()[5]));
 					getAction1Button().setEnabled(true);

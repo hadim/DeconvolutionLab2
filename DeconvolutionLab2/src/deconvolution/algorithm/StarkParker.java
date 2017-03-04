@@ -34,23 +34,43 @@ package deconvolution.algorithm;
 import java.util.concurrent.Callable;
 
 import signal.ComplexSignal;
+import signal.Constraint;
 import signal.Operations;
 import signal.RealSignal;
 import signal.SignalCollector;
 
-public class Convolution extends AbstractAlgorithm implements Callable<RealSignal> {
+public class StarkParker extends AbstractAlgorithm implements Callable<RealSignal> {
 
-	public Convolution() {
+	private double gamma = 1.0;
+
+	public StarkParker(int iter, double gamma) {
 		super();
+		controller.setIterationMax(iter);
+		this.gamma = gamma;
 	}
 
 	@Override
+	// Landweber algorithm
+	// X(n+1) = X(n) + g*H*(Y-H*X(n))
+	// => X(n+1) = X(n) - g*H*H*X(n) + g*H*Y
+	// => X(n+1) = X(n) * (I-g*H*H) + g*H*Y
+	// => pre-compute: A = (I-g*H*H) and G = g*H*Y
+	// => Iteration : X(n+1) = X(n) * A + G with F(0) = G
 	public RealSignal call() {
 		ComplexSignal Y = fft.transform(y);
 		ComplexSignal H = fft.transform(h);
-		ComplexSignal X = Operations.multiply(H, Y);
-		SignalCollector.free(Y);
+		ComplexSignal A = Operations.delta(gamma, H);
+		ComplexSignal G = Operations.multiplyConjugate(gamma, H, Y);
 		SignalCollector.free(H);
+		SignalCollector.free(Y);
+		ComplexSignal X = G.duplicate();
+		controller.setConstraint(Constraint.Mode.CLIPPED);
+		while (!controller.ends(X)) {
+			X.times(A);
+			X.plus(G);
+		}
+		SignalCollector.free(A);
+		SignalCollector.free(G);
 		RealSignal x = fft.inverse(X);
 		SignalCollector.free(X);
 		return x;
@@ -58,17 +78,17 @@ public class Convolution extends AbstractAlgorithm implements Callable<RealSigna
 
 	@Override
 	public String getName() {
-		return "Convolution Noiseless [CONV]";
+		return "Bounded-Variable Least Squares [BVLS | SP]";
 	}
 
 	@Override
 	public int getComplexityNumberofFFT() {
-		return 3;
+		return 3 + controller.getIterationMax() * 2;
 	}
 
 	@Override
 	public double getMemoryFootprintRatio() {
-		return 8.0;
+		return 9.0;
 	}
 
 	@Override
@@ -78,12 +98,12 @@ public class Convolution extends AbstractAlgorithm implements Callable<RealSigna
 
 	@Override
 	public boolean isStepControllable() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean isIterative() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -93,16 +113,22 @@ public class Convolution extends AbstractAlgorithm implements Callable<RealSigna
 
 	@Override
 	public void setParameters(double[] params) {
-	}
-
-	@Override
-	public double[] getParameters() {
-		return new double[] {};
+		if (params == null)
+			return;
+		if (params.length > 0)
+			controller.setIterationMax((int) Math.round(params[0]));
+		if (params.length > 1)
+			gamma = (float) params[1];
 	}
 
 	@Override
 	public double[] getDefaultParameters() {
-		return new double[] {};
+		return new double[] { 10, 1 };
+	}
+
+	@Override
+	public double[] getParameters() {
+		return new double[] { controller.getIterationMax(), gamma };
 	}
 
 	@Override
@@ -112,7 +138,6 @@ public class Convolution extends AbstractAlgorithm implements Callable<RealSigna
 
 	@Override
 	public double getStepFactor() {
-		return 0;
+		return gamma;
 	}
-
 }

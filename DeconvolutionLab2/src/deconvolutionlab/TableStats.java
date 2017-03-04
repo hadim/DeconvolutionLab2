@@ -9,6 +9,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.table.DefaultTableModel;
 
 import deconvolutionlab.monitor.Monitors;
 import lab.component.CustomizedColumn;
@@ -54,7 +55,12 @@ public class TableStats {
 	public String getName() {
 		return name;
 	}
-	
+
+	public void clear() {
+		DefaultTableModel model = (DefaultTableModel) table.getModel();
+		model.setRowCount(0);
+	}
+
 	public void nextStats(Monitors monitors, String[] stats) {
 		if (table == null)
 			return;
@@ -78,13 +84,6 @@ public class TableStats {
 
 	public JPanel getPanel() {
 		return panel;
-	}
-
-	public void show() {
-		JFrame frame = new JFrame(name);
-		frame.getContentPane().add(panel);
-		frame.pack();
-		frame.setVisible(true);
 	}
 
 }

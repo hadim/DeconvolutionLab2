@@ -101,7 +101,7 @@ public class RunningModule extends AbstractModule implements MouseListener {
 		valuesPath = new String[] { "current", "specify" };
 		valuesMonitor = new String[] { "console table", "console", "table", "no" };
 		valuesStats = new String[] { "no", "show", "save", "show save" };
-		valuesVerbose = new String[] { "log", "quiet", "nute", "prolix" };
+		valuesVerbose = new String[] { "log", "quiet", "mute", "prolix" };
 		valuesSystem = new String[] { "yes", "no" };
 		valuesMultithreading = new String[] { "yes", "no" };
 		valuesDisplay = new String[] { "yes", "no" };

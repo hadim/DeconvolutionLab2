@@ -37,6 +37,7 @@ import signal.ComplexSignal;
 import signal.Constraint;
 import signal.Operations;
 import signal.RealSignal;
+import signal.SignalCollector;
 import signal.factory.complex.ComplexSignalFactory;
 
 public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
@@ -59,21 +60,38 @@ public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
 		ComplexSignal A = Operations.delta(gamma, H);
 		ComplexSignal L = ComplexSignalFactory.laplacian(Y.nx, Y.ny, Y.nz);
 		ComplexSignal L2 = Operations.multiplyConjugate(lambda * gamma, L, L);
+		SignalCollector.free(L);
 		A.minus(L2);
+		SignalCollector.free(L2);
 		ComplexSignal G = Operations.multiplyConjugate(gamma, H, Y);
+		SignalCollector.free(H);
+		SignalCollector.free(Y);
 		ComplexSignal X = G.duplicate();
 		controller.setConstraint(Constraint.Mode.NONNEGATIVE);
 		while (!controller.ends(X)) {
 			X.times(A);
 			X.plus(G);
 		}
+		SignalCollector.free(A);
+		SignalCollector.free(G);
 		RealSignal x = fft.inverse(X);
+		SignalCollector.free(X);
 		return x;
 	}
 
 	@Override
 	public String getName() {
 		return "Iterative Contraint Tikhonov-Miller [ICTM]";
+	}
+
+	@Override
+	public int getComplexityNumberofFFT() {
+		return 3 + controller.getIterationMax() * 2;
+	}
+
+	@Override
+	public double getMemoryFootprintRatio() {
+		return 10.0;
 	}
 
 	@Override

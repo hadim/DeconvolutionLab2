@@ -116,7 +116,8 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 		pn.add(bnFile);
 		pn.add(bnDirectory);
 		pn.add(bnSynthetic);
-		pn.add(bnPlatform);
+		if (Lab.getPlatform() == Imaging.Platform.IMAGEJ)
+			pn.add(bnPlatform);
 
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createEtchedBorder());
@@ -248,8 +249,9 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 		if (row < 0)
 			return;
 		Deconvolution deconvolution = new Deconvolution("Check PSF", Command.command());
+		deconvolution.openPSF();
 		if (stack) {
-			RealSignal x = deconvolution.openPSF();
+			RealSignal x = deconvolution.getPSF();
 			if (x != null)
 				Lab.show(Monitors.createDefaultMonitor(), x, table.getCell(row, 0));
 		} 

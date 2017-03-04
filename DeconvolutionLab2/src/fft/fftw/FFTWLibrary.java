@@ -182,7 +182,6 @@ public class FFTWLibrary extends AbstractFFTLibrary {
 		}
 		catch (Exception ex) {
 			monitors.log("FFTW not found in : " + path);
-			System.out.println(">>" + ex.toString());
 		}
 	}
 

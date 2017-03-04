@@ -37,6 +37,7 @@ import signal.ComplexSignal;
 import signal.Constraint;
 import signal.Operations;
 import signal.RealSignal;
+import signal.SignalCollector;
 
 public class LandweberPositivity extends AbstractAlgorithm implements Callable<RealSignal> {
 
@@ -63,17 +64,32 @@ public class LandweberPositivity extends AbstractAlgorithm implements Callable<R
 		ComplexSignal G = Operations.multiplyConjugate(gamma, H, Y);
 		ComplexSignal X = G.duplicate();
 		controller.setConstraint(Constraint.Mode.NONNEGATIVE);
+		SignalCollector.free(Y);
+		SignalCollector.free(H);
 		while (!controller.ends(X)) {
 			X.times(A);
 			X.plus(G);
 		}
+		SignalCollector.free(A);
+		SignalCollector.free(G);
 		RealSignal x = fft.inverse(X);
+		SignalCollector.free(X);
 		return x;
 	}
 
 	@Override
 	public String getName() {
 		return "Non-Negative Least-Square [NNLS | LW+]";
+	}
+
+	@Override
+	public int getComplexityNumberofFFT() {
+		return 3 + controller.getIterationMax() * 2;
+	}
+
+	@Override
+	public double getMemoryFootprintRatio() {
+		return 10.0;
 	}
 
 	@Override

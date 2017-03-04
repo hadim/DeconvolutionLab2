@@ -59,7 +59,7 @@ import lab.component.PanelImage;
 import lab.tools.NumFormat;
 import signal.SignalCollector;
 
-public class SystemInfo extends JDialog implements WindowListener, ActionListener, MouseListener {
+public class SystemPanel extends JPanel implements ActionListener, MouseListener {
 
 	private JPanel				cards;
 
@@ -79,33 +79,23 @@ public class SystemInfo extends JDialog implements WindowListener, ActionListene
 
 	private int					width		= Constants.widthGUI;
 
-	private static SystemInfo	instance;
+	private static SystemPanel	instance;
 	private int					rate = 0;
+	private static JFrame frame;
 	
 	private ArrayList<AbstractMeter> meters = new ArrayList<AbstractMeter>();
 	
-	public static void activate() {
+	public static SystemPanel getInstance(JFrame parent) {
 		if (instance == null) {
-			instance = new SystemInfo();
-			Lab.setVisible(instance, false);
-			Config.registerFrame("System", "Frame", instance);
-			return;
+			instance = new SystemPanel();
 		}
-		if (!instance.isVisible())
-			Lab.setVisible(instance, false);
-		instance.toFront();
+		frame = parent;
+		
+		return instance;
 	}
 	
-	public static void close() {
-		if (instance == null)
-			return;
-		if (instance.isVisible())
-			instance.dispose();
-	}
 
-	private SystemInfo() {
-		super(new JFrame(), "DeconvolutionLab2 System");
-
+	private SystemPanel() {
 		memory = new MemoryMeter();
 		processor = new ProcessorMeter();
 		signal = new SignalMeter();
@@ -156,11 +146,11 @@ public class SystemInfo extends JDialog implements WindowListener, ActionListene
 		top.add(meters, BorderLayout.CENTER);
 		top.add(pan, BorderLayout.EAST);
 
-		JPanel panel = new JPanel(new BorderLayout());
-		panel.add(top, BorderLayout.NORTH);
-		panel.add(cards, BorderLayout.CENTER);
+		setLayout(new BorderLayout());
+		add(top, BorderLayout.NORTH);
+		add(cards, BorderLayout.CENTER);
 
-		getContentPane().add(panel);
+		
 		bnClear.addActionListener(this);
 		signal.addMouseListener(this);
 		memory.addMouseListener(this);
@@ -170,7 +160,7 @@ public class SystemInfo extends JDialog implements WindowListener, ActionListene
 		fft.addMouseListener(this);
 		bnRate.addActionListener(this);
 		setMinimumSize(new Dimension(width, 70));
-		pack();
+		
 		bnClear.setEnabled(signal.isExpanded());
 		Rectangle rect = Config.getDialog("System.Frame");
 		if (rect.x > 0 && rect.y > 0)
@@ -191,8 +181,6 @@ public class SystemInfo extends JDialog implements WindowListener, ActionListene
 		if (e.getSource() == bnClear) {
 			SignalCollector.clear();
 		}
-
-		pack();
 	}
 
 	public void update() {
@@ -233,7 +221,7 @@ public class SystemInfo extends JDialog implements WindowListener, ActionListene
 				cards.setVisible(true);
 			}
 			((CardLayout) (cards.getLayout())).show(cards, meter.getName());
-			pack();
+			
 		}
 		bnClear.setEnabled(signal.isExpanded());
 	}
@@ -254,34 +242,5 @@ public class SystemInfo extends JDialog implements WindowListener, ActionListene
 	public void mouseExited(MouseEvent e) {
 	}
 
-	@Override
-	public void windowOpened(WindowEvent e) {
-	}
 
-	@Override
-	public void windowClosing(WindowEvent e) {
-		timer.cancel();
-		timer = null;
-		dispose();
-	}
-
-	@Override
-	public void windowClosed(WindowEvent e) {
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e) {
-	}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {
-	}
-
-	@Override
-	public void windowActivated(WindowEvent e) {
-	}
-
-	@Override
-	public void windowDeactivated(WindowEvent e) {
-	}
 }

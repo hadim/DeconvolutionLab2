@@ -180,11 +180,12 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 			Lab.setVisible(dlg, true);
 			if (dlg.wasCancel())
 				return;
+			
 			Output out = dlg.getOut();
-			if (out == null)
-				System.out.println("Out is null");
-			else
+			if (out != null)
 				table.insert(out.getAsString());
+			
+			//Lab.setVisible(new OutputPanel(view), "panel", 30, 30);
 			update();
 		}
 		

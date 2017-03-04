@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;
+import signal.SignalCollector;
 
 public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSignal> {
 
@@ -62,12 +63,26 @@ public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSi
 			fft.inverse(U, u);
 			x.times(u);
 		}
+		SignalCollector.free(H);
+		SignalCollector.free(p);
+		SignalCollector.free(u);
+		SignalCollector.free(U);
 		return x;
 	}
 
 	@Override
 	public String getName() {
 		return "Richardson-Lucy [RL]";
+	}
+
+	@Override
+	public int getComplexityNumberofFFT() {
+		return 1 + 5 * controller.getIterationMax();
+	}
+
+	@Override
+	public double getMemoryFootprintRatio() {
+		return 9.0;
 	}
 
 	@Override

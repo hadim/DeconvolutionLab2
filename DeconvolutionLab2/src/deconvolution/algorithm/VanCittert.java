@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;
+import signal.SignalCollector;
 
 public class VanCittert extends AbstractAlgorithm implements Callable<RealSignal> {
 	
@@ -58,19 +59,34 @@ public class VanCittert extends AbstractAlgorithm implements Callable<RealSignal
 		ComplexSignal Y = fft.transform(y);
 		ComplexSignal H = fft.transform(h);
 		ComplexSignal A = Operations.delta1(gamma, H);
+		SignalCollector.free(H);
 		ComplexSignal G = Operations.multiply(gamma, Y);
+		SignalCollector.free(Y);
 		ComplexSignal X = G.duplicate();
 		while(!controller.ends(X)) {
 			X.times(A);
 			X.plus(G);
 		}
+		SignalCollector.free(G);
+		SignalCollector.free(A);
 		RealSignal x = fft.inverse(X);
+		SignalCollector.free(X);
 		return x;
 	}
-	
+
+	@Override
+	public int getComplexityNumberofFFT() {
+		return 3 + (controller.needSpatialComputation() ? 2 * controller.getIterationMax() : 0);
+	}
+
 	@Override
 	public String getName() {
 		return "Van Cittert [VC]";
+	}
+
+	@Override
+	public double getMemoryFootprintRatio() {
+		return 8.0;
 	}
 
 	@Override

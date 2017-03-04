@@ -24,7 +24,6 @@ public class RecapDModule extends AbstractDModule implements KeyListener {
 		pnCommand.addKeyListener(this);
 		table = new CustomizedTable(new String[] { "Features", "Values" }, false);
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(200, 200), pnCommand.getPane());
-		update();
 	}
 	
 	public void update() {

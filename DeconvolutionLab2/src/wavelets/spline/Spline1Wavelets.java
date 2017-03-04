@@ -60,12 +60,12 @@ public class Spline1Wavelets extends AbstractWavelets {
 	}
 
 	@Override
-    public RealSignal analysis1(RealSignal in) {
-		return tool.analysis1(in);
+    public void analysis1(RealSignal in, RealSignal out) {
+		tool.analysis1(in, out);
 	}
 	
 	@Override
-    public RealSignal synthesis1(RealSignal in) {
-		return tool.synthesis1(in);
+    public void synthesis1(RealSignal in, RealSignal out) {
+		tool.synthesis1(in, out);
 	}
 }

@@ -1,7 +1,7 @@
 package deconvolutionlab.monitor;
 
 public enum Verbose {
-	Mute, Quiet, Log, Prolix;
+	Mute, Quiet, Log, Prolix, Progress;
 	
 	public static Verbose getByName(String name) {
 		String n = name.toLowerCase().trim();
@@ -13,6 +13,8 @@ public enum Verbose {
 			return Quiet;
 		if (n.equals("mute"))
 			return Mute;
+		if (n.equals("progress"))
+			return Progress;
 		return Log;
 	}
 }

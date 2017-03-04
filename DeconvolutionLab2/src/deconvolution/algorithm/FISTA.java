@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;
+import signal.SignalCollector;
 import wavelets.AbstractWavelets;
 import wavelets.Wavelets;
 
@@ -63,7 +64,8 @@ public class FISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 		ComplexSignal H = fft.transform(h);
 		ComplexSignal A = Operations.delta(gamma, H);
 		ComplexSignal G = Operations.multiplyConjugate(gamma, H, Y);
-
+		SignalCollector.free(Y);
+		SignalCollector.free(H);
 		ComplexSignal Z = G.duplicate();
 		RealSignal x = fft.inverse(G);
 		RealSignal s = x.duplicate();
@@ -84,6 +86,13 @@ public class FISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 			pk1 = (1f + (float) Math.sqrt(1f + 4f * pk0 * pk0)) * 0.5f;
 			update(xprev, x, (pk0 - 1f) / pk1, s);
 		}
+		SignalCollector.free(A);
+		SignalCollector.free(Z);
+		SignalCollector.free(G);
+		SignalCollector.free(s);
+		SignalCollector.free(z);
+		SignalCollector.free(xprev);
+		SignalCollector.free(buffer);
 		return x;
 	}
 
@@ -100,6 +109,16 @@ public class FISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 	@Override
 	public String getName() {
 		return "Fast Iterative Shrinkage-Thresholding [FISTA]";
+	}
+
+	@Override
+	public int getComplexityNumberofFFT() {
+		return 4 + 4 * controller.getIterationMax();
+	}
+
+	@Override
+	public double getMemoryFootprintRatio() {
+		return 15.0;
 	}
 
 	@Override

@@ -73,10 +73,8 @@ public class Monitors extends ArrayList<AbstractMonitor> {
 	}
 
 	public void progress(String msg, double p) {
-		if (verbose.ordinal() >=  Verbose.Log.ordinal()) {
-			progress = Math.max(0, Math.min(100, p));
-			sendMessage(new Message(Verbose.Log, msg, System.nanoTime() - start, progress));
-		}
+		progress = Math.max(0, Math.min(100, p));
+		sendProgress(new Message(Verbose.Prolix, msg, System.nanoTime() - start, progress));
 	}
 
 	public void log(String msg) {
@@ -91,6 +89,12 @@ public class Monitors extends ArrayList<AbstractMonitor> {
 
 	private void sendMessage(Message message) {
 		for (AbstractMonitor monitor : this)
-			monitor.add(message);
+					monitor.add(message);
+	}
+	
+	private void sendProgress(Message message) {
+		for (AbstractMonitor monitor : this)
+			if (monitor instanceof StatusMonitor)
+				monitor.add(message);
 	}
 }

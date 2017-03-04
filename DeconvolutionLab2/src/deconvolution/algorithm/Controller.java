@@ -48,6 +48,20 @@ import signal.Constraint;
 import signal.RealSignal;
 import signal.SignalCollector;
 
+/**
+ * This is an important class to manage all the common task
+ * of the algorithm. 
+ * The method start() is called before at the starting of the
+ * algorithm.
+ * The method ends() is called at the end of every iterations
+ * for the iterative algorithm. It returns true if one the
+ * stopping criteria is true.
+ * The method finish() is called when the algorithm is completely
+ * terminated.
+ * 
+ * @author sage
+ *
+ */
 public class Controller {
 
 	private int					iterationsMax		= 100;
@@ -139,6 +153,10 @@ public class Controller {
 		this.outs = outs;
 	}
 
+	public boolean needSpatialComputation() {
+		return doConstraint || doResidu || doReference;
+	}
+	
 	public void start(RealSignal x) {
 		this.x = x;
 		statsInput = x.getStats();
@@ -300,7 +318,7 @@ public class Controller {
 	}
 
 	public String getStoppingCriteriaAsString(AbstractAlgorithm algo) {
-		String stop = algo.isIterative() ? " iterations limit=" + getIterationMax() + ", " : "direct, ";
+		String stop = algo.isIterative() ? "iterations limit=" + getIterationMax() + ", " : "direct, ";
 		stop += doTime ? ", time limit=" + NumFormat.nice(timeMax * 1e-9) : " no time limit" + ", ";
 		stop += doResidu ? ", residu limit=" + NumFormat.nice(residuMin) : " no residu limit";
 		return stop;

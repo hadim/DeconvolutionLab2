@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;
+import signal.SignalCollector;
 
 public class NaiveInverseFilter extends AbstractAlgorithm implements Callable<RealSignal> {
 
@@ -48,13 +49,26 @@ public class NaiveInverseFilter extends AbstractAlgorithm implements Callable<Re
 		ComplexSignal Y = fft.transform(y);
 		ComplexSignal H = fft.transform(h);
 		ComplexSignal X = Operations.divideStabilized(Y, H);
+		SignalCollector.free(Y);
+		SignalCollector.free(H);
 		RealSignal x = fft.inverse(X);
+		SignalCollector.free(X);
 		return x;
 	}
 
 	@Override
 	public String getName() {
 		return "Naive Inverse Filter [NIF | IF]";
+	}
+
+	@Override
+	public int getComplexityNumberofFFT() {
+		return 3;
+	}
+
+	@Override
+	public double getMemoryFootprintRatio() {
+		return 8.0;
 	}
 
 	@Override

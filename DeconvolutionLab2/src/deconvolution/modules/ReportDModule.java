@@ -14,7 +14,6 @@ public class ReportDModule extends AbstractDModule {
 
 	private JPanelImage pnImage;
 	private CustomizedTable table;
-	private BufferedImage img;
 	
 	public ReportDModule(Deconvolution deconvolution) {
 		super(deconvolution);
@@ -22,7 +21,6 @@ public class ReportDModule extends AbstractDModule {
 		table = new CustomizedTable(new String[] { "Output", "Values" }, false);
 		pnImage.setPreferredSize(new Dimension(300, 300));
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(300, 300), pnImage);
-		update();
 	}
 	
 	public void update() {
@@ -35,14 +33,12 @@ public class ReportDModule extends AbstractDModule {
 		
 		for (String[] feature : deconvolution.getDeconvolutionReports())
 			table.append(feature);
-		RealSignal signal = deconvolution.getOutput();
-		if (signal == null) {
-			table.append(new String[] {"ERROR", "No output image"});
+		RealSignal image = deconvolution.getOutput();
+		if (image == null) {
+			table.append(new String[] {"ERROR", "No open output"});
 			return;
 		}
-		img = signal.createPreviewMIPZ();
-		pnImage.setImage(img);
-
+		pnImage.setImage(image.preview());
 		for (String[] feature : deconvolution.checkOutput())
 			table.append(feature);
 		split.setDividerLocation(300);

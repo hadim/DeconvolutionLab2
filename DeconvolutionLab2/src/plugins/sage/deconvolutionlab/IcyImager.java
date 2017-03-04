@@ -35,10 +35,13 @@ import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 import deconvolutionlab.Imaging;
+import deconvolutionlab.Lab;
 import icy.file.Saver;
-import icy.gui.frame.IcyFrame;
+import icy.gui.frame.IcyFrameEvent;
+import icy.gui.frame.IcyFrameListener;
 import icy.image.IcyBufferedImage;
 import icy.imagej.ImageJUtil;
 import icy.main.Icy;
@@ -51,7 +54,7 @@ import signal.ComplexComponent;
 import signal.ComplexSignal;
 import signal.RealSignal;
 
-public class IcyImager extends Imaging {
+public class IcyImager extends Imaging implements IcyFrameListener {
 
 	@Override
 	public Platform getPlatform() {
@@ -60,13 +63,24 @@ public class IcyImager extends Imaging {
 
 	@Override
 	public void setVisible(JDialog dialog, boolean modal) {
+		
+		/*
 		IcyFrame icf = new IcyFrame();
+		icf.addFrameListener(this);
 		icf.setTitle(dialog.getTitle());
-		dialog.setModal(modal);
-		icf.add(dialog.getContentPane());	
+		//dialog.setModal(modal);
+		icf.add(dialog.getContentPane());
+		//icf.add(panel);
 		icf.toFront();
 		icf.addToDesktopPane();
-		icf.setVisible(true);
+		icf.setVisible(true);	
+		*/
+		//Lab.setVisible(dialog, true);
+		
+		dialog.pack();
+		dialog.setLocation(30, 30);
+		dialog.setVisible(true);
+
 	}
 	
 	public static RealSignal create(Sequence seq) {
@@ -98,8 +112,6 @@ public class IcyImager extends Imaging {
 
 	@Override
     public RealSignal open(String filename) {
-		//File file = new File(filename);
-		//return build(Loader.loadSequence(file, 0, false));
 		Opener opener = new Opener();
 		ImagePlus imp = opener.openImage(filename);
 		Sequence seq = ImageJUtil.convertToIcySequence(imp, null);
@@ -211,6 +223,51 @@ public class IcyImager extends Imaging {
 	@Override
 	public boolean isSelectable() {
 		return false;
+	}
+
+	@Override
+	public void icyFrameOpened(IcyFrameEvent e) {
+		System.out.println("" + e);
+	}
+
+	@Override
+	public void icyFrameClosing(IcyFrameEvent e) {
+		System.out.println("" + e);
+	}
+
+	@Override
+	public void icyFrameClosed(IcyFrameEvent e) {
+		System.out.println("" + e);
+	}
+
+	@Override
+	public void icyFrameIconified(IcyFrameEvent e) {
+		System.out.println("" + e);
+	}
+
+	@Override
+	public void icyFrameDeiconified(IcyFrameEvent e) {
+		System.out.println("" + e);
+	}
+
+	@Override
+	public void icyFrameActivated(IcyFrameEvent e) {
+		System.out.println("" + e);
+	}
+
+	@Override
+	public void icyFrameDeactivated(IcyFrameEvent e) {
+		System.out.println("" + e);
+	}
+
+	@Override
+	public void icyFrameInternalized(IcyFrameEvent e) {
+		System.out.println("" + e);
+	}
+
+	@Override
+	public void icyFrameExternalized(IcyFrameEvent e) {
+		System.out.println("" + e);
 	}
 
 }

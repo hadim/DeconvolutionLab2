@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;
+import signal.SignalCollector;
 
 public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<RealSignal> {
 
@@ -73,7 +74,6 @@ public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<Real
 			gradientY(gy, ggy);
 			gradientZ(gz, ggz);
 			compute((float)lambda, ggx, ggy, ggz, tv);
-			
 			fft.transform(x, U);
 			U.times(H);
 			fft.inverse(U, u);
@@ -84,6 +84,14 @@ public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<Real
 			x.times(u); 
 			x.times(tv);
 		}
+		SignalCollector.free(H);
+		SignalCollector.free(U);
+		SignalCollector.free(ggx);
+		SignalCollector.free(ggy);
+		SignalCollector.free(ggz);
+		SignalCollector.free(tv);
+		SignalCollector.free(u);
+		SignalCollector.free(p);
 		return x;
 	}
 	
@@ -96,7 +104,6 @@ public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<Real
 			double dz = gz.data[k][i];
 			tv.data[k][i] = (float)(1.0 / ( (dx+dy+dz) * lambda + 1.0));
 		}
-		//Log.info("Norm TV "+ Math.sqrt(norm));
 	}
 
 	public void gradientX(RealSignal signal, RealSignal output) {
@@ -155,11 +162,20 @@ public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<Real
 			}
 		}
 	}
-	
-	
+
+	@Override
+	public int getComplexityNumberofFFT() {
+		return 1 + 7 * controller.getIterationMax();
+	}
+
 	@Override
 	public String getName() {
 		return "Richardson-Lucy Total Variation [RLTV]";
+	}
+	
+	@Override
+	public double getMemoryFootprintRatio() {
+		return 13.0;
 	}
 	
 	@Override

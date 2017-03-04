@@ -61,6 +61,7 @@ public class TableMonitor implements AbstractMonitor, ActionListener {
 	private String 					name;
 	
 	public TableMonitor(String name, int width, int height) {
+		this.name = name;
 		ArrayList<CustomizedColumn> columns = new ArrayList<CustomizedColumn>();
 		columns.add(new CustomizedColumn("#", Long.class, 60, false));
 		columns.add(new CustomizedColumn("Time", String.class, 100, false));
@@ -92,13 +93,6 @@ public class TableMonitor implements AbstractMonitor, ActionListener {
 
 	public JPanel getPanel() {
 		return panel;
-	}
-
-	public void show() {
-		JFrame frame = new JFrame(name);
-		frame.getContentPane().add(panel);
-		frame.pack();
-		frame.setVisible(true);
 	}
 
 	@Override
