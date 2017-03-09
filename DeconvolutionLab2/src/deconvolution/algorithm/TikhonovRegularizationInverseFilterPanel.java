@@ -40,11 +40,11 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import bilib.component.GridPanel;
+import bilib.component.RegularizationPanel;
+import bilib.tools.NumFormat;
 import deconvolution.Command;
 import deconvolutionlab.Config;
-import lab.component.GridPanel;
-import lab.component.RegularizationPanel;
-import lab.tools.NumFormat;
 
 public class TikhonovRegularizationInverseFilterPanel extends AbstractAlgorithmPanel implements ActionListener, ChangeListener, KeyListener {
 

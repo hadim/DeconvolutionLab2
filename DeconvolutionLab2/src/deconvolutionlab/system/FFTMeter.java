@@ -36,8 +36,8 @@ import java.io.File;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.ManagementFactory;
 
+import bilib.tools.NumFormat;
 import fft.FFT;
-import lab.tools.NumFormat;
 
 public class FFTMeter extends AbstractMeter {
 

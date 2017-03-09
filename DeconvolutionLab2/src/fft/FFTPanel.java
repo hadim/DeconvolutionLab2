@@ -11,12 +11,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import bilib.component.CustomizedColumn;
+import bilib.component.CustomizedTable;
+import bilib.component.HTMLPane;
+import bilib.tools.NumFormat;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
-import lab.component.CustomizedColumn;
-import lab.component.CustomizedTable;
-import lab.component.HTMLPane;
-import lab.tools.NumFormat;
 import signal.Operations;
 
 public class FFTPanel extends JPanel implements MouseListener {

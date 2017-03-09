@@ -42,12 +42,12 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import bilib.component.HTMLPane;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolution.Token;
 import deconvolution.algorithm.AbstractAlgorithm;
 import deconvolutionlab.Config;
-import lab.component.HTMLPane;
 
 public class LanguageModule extends AbstractModule implements ActionListener {
 

@@ -33,10 +33,10 @@ package deconvolutionlab;
 
 import java.io.File;
 
+import bilib.tools.NumFormat;
 import deconvolution.algorithm.Controller;
 import deconvolutionlab.Imaging.ContainerImage;
 import deconvolutionlab.monitor.Monitors;
-import lab.tools.NumFormat;
 import signal.Constraint;
 import signal.RealSignal;
 

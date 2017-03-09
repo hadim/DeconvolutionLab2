@@ -1,5 +1,3 @@
-package lab.tools;
-
 /*
  * DeconvolutionLab2
  * 
@@ -31,48 +29,30 @@ package lab.tools;
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.File;
-import java.security.CodeSource;
+package bilib.component;
 
-public class Tools {
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
 
-	public static String[] explodeLower(String line, String regex) {
-		String[] items = line.split(regex);
-		String[] out = new String[items.length];
-		for(int i=0; i<items.length; i++)
-			out[i] = items[i].trim().toLowerCase();
-		return out;
+import javax.swing.JLabel;
+
+public class LabelImage extends JLabel {
+
+	private Image image;
+
+	public LabelImage(String filename, int width, int height, Color altColor) {
+		image = ImageLoader.get(filename);
+		setOpaque(true);
+		setBackground(altColor);
+		setPreferredSize(new Dimension(200, 60));
 	}
 
-	public static String[] explodeCase(String line, String regex) {
-		String[] items = line.split(regex);
-		String[] out = new String[items.length];
-		for(int i=0; i<items.length; i++)
-			out[i] = items[i].trim();
-		return out;
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		if (image != null)
+			g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
 	}
-	
-
-	public static String ellipsis(String text, int length) {
-		int l = text.length();
-		if (l <= length)
-			return text;
-		String result = 
-				text.substring(0,length/2) + 
-				"..." + 
-				text.substring(text.length()-length/2+3, text.length());
-		return result;
-	}
-	
-	public static String getWorkingPath() {
-		try {
-			CodeSource codeSource = Tools.class.getProtectionDomain().getCodeSource();
-			File jarFile = new File(codeSource.getLocation().toURI().getPath());
-			return jarFile.getParentFile().getPath() + File.separator;
-		}
-		catch(Exception ex) {
-			return System.getProperty("user.dir") + File.separator;
-		}
-	}
-
 }

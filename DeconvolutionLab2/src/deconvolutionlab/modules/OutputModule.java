@@ -44,6 +44,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+import bilib.component.CustomizedColumn;
+import bilib.component.CustomizedTable;
 import deconvolution.Command;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
@@ -51,8 +53,6 @@ import deconvolutionlab.Lab;
 import deconvolutionlab.Output;
 import deconvolutionlab.Output.View;
 import deconvolutionlab.dialog.OutputDialog;
-import lab.component.CustomizedColumn;
-import lab.component.CustomizedTable;
 
 public class OutputModule extends AbstractModule implements ActionListener, MouseListener {
 

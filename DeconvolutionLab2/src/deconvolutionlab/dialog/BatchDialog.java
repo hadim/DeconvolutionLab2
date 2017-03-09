@@ -45,14 +45,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import bilib.component.GridPanel;
+import bilib.component.HTMLPane;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolutionlab.Constants;
 import deconvolutionlab.Lab;
 import deconvolutionlab.modules.BatchModule;
 import ij.gui.GUI;
-import lab.component.GridPanel;
-import lab.component.HTMLPane;
 
 public class BatchDialog extends JDialog implements ActionListener, WindowListener {
 

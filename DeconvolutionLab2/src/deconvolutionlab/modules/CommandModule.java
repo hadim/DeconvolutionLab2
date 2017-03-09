@@ -38,6 +38,8 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+import bilib.component.HTMLPane;
+import bilib.tools.Files;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolution.DeconvolutionDialog;
@@ -45,8 +47,6 @@ import deconvolutionlab.Lab;
 import deconvolutionlab.dialog.PatternDialog;
 import deconvolutionlab.dialog.SyntheticDialog;
 import deconvolutionlab.monitor.Monitors;
-import lab.component.HTMLPane;
-import lab.tools.Files;
 import signal.RealSignal;
 import signal.factory.SignalFactory;
 

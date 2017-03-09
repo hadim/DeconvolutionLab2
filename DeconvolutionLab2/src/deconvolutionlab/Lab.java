@@ -33,22 +33,20 @@ package deconvolutionlab;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.regex.Pattern;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import bilib.tools.NumFormat;
+import bilib.tools.WebBrowser;
 import deconvolutionlab.Imaging.ContainerImage;
 import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 import fft.FFT;
 import imagej.IJImager;
-import lab.tools.NumFormat;
-import lab.tools.WebBrowser;
 import plugins.sage.deconvolutionlab.IcyImager;
 import signal.ComplexComponent;
 import signal.ComplexSignal;

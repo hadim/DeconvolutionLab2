@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import bilib.tools.NumFormat;
 import deconvolution.algorithm.AbstractAlgorithm;
 import deconvolution.algorithm.Algorithm;
 import deconvolution.algorithm.Controller;
@@ -48,7 +49,6 @@ import deconvolutionlab.monitor.Verbose;
 import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 import fft.FFT;
-import lab.tools.NumFormat;
 import signal.Constraint;
 import signal.Operations;
 import signal.apodization.AbstractApodization;

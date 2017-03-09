@@ -34,6 +34,7 @@ package deconvolution.algorithm;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import bilib.tools.NumFormat;
 import deconvolution.Deconvolution;
 import deconvolutionlab.OutputCollection;
 import deconvolutionlab.TableStats;
@@ -41,7 +42,6 @@ import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.system.SystemUsage;
 import fft.AbstractFFT;
 import fft.FFT;
-import lab.tools.NumFormat;
 import signal.Assessment;
 import signal.ComplexSignal;
 import signal.Constraint;

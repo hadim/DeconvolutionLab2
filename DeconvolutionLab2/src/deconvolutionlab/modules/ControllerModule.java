@@ -50,10 +50,10 @@ import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import bilib.component.GridPanel;
+import bilib.tools.Files;
 import deconvolution.Command;
 import deconvolutionlab.Config;
-import lab.component.GridPanel;
-import lab.tools.Files;
 import signal.Constraint;
 
 public class ControllerModule extends AbstractModule implements ActionListener, ChangeListener, KeyListener {

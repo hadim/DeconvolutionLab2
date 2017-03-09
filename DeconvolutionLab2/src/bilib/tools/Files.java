@@ -29,22 +29,43 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lab.component;
+package bilib.tools;
 
-import java.awt.Image;
-import java.net.URL;
+import java.io.File;
 
-import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 
-public class ImageLoader {
-	
-	public static Image get(String filename) {
-		URL url = ImageLoader.class.getResource(filename);
-		if (url != null) {
-			ImageIcon img = new ImageIcon(url, "") ;  
-			return img.getImage();
+public class Files {
+
+	public static File browseFile(String path) {
+		JFileChooser fc = new JFileChooser(); 
+		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		File dir = new File(path);
+		if (dir.exists())
+			fc.setCurrentDirectory(dir);
+		
+		int ret = fc.showOpenDialog(null); 
+		if (ret == JFileChooser.APPROVE_OPTION) {
+			File file = new File(fc.getSelectedFile().getAbsolutePath());
+			if (file.exists())
+				return file;
 		}
 		return null;
 	}
+	
+	public static File browseDirectory(String path) {
+		JFileChooser fc = new JFileChooser(); 
+		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		File dir = new File(path);
+		if (dir.exists())
+			fc.setCurrentDirectory(dir);
 
+		int ret = fc.showOpenDialog(null); 
+		if (ret == JFileChooser.APPROVE_OPTION) {
+			File file = new File(fc.getSelectedFile().getAbsolutePath());
+			if (file.exists())
+				return file;
+		}
+		return null;
+	}
 }

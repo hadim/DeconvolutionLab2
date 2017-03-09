@@ -33,7 +33,7 @@ package deconvolution.algorithm;
 
 import javax.swing.JPanel;
 
-import lab.component.GridPanel;
+import bilib.component.GridPanel;
 
 public class IdentityPanel extends AbstractAlgorithmPanel {
 

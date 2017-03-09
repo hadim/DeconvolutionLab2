@@ -29,30 +29,35 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lab.component;
+package bilib.tools;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Image;
+import signal.RealSignal;
 
-import javax.swing.JLabel;
+public class NoiseGenerator {
 
-public class LabelImage extends JLabel {
+	private static PsRandom rand = new PsRandom();
 
-	private Image image;
-
-	public LabelImage(String filename, int width, int height, Color altColor) {
-		image = ImageLoader.get(filename);
-		setOpaque(true);
-		setBackground(altColor);
-		setPreferredSize(new Dimension(200, 60));
+	private NoiseGenerator() {
+	}
+	
+	public void setSeed(long seed) {
+		rand.setSeed(seed);
+	}
+	
+	public static void gaussian(RealSignal x, double mean, double sd) {	
+		for (int k = 0; k < x.nz; k++) {
+			float[] slice = x.getXY(k);
+			for (int j = 0; j < x.ny * x.nx; j++)
+				slice[j] += (float) rand.nextGaussian(mean, sd);
+		}
 	}
 
-	@Override
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
-		if (image != null)
-			g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
+	public static void poisson(RealSignal x, double mean) {
+		for (int k = 0; k < x.nz; k++) {
+			float[] slice = x.getXY(k);
+			for (int j = 0; j < x.ny * x.nx; j++)
+				slice[j] += (float) rand.nextPoissonian(mean);
+		}
 	}
+
 }

@@ -4,10 +4,10 @@ import java.util.ArrayList;
 
 import javax.swing.JScrollPane;
 
+import bilib.component.CustomizedColumn;
+import bilib.component.CustomizedTable;
+import bilib.tools.NumFormat;
 import deconvolutionlab.system.SystemUsage;
-import lab.component.CustomizedColumn;
-import lab.component.CustomizedTable;
-import lab.tools.NumFormat;
 
 public class SignalCollector {
 

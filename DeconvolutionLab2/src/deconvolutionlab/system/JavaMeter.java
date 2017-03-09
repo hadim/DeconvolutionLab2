@@ -35,7 +35,7 @@ import java.awt.Graphics;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
 
-import lab.tools.NumFormat;
+import bilib.tools.NumFormat;
 
 public class JavaMeter extends AbstractMeter {
 

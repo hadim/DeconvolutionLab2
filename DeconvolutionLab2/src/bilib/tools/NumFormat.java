@@ -29,7 +29,7 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lab.tools;
+package bilib.tools;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;

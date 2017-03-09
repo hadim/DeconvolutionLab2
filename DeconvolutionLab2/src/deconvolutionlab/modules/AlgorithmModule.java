@@ -46,6 +46,7 @@ import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import bilib.component.HTMLPane;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolution.DeconvolutionDialog;
@@ -53,7 +54,6 @@ import deconvolution.algorithm.AbstractAlgorithmPanel;
 import deconvolution.algorithm.Algorithm;
 import deconvolutionlab.Config;
 import deconvolutionlab.Lab;
-import lab.component.HTMLPane;
 
 public class AlgorithmModule extends AbstractModule implements ActionListener, ChangeListener {
 

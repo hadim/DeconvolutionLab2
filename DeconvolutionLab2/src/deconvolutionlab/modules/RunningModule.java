@@ -41,12 +41,12 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import bilib.component.CustomizedColumn;
+import bilib.component.CustomizedTable;
+import bilib.tools.Files;
 import deconvolution.Command;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
-import lab.component.CustomizedColumn;
-import lab.component.CustomizedTable;
-import lab.tools.Files;
 
 public class RunningModule extends AbstractModule implements MouseListener {
 

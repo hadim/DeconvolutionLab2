@@ -1,4 +1,4 @@
-package lab.component;
+package bilib.component;
 
 import java.awt.Color;
 import java.awt.Graphics;

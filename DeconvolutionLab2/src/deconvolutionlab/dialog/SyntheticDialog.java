@@ -44,13 +44,13 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import bilib.component.GridPanel;
+import bilib.component.SpinnerRangeDouble;
+import bilib.component.SpinnerRangeInteger;
+import bilib.tools.NumFormat;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
 import ij.gui.GUI;
-import lab.component.GridPanel;
-import lab.component.SpinnerRangeDouble;
-import lab.component.SpinnerRangeInteger;
-import lab.tools.NumFormat;
 import signal.RealSignal;
 import signal.factory.SignalFactory;
 

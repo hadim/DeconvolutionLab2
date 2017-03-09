@@ -48,6 +48,7 @@ import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import bilib.component.JPanelImage;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolution.DeconvolutionDialog;
@@ -69,7 +70,6 @@ import deconvolutionlab.modules.OutputModule;
 import deconvolutionlab.modules.PSFModule;
 import deconvolutionlab.modules.RunningModule;
 import deconvolutionlab.system.SystemInfo;
-import lab.component.JPanelImage;
 
 public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 

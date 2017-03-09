@@ -46,14 +46,14 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import bilib.component.GridPanel;
+import bilib.component.HTMLPane;
+import bilib.component.SpinnerRangeInteger;
 import deconvolutionlab.Imaging;
 import deconvolutionlab.Output;
 import deconvolutionlab.Output.Dynamic;
 import deconvolutionlab.Output.View;
 import ij.gui.GUI;
-import lab.component.GridPanel;
-import lab.component.HTMLPane;
-import lab.component.SpinnerRangeInteger;
 
 public class OutputPanel extends JPanel implements ActionListener, ChangeListener {
 

@@ -35,13 +35,13 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import bilib.component.GridPanel;
+import bilib.component.SpinnerRangeDouble;
+import bilib.component.SpinnerRangeInteger;
+import bilib.tools.NumFormat;
 import deconvolution.Command;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
-import lab.component.GridPanel;
-import lab.component.SpinnerRangeDouble;
-import lab.component.SpinnerRangeInteger;
-import lab.tools.NumFormat;
 
 public class LandweberPanel extends AbstractAlgorithmPanel implements ChangeListener {
 

@@ -29,7 +29,7 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lab.component;
+package bilib.component;
 
 import javax.swing.JFormattedTextField;
 import javax.swing.JSpinner;

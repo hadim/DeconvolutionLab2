@@ -39,7 +39,7 @@ import java.lang.management.RuntimeMXBean;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import lab.tools.NumFormat;
+import bilib.tools.NumFormat;
 
 public class ProcessorMeter extends AbstractMeter {
 		

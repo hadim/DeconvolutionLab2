@@ -11,9 +11,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.table.DefaultTableModel;
 
+import bilib.component.CustomizedColumn;
+import bilib.component.CustomizedTable;
 import deconvolutionlab.monitor.Monitors;
-import lab.component.CustomizedColumn;
-import lab.component.CustomizedTable;
 
 public class TableStats {
 

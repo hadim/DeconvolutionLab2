@@ -36,7 +36,7 @@ import java.io.File;
 import java.lang.management.ClassLoadingMXBean;
 import java.lang.management.ManagementFactory;
 
-import lab.tools.NumFormat;
+import bilib.tools.NumFormat;
 
 public class FileMeter extends AbstractMeter {
 

@@ -2,6 +2,9 @@ package deconvolution.modules;
 
 import javax.swing.JSplitPane;
 
+import bilib.component.CustomizedTable;
+import bilib.component.HTMLPane;
+import bilib.tools.NumFormat;
 import deconvolution.Deconvolution;
 import deconvolution.Features;
 import deconvolution.algorithm.AbstractAlgorithm;
@@ -11,9 +14,6 @@ import deconvolution.algorithm.Controller;
 import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFT;
 import fft.FFT;
-import lab.component.CustomizedTable;
-import lab.component.HTMLPane;
-import lab.tools.NumFormat;
 import signal.ComplexSignal;
 import signal.RealSignal;
 import signal.SignalCollector;

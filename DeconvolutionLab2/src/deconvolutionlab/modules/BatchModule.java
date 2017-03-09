@@ -45,10 +45,10 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.ListSelectionModel;
 
+import bilib.component.CustomizedColumn;
+import bilib.component.CustomizedTable;
 import deconvolution.Deconvolution;
 import deconvolutionlab.Constants;
-import lab.component.CustomizedColumn;
-import lab.component.CustomizedTable;
 
 public class BatchModule extends AbstractModule implements MouseListener, ActionListener {
 

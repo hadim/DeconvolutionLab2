@@ -117,9 +117,9 @@ public class DeconvolutionLab2 {
 		System.out.println("java -jar DeconvolutionLab_2.jar info");
 		System.out.println("java -jar DeconvolutionLab_2.jar help");
 		System.out.println("{command} is the full command line for running a deconvolution");
-		System.out.print("Keywords of {command}: ");
+		System.out.println("Keywords of {command}: ");
 		for (String keyword : Command.keywords)
-			System.out.print(keyword + " ");
+			System.out.println("\t" + keyword);
 
 	}
 

@@ -1,3 +1,5 @@
+package bilib.tools;
+
 /*
  * DeconvolutionLab2
  * 
@@ -29,45 +31,48 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lab.tools;
-
 import java.io.File;
+import java.security.CodeSource;
 
-import javax.swing.JFileChooser;
+public class Tools {
 
-import deconvolutionlab.Lab;
+	public static String[] explodeLower(String line, String regex) {
+		String[] items = line.split(regex);
+		String[] out = new String[items.length];
+		for(int i=0; i<items.length; i++)
+			out[i] = items[i].trim().toLowerCase();
+		return out;
+	}
 
-public class Files {
-
-	public static File browseFile(String path) {
-		JFileChooser fc = new JFileChooser(); 
-		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		File dir = new File(path);
-		if (dir.exists())
-			fc.setCurrentDirectory(dir);
-		
-		int ret = fc.showOpenDialog(null); 
-		if (ret == JFileChooser.APPROVE_OPTION) {
-			File file = new File(fc.getSelectedFile().getAbsolutePath());
-			if (file.exists())
-				return file;
-		}
-		return null;
+	public static String[] explodeCase(String line, String regex) {
+		String[] items = line.split(regex);
+		String[] out = new String[items.length];
+		for(int i=0; i<items.length; i++)
+			out[i] = items[i].trim();
+		return out;
 	}
 	
-	public static File browseDirectory(String path) {
-		JFileChooser fc = new JFileChooser(); 
-		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		File dir = new File(path);
-		if (dir.exists())
-			fc.setCurrentDirectory(dir);
 
-		int ret = fc.showOpenDialog(null); 
-		if (ret == JFileChooser.APPROVE_OPTION) {
-			File file = new File(fc.getSelectedFile().getAbsolutePath());
-			if (file.exists())
-				return file;
-		}
-		return null;
+	public static String ellipsis(String text, int length) {
+		int l = text.length();
+		if (l <= length)
+			return text;
+		String result = 
+				text.substring(0,length/2) + 
+				"..." + 
+				text.substring(text.length()-length/2+3, text.length());
+		return result;
 	}
+	
+	public static String getWorkingPath() {
+		try {
+			CodeSource codeSource = Tools.class.getProtectionDomain().getCodeSource();
+			File jarFile = new File(codeSource.getLocation().toURI().getPath());
+			return jarFile.getParentFile().getPath() + File.separator;
+		}
+		catch(Exception ex) {
+			return System.getProperty("user.dir") + File.separator;
+		}
+	}
+
 }

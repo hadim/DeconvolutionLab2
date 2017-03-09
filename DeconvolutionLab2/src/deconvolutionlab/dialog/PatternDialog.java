@@ -49,8 +49,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import bilib.component.GridPanel;
 import ij.gui.GUI;
-import lab.component.GridPanel;
 
 public class PatternDialog extends JDialog implements ActionListener, WindowListener, KeyListener {
 

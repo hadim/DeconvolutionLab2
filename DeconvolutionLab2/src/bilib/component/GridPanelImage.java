@@ -29,14 +29,11 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lab.component;
+package bilib.component;
 
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
-
-import javax.swing.JPanel;
 
 /**
  * This class extends the JPanel to create grid panel given the possibility to
@@ -45,28 +42,14 @@ import javax.swing.JPanel;
  * @author Daniel Sage, Biomedical Imaging Group, EPFL, Lausanne, Switzerland.
  * 
  */
-public class JPanelImage extends JPanel {
+public class GridPanelImage extends GridPanel {
 	
 	private Image image;
 	
-	public JPanelImage() {
-		super();
-	}
-	public JPanelImage(BufferedImage img) {
-		super();
-		image = img;
-	}
-
-	public JPanelImage(String filename) {
-		super();
+	public GridPanelImage(boolean border, int defaultSpace, String filename) {
+		super(border, defaultSpace);
 		image = ImageLoader.get(filename);
 	}
-
-	public void setImage(BufferedImage image) {
-		this.image = image;
-		repaint();
-	}
-
 
 	@Override
 	  protected void paintComponent(Graphics g) {

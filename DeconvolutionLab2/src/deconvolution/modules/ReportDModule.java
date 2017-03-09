@@ -5,9 +5,9 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JSplitPane;
 
+import bilib.component.CustomizedTable;
+import bilib.component.JPanelImage;
 import deconvolution.Deconvolution;
-import lab.component.CustomizedTable;
-import lab.component.JPanelImage;
 import signal.RealSignal;
 
 public class ReportDModule extends AbstractDModule {

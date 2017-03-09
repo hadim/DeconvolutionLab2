@@ -37,9 +37,9 @@ import java.awt.event.KeyListener;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import bilib.component.GridPanel;
 import deconvolution.Command;
 import deconvolutionlab.Config;
-import lab.component.GridPanel;
 
 public class SimulationPanel extends AbstractAlgorithmPanel implements KeyListener {
 

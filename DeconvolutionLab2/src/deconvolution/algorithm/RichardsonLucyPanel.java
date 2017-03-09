@@ -35,10 +35,10 @@ import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import bilib.component.GridPanel;
+import bilib.component.SpinnerRangeInteger;
 import deconvolution.Command;
 import deconvolutionlab.Config;
-import lab.component.GridPanel;
-import lab.component.SpinnerRangeInteger;
 
 public class RichardsonLucyPanel extends AbstractAlgorithmPanel implements ChangeListener {
 

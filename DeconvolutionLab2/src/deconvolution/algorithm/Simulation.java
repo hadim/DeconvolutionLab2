@@ -33,7 +33,7 @@ package deconvolution.algorithm;
 
 import java.util.concurrent.Callable;
 
-import lab.tools.PsRandom;
+import bilib.tools.PsRandom;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;

@@ -53,6 +53,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JToolBar;
 
+import bilib.component.BorderToggledButton;
+import bilib.component.JPanelImage;
 import deconvolution.modules.AlgorithmDModule;
 import deconvolution.modules.ImageDModule;
 import deconvolution.modules.PSFDModule;
@@ -64,8 +66,6 @@ import deconvolutionlab.Lab;
 import deconvolutionlab.TableStats;
 import deconvolutionlab.monitor.StatusMonitor;
 import deconvolutionlab.monitor.TableMonitor;
-import lab.component.BorderToggledButton;
-import lab.component.JPanelImage;
 
 public class DeconvolutionDialog extends JDialog implements WindowListener, ActionListener, Runnable {
 

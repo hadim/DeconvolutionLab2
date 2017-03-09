@@ -54,7 +54,7 @@ import signal.ComplexComponent;
 import signal.ComplexSignal;
 import signal.RealSignal;
 
-public class IcyImager extends Imaging implements IcyFrameListener {
+public class IcyImager extends Imaging {
 
 	@Override
 	public Platform getPlatform() {
@@ -224,50 +224,4 @@ public class IcyImager extends Imaging implements IcyFrameListener {
 	public boolean isSelectable() {
 		return false;
 	}
-
-	@Override
-	public void icyFrameOpened(IcyFrameEvent e) {
-		System.out.println("" + e);
-	}
-
-	@Override
-	public void icyFrameClosing(IcyFrameEvent e) {
-		System.out.println("" + e);
-	}
-
-	@Override
-	public void icyFrameClosed(IcyFrameEvent e) {
-		System.out.println("" + e);
-	}
-
-	@Override
-	public void icyFrameIconified(IcyFrameEvent e) {
-		System.out.println("" + e);
-	}
-
-	@Override
-	public void icyFrameDeiconified(IcyFrameEvent e) {
-		System.out.println("" + e);
-	}
-
-	@Override
-	public void icyFrameActivated(IcyFrameEvent e) {
-		System.out.println("" + e);
-	}
-
-	@Override
-	public void icyFrameDeactivated(IcyFrameEvent e) {
-		System.out.println("" + e);
-	}
-
-	@Override
-	public void icyFrameInternalized(IcyFrameEvent e) {
-		System.out.println("" + e);
-	}
-
-	@Override
-	public void icyFrameExternalized(IcyFrameEvent e) {
-		System.out.println("" + e);
-	}
-
 }

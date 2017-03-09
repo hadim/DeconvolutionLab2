@@ -29,7 +29,7 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lab.component;
+package bilib.component;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

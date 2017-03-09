@@ -1,4 +1,4 @@
-package lab.component;
+package bilib.component;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 
-import lab.tools.NumFormat;
+import bilib.tools.NumFormat;
 
 public class RegularizationPanel extends JPanel {
 

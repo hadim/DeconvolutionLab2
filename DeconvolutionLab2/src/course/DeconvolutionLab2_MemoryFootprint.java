@@ -30,10 +30,10 @@
  */
 package course;
 
+import bilib.component.CustomizedTable;
+import bilib.tools.NumFormat;
 import deconvolution.Deconvolution;
 import ij.plugin.PlugIn;
-import lab.component.CustomizedTable;
-import lab.tools.NumFormat;
 import signal.SignalCollector;
 
 public class DeconvolutionLab2_MemoryFootprint implements PlugIn {

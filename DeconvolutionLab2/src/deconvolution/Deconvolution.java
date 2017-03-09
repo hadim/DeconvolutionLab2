@@ -34,6 +34,7 @@ package deconvolution;
 import java.io.File;
 import java.util.ArrayList;
 
+import bilib.tools.NumFormat;
 import deconvolution.algorithm.AbstractAlgorithm;
 import deconvolution.algorithm.Controller;
 import deconvolutionlab.Constants;
@@ -48,7 +49,6 @@ import deconvolutionlab.monitor.TableMonitor;
 import deconvolutionlab.monitor.Verbose;
 import deconvolutionlab.system.SystemInfo;
 import fft.AbstractFFTLibrary;
-import lab.tools.NumFormat;
 import signal.RealSignal;
 import signal.SignalCollector;
 import signal.apodization.Apodization;

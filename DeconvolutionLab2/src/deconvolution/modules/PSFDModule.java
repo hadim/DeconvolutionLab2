@@ -5,13 +5,13 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JSplitPane;
 
+import bilib.component.CustomizedTable;
+import bilib.component.JPanelImage;
+import bilib.tools.NumFormat;
 import deconvolution.Deconvolution;
 import deconvolution.Features;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
-import lab.component.CustomizedTable;
-import lab.component.JPanelImage;
-import lab.tools.NumFormat;
 import signal.Constraint;
 import signal.RealSignal;
 import signal.SignalCollector;

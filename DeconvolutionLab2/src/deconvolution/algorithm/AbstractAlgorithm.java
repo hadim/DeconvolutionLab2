@@ -37,11 +37,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import bilib.tools.NumFormat;
 import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 import fft.FFT;
-import lab.tools.NumFormat;
 import signal.Operations;
 import signal.RealSignal;
 import signal.SignalCollector;

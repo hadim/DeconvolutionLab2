@@ -53,6 +53,9 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+import bilib.component.CustomizedColumn;
+import bilib.component.CustomizedTable;
+import bilib.tools.Files;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolution.DeconvolutionDialog;
@@ -64,9 +67,6 @@ import deconvolutionlab.Lab;
 import deconvolutionlab.dialog.PatternDialog;
 import deconvolutionlab.dialog.SyntheticDialog;
 import deconvolutionlab.monitor.Monitors;
-import lab.component.CustomizedColumn;
-import lab.component.CustomizedTable;
-import lab.tools.Files;
 import signal.RealSignal;
 import signal.factory.SignalFactory;
 

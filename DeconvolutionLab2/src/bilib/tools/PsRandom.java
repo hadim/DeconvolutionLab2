@@ -48,7 +48,7 @@
 * or its derivatives.
 *
 ***************************************************************************************/
-package lab.tools;
+package bilib.tools;
 
 import java.io.Serializable;
 import java.util.Random;

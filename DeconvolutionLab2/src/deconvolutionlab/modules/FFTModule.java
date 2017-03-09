@@ -43,12 +43,12 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import bilib.component.GridPanel;
+import bilib.tools.NumFormat;
 import deconvolution.Command;
 import deconvolution.algorithm.Algorithm;
 import deconvolutionlab.Config;
 import fft.FFT;
-import lab.component.GridPanel;
-import lab.tools.NumFormat;
 
 public class FFTModule extends AbstractModule implements ActionListener, ChangeListener {
 

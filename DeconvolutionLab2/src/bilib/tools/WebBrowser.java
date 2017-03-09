@@ -29,35 +29,35 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lab.tools;
+package bilib.tools;
 
-import signal.RealSignal;
+import java.awt.Desktop;
+import java.net.URL;
 
-public class NoiseGenerator {
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
-	private static PsRandom rand = new PsRandom();
+public class WebBrowser {
 
-	private NoiseGenerator() {
-	}
-	
-	public void setSeed(long seed) {
-		rand.setSeed(seed);
-	}
-	
-	public static void gaussian(RealSignal x, double mean, double sd) {	
-		for (int k = 0; k < x.nz; k++) {
-			float[] slice = x.getXY(k);
-			for (int j = 0; j < x.ny * x.nx; j++)
-				slice[j] += (float) rand.nextGaussian(mean, sd);
+	public static boolean open(String url) {
+		Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+		if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+			try {
+				desktop.browse(new URL(url).toURI());
+				return true;
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
-	}
-
-	public static void poisson(RealSignal x, double mean) {
-		for (int k = 0; k < x.nz; k++) {
-			float[] slice = x.getXY(k);
-			for (int j = 0; j < x.ny * x.nx; j++)
-				slice[j] += (float) rand.nextPoissonian(mean);
-		}
+		
+		JFrame frame = new JFrame("Help");
+		JLabel lbl = new JLabel(url);
+		frame.add(lbl);
+		frame.pack();
+		frame.setVisible(true);
+		
+		return false;
 	}
 
 }

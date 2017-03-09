@@ -43,10 +43,10 @@ import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import bilib.component.GridPanel;
+import bilib.tools.Files;
 import deconvolution.Command;
 import deconvolutionlab.Config;
-import lab.component.GridPanel;
-import lab.tools.Files;
 
 public class WatcherModule extends AbstractModule implements ActionListener, KeyListener {
 

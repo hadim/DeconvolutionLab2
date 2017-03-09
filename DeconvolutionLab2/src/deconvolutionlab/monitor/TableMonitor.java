@@ -49,8 +49,8 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-import lab.component.CustomizedColumn;
-import lab.component.CustomizedTable;
+import bilib.component.CustomizedColumn;
+import bilib.component.CustomizedTable;
 
 public class TableMonitor implements AbstractMonitor, ActionListener {
 

@@ -31,8 +31,8 @@
 
 package deconvolutionlab.monitor;
 
+import bilib.tools.NumFormat;
 import deconvolutionlab.system.SystemUsage;
-import lab.tools.NumFormat;
 
 public class Message {
 	

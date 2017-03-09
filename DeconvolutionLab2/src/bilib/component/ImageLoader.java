@@ -29,35 +29,22 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lab.tools;
+package bilib.component;
 
-import java.awt.Desktop;
+import java.awt.Image;
 import java.net.URL;
 
-import javax.swing.JFrame;
-import javax.swing.JLabel;
+import javax.swing.ImageIcon;
 
-public class WebBrowser {
-
-	public static boolean open(String url) {
-		Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-		if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-			try {
-				desktop.browse(new URL(url).toURI());
-				return true;
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
+public class ImageLoader {
+	
+	public static Image get(String filename) {
+		URL url = ImageLoader.class.getResource(filename);
+		if (url != null) {
+			ImageIcon img = new ImageIcon(url, "") ;  
+			return img.getImage();
 		}
-		
-		JFrame frame = new JFrame("Help");
-		JLabel lbl = new JLabel(url);
-		frame.add(lbl);
-		frame.pack();
-		frame.setVisible(true);
-		
-		return false;
+		return null;
 	}
 
 }

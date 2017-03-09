@@ -43,14 +43,14 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import bilib.component.GridPanel;
+import bilib.component.SpinnerRangeInteger;
+import bilib.tools.NumFormat;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolution.Features;
 import deconvolutionlab.Config;
 import deconvolutionlab.monitor.Monitors;
-import lab.component.GridPanel;
-import lab.component.SpinnerRangeInteger;
-import lab.tools.NumFormat;
 import signal.RealSignal;
 import signal.apodization.AbstractApodization;
 import signal.apodization.Apodization;
