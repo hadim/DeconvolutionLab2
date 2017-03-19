@@ -37,51 +37,6 @@ import java.util.regex.Pattern;
 
 public class NumFormat {
 
-	public static String[] floatRepresentation(double a) {
-		double[] base = { 10, 5, 3, 2 };
-		double min = Double.MAX_VALUE;
-		double mantisse = 0;
-		double exp = 1;
-		for (int i = 0; i < base.length; i++) {
-			double p = Math.log(a) / Math.log(base[i]);
-			double e = roundToNumberOfSignificantDigits(p, 3);
-			double b = Math.pow(base[i], e);
-			if (Math.abs(a-b) < min) {
-				mantisse = base[i];
-				exp = e;
-				min = Math.abs(a-b);
-			}
-		}
-		return new String[] { "" + mantisse, "" + exp };
-	}
-
-	public static double roundToNumberOfSignificantDigits(double num, int n) {
-		double maxPowerOfTen = Math.floor(Math.log10(Double.MAX_VALUE));
-		if (num == 0) {
-			return 0;
-		}
-		final double d = Math.ceil(Math.log10(num < 0 ? -num : num));
-		final int power = n - (int) d;
-
-		double firstMagnitudeFactor = 1.0;
-		double secondMagnitudeFactor = 1.0;
-		if (power > maxPowerOfTen) {
-			firstMagnitudeFactor = Math.pow(10.0, maxPowerOfTen);
-			secondMagnitudeFactor = Math.pow(10.0, (double) power - maxPowerOfTen);
-		}
-		else {
-			firstMagnitudeFactor = Math.pow(10.0, (double) power);
-		}
-
-		double toBeRounded = num * firstMagnitudeFactor;
-		toBeRounded *= secondMagnitudeFactor;
-
-		final long shifted = Math.round(toBeRounded);
-		double rounded = ((double) shifted) / firstMagnitudeFactor;
-		rounded /= secondMagnitudeFactor;
-		return rounded;
-	}
-	
 	public static double parseNumber(String line, double def) {
 		double[] numbers = parseNumbers(line);
 		if (numbers.length >= 1)

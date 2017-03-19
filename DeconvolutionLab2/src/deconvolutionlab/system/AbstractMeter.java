@@ -40,7 +40,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import bilib.component.CustomizedTable;
+import bilib.table.CustomizedTable;
 import deconvolutionlab.Constants;
 
 public abstract class AbstractMeter extends JButton {

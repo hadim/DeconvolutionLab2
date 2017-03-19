@@ -42,15 +42,14 @@ import java.util.HashMap;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
-import bilib.component.CustomizedColumn;
-import bilib.component.CustomizedTable;
+import bilib.table.CustomizedColumn;
+import bilib.table.CustomizedTable;
 
 public class TableMonitor implements AbstractMonitor, ActionListener {
 

@@ -39,9 +39,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import bilib.component.GridPanel;
-import bilib.component.RegularizationPanel;
 import bilib.tools.NumFormat;
 import deconvolution.Command;
+import deconvolution.RegularizationPanel;
 import deconvolutionlab.Config;
 
 public class RegularizedInverseFilterPanel extends AbstractAlgorithmPanel implements KeyListener, ChangeListener {

@@ -53,13 +53,12 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import bilib.component.CustomizedColumn;
-import bilib.component.CustomizedTable;
+import bilib.table.CustomizedColumn;
+import bilib.table.CustomizedTable;
 import bilib.tools.Files;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolution.DeconvolutionDialog;
-import deconvolution.modules.ImageDModule;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 import deconvolutionlab.Imaging;

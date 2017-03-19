@@ -52,9 +52,9 @@ import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import bilib.component.CustomizedTable;
 import bilib.component.SpinnerRangeDouble;
 import bilib.component.SpinnerRangeInteger;
+import bilib.table.CustomizedTable;
 import bilib.tools.NumFormat;
 import deconvolutionlab.monitor.Monitors;
 

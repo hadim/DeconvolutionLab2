@@ -7,12 +7,18 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
+import deconvolutionlab.splash.ImageLoader;
+
 public class PanelImage extends JPanel {
 
 	private Image	image;
 	private int		w	= -1;
 	private int		h	= -1;
 
+	public PanelImage() {
+		super();
+	}
+	
 	public PanelImage(String filename) {
 		super();
 		image = ImageLoader.get(filename);
@@ -31,7 +37,12 @@ public class PanelImage extends JPanel {
 		this.w = w;
 		this.h = h;
 	}
-	
+
+	public void setImage(BufferedImage image) {
+		this.image = image;
+		repaint();
+	}
+
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);

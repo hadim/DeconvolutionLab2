@@ -1,29 +1,25 @@
 package deconvolution.modules;
 
 import java.awt.Dimension;
-import java.awt.image.BufferedImage;
 
 import javax.swing.JSplitPane;
 
-import bilib.component.CustomizedTable;
-import bilib.component.JPanelImage;
+import bilib.component.PanelImage;
+import bilib.table.CustomizedTable;
 import bilib.tools.NumFormat;
 import deconvolution.Deconvolution;
 import deconvolution.Features;
-import deconvolutionlab.Lab;
-import deconvolutionlab.monitor.Monitors;
-import signal.Constraint;
 import signal.RealSignal;
 import signal.SignalCollector;
 
 public class PSFDModule extends AbstractDModule implements Runnable {
 
-	private JPanelImage		pnImage;
+	private PanelImage	pnImage;
 	private CustomizedTable	table;
 
 	public PSFDModule(Deconvolution deconvolution) {
 		super(deconvolution);
-		pnImage = new JPanelImage();
+		pnImage = new PanelImage();
 		table = new CustomizedTable(new String[] { "Features", "Values" }, false);
 		pnImage.setPreferredSize(new Dimension(300, 300));
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(300, 300), pnImage);

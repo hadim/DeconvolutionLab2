@@ -45,8 +45,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import bilib.component.CustomizedColumn;
-import bilib.component.CustomizedTable;
+import bilib.table.CustomizedColumn;
+import bilib.table.CustomizedTable;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 public class ConfigModule extends AbstractModule implements ActionListener {

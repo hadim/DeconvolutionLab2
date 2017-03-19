@@ -39,7 +39,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -53,7 +52,6 @@ import deconvolutionlab.Imaging;
 import deconvolutionlab.Output;
 import deconvolutionlab.Output.Dynamic;
 import deconvolutionlab.Output.View;
-import ij.gui.GUI;
 
 public class OutputPanel extends JPanel implements ActionListener, ChangeListener {
 

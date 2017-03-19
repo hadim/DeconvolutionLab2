@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 import javax.swing.JScrollPane;
 
-import bilib.component.CustomizedColumn;
-import bilib.component.CustomizedTable;
+import bilib.table.CustomizedColumn;
+import bilib.table.CustomizedTable;
 import bilib.tools.NumFormat;
 import deconvolutionlab.system.SystemUsage;
 

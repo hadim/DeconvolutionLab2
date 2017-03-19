@@ -29,35 +29,39 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bilib.tools;
+package bilib.table;
 
-import signal.RealSignal;
+public class CustomizedColumn {
+	public Class<?>	classe;
+	public String	header;
+	public int		width;
+	public boolean	editable;
+	public String[]	choices;	// Combobox
+	public String	button;		// Button
+	public String	tooltip;	
 
-public class NoiseGenerator {
-
-	private static PsRandom rand = new PsRandom();
-
-	private NoiseGenerator() {
-	}
-	
-	public void setSeed(long seed) {
-		rand.setSeed(seed);
-	}
-	
-	public static void gaussian(RealSignal x, double mean, double sd) {	
-		for (int k = 0; k < x.nz; k++) {
-			float[] slice = x.getXY(k);
-			for (int j = 0; j < x.ny * x.nx; j++)
-				slice[j] += (float) rand.nextGaussian(mean, sd);
-		}
+	public CustomizedColumn(String header, Class<?> classe, int width, boolean editable) {
+		this.classe = classe;
+		this.header = header;
+		this.width = width;
+		this.editable = editable;
 	}
 
-	public static void poisson(RealSignal x, double mean) {
-		for (int k = 0; k < x.nz; k++) {
-			float[] slice = x.getXY(k);
-			for (int j = 0; j < x.ny * x.nx; j++)
-				slice[j] += (float) rand.nextPoissonian(mean);
-		}
+	public CustomizedColumn(String header, Class<?> classe, int width, String[] choices, String tooltip) {
+		this.classe = classe;
+		this.header = header;
+		this.width = width;
+		this.editable = true;
+		this.choices = choices;
+		this.tooltip = tooltip;
 	}
 
+	public CustomizedColumn(String header, Class<?> classe, int width, String button, String tooltip) {
+		this.classe = classe;
+		this.header = header;
+		this.width = width;
+		this.editable = false;
+		this.button = button;
+		this.tooltip = tooltip;
+	}
 }

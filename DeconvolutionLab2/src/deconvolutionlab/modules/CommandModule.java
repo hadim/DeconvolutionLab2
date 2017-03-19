@@ -33,22 +33,14 @@ package deconvolutionlab.modules;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
 import bilib.component.HTMLPane;
-import bilib.tools.Files;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolution.DeconvolutionDialog;
 import deconvolutionlab.Lab;
-import deconvolutionlab.dialog.PatternDialog;
-import deconvolutionlab.dialog.SyntheticDialog;
-import deconvolutionlab.monitor.Monitors;
-import signal.RealSignal;
-import signal.factory.SignalFactory;
 
 public class CommandModule extends AbstractModule {
 

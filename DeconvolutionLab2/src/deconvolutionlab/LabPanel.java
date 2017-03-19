@@ -48,10 +48,9 @@ import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import bilib.component.JPanelImage;
+import bilib.component.PanelImage;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
-import deconvolution.DeconvolutionDialog;
 import deconvolutionlab.dialog.BatchDialog;
 import deconvolutionlab.modules.AboutModule;
 import deconvolutionlab.modules.AbstractModule;
@@ -129,7 +128,7 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		panelScript = new GroupedModulePanel(buildProgrammingPanel(), this);
 		panelAbout = new GroupedModulePanel(buildAboutPanel(), this);
 		Border border = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-		JPanelImage bottom = new JPanelImage("celegans.jpg");
+		PanelImage bottom = new PanelImage("celegans.jpg");
 		bottom.setBorder(border);
 
 		bottom.setLayout(new GridLayout(1, 6));

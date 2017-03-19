@@ -11,9 +11,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import bilib.component.CustomizedColumn;
-import bilib.component.CustomizedTable;
 import bilib.component.HTMLPane;
+import bilib.table.CustomizedColumn;
+import bilib.table.CustomizedTable;
 import bilib.tools.NumFormat;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;

@@ -6,8 +6,8 @@ import java.awt.event.KeyListener;
 import javax.swing.JSplitPane;
 import javax.swing.text.BadLocationException;
 
-import bilib.component.CustomizedTable;
 import bilib.component.HTMLPane;
+import bilib.table.CustomizedTable;
 import deconvolution.Deconvolution;
 
 public class RecapDModule extends AbstractDModule implements KeyListener {

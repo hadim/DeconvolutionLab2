@@ -41,8 +41,8 @@ import java.util.ArrayList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import bilib.component.CustomizedColumn;
-import bilib.component.CustomizedTable;
+import bilib.table.CustomizedColumn;
+import bilib.table.CustomizedTable;
 import bilib.tools.Files;
 import deconvolution.Command;
 import deconvolutionlab.Config;

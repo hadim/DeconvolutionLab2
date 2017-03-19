@@ -30,7 +30,7 @@
  */
 package course;
 
-import bilib.component.CustomizedTable;
+import bilib.table.CustomizedTable;
 import bilib.tools.NumFormat;
 import deconvolution.Deconvolution;
 import ij.plugin.PlugIn;

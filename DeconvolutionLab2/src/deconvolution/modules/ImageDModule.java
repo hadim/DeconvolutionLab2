@@ -4,8 +4,8 @@ import java.awt.Dimension;
 
 import javax.swing.JSplitPane;
 
-import bilib.component.CustomizedTable;
-import bilib.component.JPanelImage;
+import bilib.component.PanelImage;
+import bilib.table.CustomizedTable;
 import bilib.tools.NumFormat;
 import deconvolution.Deconvolution;
 import deconvolution.Features;
@@ -14,12 +14,12 @@ import signal.SignalCollector;
 
 public class ImageDModule extends AbstractDModule implements Runnable {
 
-	private JPanelImage pnImage;
+	private PanelImage pnImage;
 	private CustomizedTable table;
 	
 	public ImageDModule(Deconvolution deconvolution) {
 		super(deconvolution);
-		pnImage = new JPanelImage();
+		pnImage = new PanelImage();
 		table = new CustomizedTable(new String[] { "Features", "Values" }, false);
 		pnImage.setPreferredSize(new Dimension(300, 300));
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(300, 300), pnImage);

@@ -50,9 +50,7 @@ import bilib.component.HTMLPane;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolutionlab.Constants;
-import deconvolutionlab.Lab;
 import deconvolutionlab.modules.BatchModule;
-import ij.gui.GUI;
 
 public class BatchDialog extends JDialog implements ActionListener, WindowListener {
 

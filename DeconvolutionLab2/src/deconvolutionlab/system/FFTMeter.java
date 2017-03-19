@@ -32,11 +32,6 @@
 package deconvolutionlab.system;
 
 import java.awt.Graphics;
-import java.io.File;
-import java.lang.management.ClassLoadingMXBean;
-import java.lang.management.ManagementFactory;
-
-import bilib.tools.NumFormat;
 import fft.FFT;
 
 public class FFTMeter extends AbstractMeter {

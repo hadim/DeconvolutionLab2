@@ -29,7 +29,7 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bilib.component;
+package bilib.table;
 
 import java.awt.Component;
 import java.awt.Dimension;

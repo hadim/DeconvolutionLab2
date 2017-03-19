@@ -1,4 +1,4 @@
-package bilib.component;
+package deconvolution;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

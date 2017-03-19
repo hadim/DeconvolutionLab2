@@ -42,11 +42,11 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import bilib.component.GridPanel;
-import bilib.component.RegularizationPanel;
 import bilib.component.SpinnerRangeDouble;
 import bilib.component.SpinnerRangeInteger;
 import bilib.tools.NumFormat;
 import deconvolution.Command;
+import deconvolution.RegularizationPanel;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 import wavelets.AbstractWavelets;

@@ -5,19 +5,19 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JSplitPane;
 
-import bilib.component.CustomizedTable;
-import bilib.component.JPanelImage;
+import bilib.component.PanelImage;
+import bilib.table.CustomizedTable;
 import deconvolution.Deconvolution;
 import signal.RealSignal;
 
 public class ReportDModule extends AbstractDModule {
 
-	private JPanelImage pnImage;
+	private PanelImage pnImage;
 	private CustomizedTable table;
 	
 	public ReportDModule(Deconvolution deconvolution) {
 		super(deconvolution);
-		pnImage = new JPanelImage();
+		pnImage = new PanelImage();
 		table = new CustomizedTable(new String[] { "Output", "Values" }, false);
 		pnImage.setPreferredSize(new Dimension(300, 300));
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(300, 300), pnImage);

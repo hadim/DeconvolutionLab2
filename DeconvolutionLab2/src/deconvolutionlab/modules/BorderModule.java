@@ -48,7 +48,6 @@ import bilib.component.SpinnerRangeInteger;
 import bilib.tools.NumFormat;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
-import deconvolution.Features;
 import deconvolutionlab.Config;
 import deconvolutionlab.monitor.Monitors;
 import signal.RealSignal;
@@ -69,8 +68,6 @@ public class BorderModule extends AbstractModule implements ActionListener, Chan
 	private SpinnerRangeInteger	spnExtensionZ;
 	private JLabel		        lblPad;
 	private JLabel		        lblApo;
-
-	private boolean build = false;
 	
 	public BorderModule(boolean expanded) {
 		super("Border", "", "Test", "Default", expanded);
@@ -147,7 +144,6 @@ public class BorderModule extends AbstractModule implements ActionListener, Chan
 
 		getAction1Button().addActionListener(this);
 		getAction2Button().addActionListener(this);
-		build = true;
 		return panel;
 	}
 

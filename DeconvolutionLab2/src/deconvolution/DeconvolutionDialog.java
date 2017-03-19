@@ -54,7 +54,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JToolBar;
 
 import bilib.component.BorderToggledButton;
-import bilib.component.JPanelImage;
+import bilib.component.PanelImage;
 import deconvolution.modules.AlgorithmDModule;
 import deconvolution.modules.ImageDModule;
 import deconvolution.modules.PSFDModule;
@@ -142,7 +142,7 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 
 		// Panel buttons
 		if (module == Module.ALL) {
-			JPanelImage buttons = new JPanelImage("celegans.jpg");
+			PanelImage buttons = new PanelImage("celegans.jpg");
 			buttons.setLayout(new FlowLayout());
 			buttons.setBorder(BorderFactory.createEtchedBorder());
 			buttons.add(bnReset);

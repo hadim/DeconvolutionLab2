@@ -44,8 +44,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import bilib.component.CustomizedColumn;
-import bilib.component.CustomizedTable;
+import bilib.table.CustomizedColumn;
+import bilib.table.CustomizedTable;
 import deconvolution.Command;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
