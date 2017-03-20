@@ -153,8 +153,7 @@ public class FISTAPanel extends AbstractAlgorithmPanel implements KeyListener, A
 	@Override
 	public String getDocumentation() {
 		String s = "";
-		s += "<h1>" + getName() + "</h1>";
-		s += "<h2>Shortname: FISTA</h2>";
+		s += "<h1>" + getName() + " (FISTA)</h1>";
 		s += "<p>Iterative: " + algo.isIterative() + "</p>";
 		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
 		s += "<p>Regularization: " + algo.isRegularized() + "</p>";

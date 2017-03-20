@@ -73,7 +73,10 @@ public class Message {
 	}
 	
 	public String formatTab() {
-		return level.name() + " \t " + NumFormat.time(chrono) + " \t " +  mem + " \t " + message;
+		if (level.name().equalsIgnoreCase("quiet"))
+			return "Error" + " \t " + NumFormat.time(chrono) + " \t " +  mem + " \t " + message;
+		else
+			return "Log  " + " \t " + NumFormat.time(chrono) + " \t " +  mem + " \t " + message;
 	}
 	
 	public String[] formatArray() {

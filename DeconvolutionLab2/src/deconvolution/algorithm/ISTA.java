@@ -100,7 +100,7 @@ public class ISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 	
 	@Override
 	public String getName() {
-		return "Iterative Shrinkage-Thresholding [ISTA]";
+		return "Iterative Shrinkage-Thresholding";
 	}
 	
 	@Override

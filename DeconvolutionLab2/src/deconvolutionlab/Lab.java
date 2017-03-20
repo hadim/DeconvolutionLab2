@@ -183,46 +183,22 @@ public class Lab {
 		monitors.log("Save Real Signal " + filename);
 	}
 
-	public static RealSignal createRealSignal(Monitors monitors, String arg, String cmd, String path) {
-
-		RealSignal signal = null;
-		if (arg.equalsIgnoreCase("synthetic")) {
-			signal = SignalFactory.createFromCommand(cmd);
-		}
-
-		if (arg.equalsIgnoreCase("platform")) {
-			signal = getImager().create(cmd);
-		}
 	
-		if (arg.equalsIgnoreCase("file")) {
-			File file = new File(path + File.separator + cmd);
-			if (file != null) {
-				if (file.isFile())
-					signal = Lab.openFile(monitors, path + File.separator + cmd);
-			}
-			if (signal == null) {
-				File local = new File(cmd);
-				if (local != null) {
-					if (local.isFile())
-						signal = Lab.openFile(monitors, cmd);
-				}
-			}
-		}
-		
-		if (arg.equalsIgnoreCase("dir") || arg.equalsIgnoreCase("directory")) {
-			File file = new File(path + File.separator + cmd);
-			if (file != null) {
-				if (file.isDirectory())
-					signal = Lab.openDir(monitors, path + File.separator + cmd);
-			}
-			if (signal == null) {
-				File local = new File(cmd);
-				if (local != null) {
-					if (local.isDirectory())
-						signal = Lab.openDir(monitors, cmd);
-				}
-			}
-		}
+	public static RealSignal createSynthetic(Monitors monitors, String cmd) {
+		RealSignal signal = SignalFactory.createFromCommand(cmd);
+		if (signal == null)
+			monitors.error("Unable to create " + cmd);
+		else
+			monitors.log("Create " + cmd);
+		return signal;
+	}
+
+	public static RealSignal getImage(Monitors monitors, String name) {
+		RealSignal signal = getImager().create(name);
+		if (signal == null)
+			monitors.error("Unable to get " + name);
+		else
+			monitors.log("Load " + name);
 		return signal;
 	}
 

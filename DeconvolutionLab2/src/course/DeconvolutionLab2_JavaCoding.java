@@ -47,10 +47,9 @@ public class DeconvolutionLab2_JavaCoding implements PlugIn {
 	
 	public DeconvolutionLab2_JavaCoding() {
 		String path = desktop + "Deconvolution" + File.separator + "data" + File.separator + "bars" + File.separator;
-		Monitors monitors = new Monitors();
+		Monitors monitors = Monitors.createDefaultMonitor();
 		RealSignal image = Lab.openFile(monitors, path + "bars.tif");
 		RealSignal psf = Lab.openFile(monitors, path + "psf.tif");
-		
 		Simulation convolution = new Simulation(100, 100, 10);
 		RealSignal a = convolution.run(image, psf);
 		Lab.showMIP(monitors, a, "a");

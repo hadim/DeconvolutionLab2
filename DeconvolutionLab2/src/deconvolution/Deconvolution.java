@@ -52,6 +52,7 @@ import fft.AbstractFFTLibrary;
 import signal.RealSignal;
 import signal.SignalCollector;
 import signal.apodization.Apodization;
+import signal.factory.SignalFactory;
 import signal.padding.Padding;
 
 public class Deconvolution implements Runnable {
@@ -435,7 +436,7 @@ public class Deconvolution implements Runnable {
 			return null;
 		String arg = token.option.trim();
 		String cmd = token.parameters.substring(arg.length(), token.parameters.length()).trim();
-		image = Lab.createRealSignal(monitors, arg, cmd, path);
+		image = createRealSignal(monitors, arg, cmd, path);
 		return image;
 	}
 
@@ -447,10 +448,51 @@ public class Deconvolution implements Runnable {
 			return null;
 		String arg = token.option.trim();
 		String cmd = token.parameters.substring(arg.length(), token.parameters.length()).trim();
-		psf = Lab.createRealSignal(monitors, arg, cmd, path);
+		psf = createRealSignal(monitors, arg, cmd, path);
 		return psf;
 	}
 
+	private static RealSignal createRealSignal(Monitors monitors, String arg, String cmd, String path) {
+		RealSignal signal = null;
+		if (arg.equalsIgnoreCase("synthetic")) {
+			signal = Lab.createSynthetic(monitors, cmd);
+		}
+
+		if (arg.equalsIgnoreCase("platform")) {
+			signal = Lab.getImage(monitors, cmd);
+		}
+	
+		if (arg.equalsIgnoreCase("file")) {
+			File file = new File(path + File.separator + cmd);
+			if (file != null) {
+				if (file.isFile())
+					signal = Lab.openFile(monitors, path + File.separator + cmd);
+			}
+			if (signal == null) {
+				File local = new File(cmd);
+				if (local != null) {
+					if (local.isFile())
+						signal = Lab.openFile(monitors, cmd);
+				}
+			}
+		}
+		
+		if (arg.equalsIgnoreCase("dir") || arg.equalsIgnoreCase("directory")) {
+			File file = new File(path + File.separator + cmd);
+			if (file != null) {
+				if (file.isDirectory())
+					signal = Lab.openDir(monitors, path + File.separator + cmd);
+			}
+			if (signal == null) {
+				File local = new File(cmd);
+				if (local != null) {
+					if (local.isDirectory())
+						signal = Lab.openDir(monitors, cmd);
+				}
+			}
+		}
+		return signal;
+	}
 
 	public void addDeconvolutionListener(DeconvolutionListener listener) {
 		listeners.add(listener);

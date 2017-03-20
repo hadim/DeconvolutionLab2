@@ -89,7 +89,7 @@ public class Monitors extends ArrayList<AbstractMonitor> {
 
 	private void sendMessage(Message message) {
 		for (AbstractMonitor monitor : this)
-					monitor.add(message);
+			monitor.add(message);
 	}
 	
 	private void sendProgress(Message message) {

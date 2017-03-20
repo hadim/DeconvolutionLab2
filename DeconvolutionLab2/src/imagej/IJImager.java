@@ -113,6 +113,8 @@ public class IJImager extends Imaging {
 	public RealSignal open(String filename) {
 		Opener opener = new Opener();
 		ImagePlus imp = opener.openImage(filename);
+		if (imp == null)
+			return null;
 		return build(imp);
 	}
 

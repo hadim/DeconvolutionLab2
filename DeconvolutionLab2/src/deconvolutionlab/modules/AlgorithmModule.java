@@ -74,7 +74,7 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 		String name = (String) cmb.getSelectedItem();
 		AbstractAlgorithmPanel algo = Algorithm.getPanel(name);
 		String cmd = "-algorithm " + algo.getShortnames()[0] + " " + algo.getCommand();
-		String synopsis = name;
+		String synopsis = algo.getShortnames()[0] + " " + algo.getCommand();
 		setSynopsis(synopsis);
 		setCommand(cmd);
 		return cmd;
@@ -103,6 +103,8 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 		Border b1 = BorderFactory.createEtchedBorder();
 		Border b2 = BorderFactory.createEmptyBorder(10, 10, 10, 10);
 		control.setBorder(BorderFactory.createCompoundBorder(b1, b2));
+		cards.setBorder(BorderFactory.createEtchedBorder());
+		
 		control.add(cmb);
 		control.add(cards);
 

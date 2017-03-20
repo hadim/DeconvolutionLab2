@@ -108,7 +108,7 @@ public class FISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 
 	@Override
 	public String getName() {
-		return "Fast Iterative Shrinkage-Thresholding [FISTA]";
+		return "Fast Iterative Shrinkage-Thresholding";
 	}
 	
 	@Override
