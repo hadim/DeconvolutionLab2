@@ -57,8 +57,8 @@ public class IdentityPanel extends AbstractAlgorithmPanel {
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] {"I", "ID"};
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
 	
 	@Override

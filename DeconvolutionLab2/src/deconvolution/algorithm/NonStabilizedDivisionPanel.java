@@ -57,8 +57,8 @@ public class NonStabilizedDivisionPanel extends AbstractAlgorithmPanel {
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] {"DIV"};
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
 
 	@Override
@@ -69,7 +69,10 @@ public class NonStabilizedDivisionPanel extends AbstractAlgorithmPanel {
 		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
 		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
 		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		s += "<p>Shortname: " + getShortname() + "</p>";
+		String shortname = "<p>Shortname: ";
+		for(String name : getShortnames())
+			shortname += name + " ";
+		s += shortname + "</p>";
 		return s;
 	}
 

@@ -84,7 +84,12 @@ public class TikhonovMiller extends AbstractAlgorithm implements Callable<RealSi
 
 	@Override
 	public String getName() {
-		return "Tikhonov-Miller [TM]";
+		return "Tikhonov-Miller";
+	}
+
+	@Override
+	public String[] getShortnames() {
+		return new String[] {"TM"};
 	}
 
 	@Override

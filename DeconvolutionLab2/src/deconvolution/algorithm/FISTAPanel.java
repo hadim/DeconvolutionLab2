@@ -87,11 +87,11 @@ public class FISTAPanel extends AbstractAlgorithmPanel implements KeyListener, A
 		pn.place(5, 3, "<html>Scale</html>");
 		pn.place(5, 4, cmbScale);
 
-		Config.register("Algorithm." + algo.getShortname(), "iterations", spnIter, params[0]);
-		Config.register("Algorithm." + algo.getShortname(), "step", spnStep, params[1]);
-		Config.register("Algorithm." + algo.getShortname(), "wavelets", cmbWav, wavdef.getName());
-		Config.register("Algorithm." + algo.getShortname(), "scale", cmbScale, wavdef.getScales());
-		Config.register("Algorithm." + algo.getShortname(), "reg", reg.getText(), "0.1");
+		Config.register("Algorithm." + algo.getShortnames()[0], "iterations", spnIter, params[0]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "step", spnStep, params[1]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "wavelets", cmbWav, wavdef.getName());
+		Config.register("Algorithm." + algo.getShortnames()[0], "scale", cmbScale, wavdef.getScales());
+		Config.register("Algorithm." + algo.getShortnames()[0], "reg", reg.getText(), "0.1");
 		reg.getText().addKeyListener(this);
 		reg.getSlider().addChangeListener(this);
 		spnIter.addChangeListener(this);
@@ -146,8 +146,8 @@ public class FISTAPanel extends AbstractAlgorithmPanel implements KeyListener, A
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] {"FISTA"};
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
 
 	@Override

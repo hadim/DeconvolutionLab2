@@ -81,7 +81,12 @@ public class VanCittert extends AbstractAlgorithm implements Callable<RealSignal
 
 	@Override
 	public String getName() {
-		return "Van Cittert [VC]";
+		return "Van Cittert";
+	}
+
+	@Override
+	public String[] getShortnames() {
+		return new String[] {"VC"};
 	}
 
 	@Override

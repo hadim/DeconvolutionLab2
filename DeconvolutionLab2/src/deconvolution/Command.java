@@ -254,7 +254,6 @@ public class Command {
 		String option = token.option;
 
 		AbstractAlgorithm algo = Algorithm.createAlgorithm(option);
-		algo.setShortname(option);
 		double params[] = parseNumeric(token.parameters);
 		if (params != null) {
 			algo.setParameters(params);

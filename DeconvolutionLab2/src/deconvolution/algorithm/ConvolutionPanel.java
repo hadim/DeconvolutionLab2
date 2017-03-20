@@ -57,8 +57,8 @@ public class ConvolutionPanel extends AbstractAlgorithmPanel {
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] {"CONV"};
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
 
 	@Override

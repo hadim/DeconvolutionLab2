@@ -118,10 +118,14 @@ public class RegularizedInverseFilter extends AbstractAlgorithm implements Calla
 		return X;
 	}
 
-
 	@Override
 	public String getName() {
-		return "Regularized Inverse Filter [RIF | LRIF]";
+		return "Regularized Inverse Filter";
+	}
+
+	@Override
+	public String[] getShortnames() {
+		return new String[] {"RIF", "LRIF"};
 	}
 
 	@Override

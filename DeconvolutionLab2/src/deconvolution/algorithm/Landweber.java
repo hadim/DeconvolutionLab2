@@ -77,7 +77,12 @@ public class Landweber extends AbstractAlgorithm implements Callable<RealSignal>
 
 	@Override
 	public String getName() {
-		return "Landweber [LW | LLS]";
+		return "Landweber";
+	}
+	
+	@Override
+	public String[] getShortnames() {
+		return new String[] {"LW", "LLS"};
 	}
 
 	@Override

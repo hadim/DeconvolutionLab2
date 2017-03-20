@@ -78,7 +78,12 @@ public class StarkParker extends AbstractAlgorithm implements Callable<RealSigna
 
 	@Override
 	public String getName() {
-		return "Bounded-Variable Least Squares [BVLS | SP]";
+		return "Bounded-Variable Least Squares";
+	}
+
+	@Override
+	public String[] getShortnames() {
+		return new String[] {"BVLS", "SP"};
 	}
 
 	@Override

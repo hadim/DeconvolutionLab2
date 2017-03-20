@@ -235,7 +235,6 @@ public class Lab {
 		return signal;
 	}
 
-	
 	public static RealSignal openDir(Monitors monitors, String path) {
 		
 		String parts[] = path.split(" pattern ");

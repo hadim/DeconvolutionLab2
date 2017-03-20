@@ -113,7 +113,7 @@ public class Deconvolution implements Runnable {
 		Command.decode(command, this);
 		this.command = command;
 		if (name.equals("") && algo != null)
-			name = algo.getShortname();
+			name = algo.getShortnames()[0];
 		live = false;
 	}
 
@@ -274,7 +274,10 @@ public class Deconvolution implements Runnable {
 		report.add("Algorithm", algo.getName());
 		algo.setController(controller);
 		
-		deconvolvedImage = algo.run(monitors, image, psf, fft, pad, apo, norm, true);
+		algo.setFFT(fft);
+		algo.setMonitors(monitors);
+		
+		deconvolvedImage = algo.run(image, psf, pad, apo, norm);
 
 		live = false;
 		for (DeconvolutionListener listener : listeners)
@@ -283,7 +286,7 @@ public class Deconvolution implements Runnable {
 		report.add("End", NumFormat.time(System.nanoTime() - chrono));
 
 		if (flagDisplay)
-			Lab.show(monitors, deconvolvedImage, "Result of " + algo.getShortname());
+			Lab.show(monitors, deconvolvedImage, "Result of " + algo.getShortnames()[0]);
 
 		if (finish == Finish.KILL) {
 			System.out.println("End");

@@ -91,8 +91,14 @@ public class Simulation extends AbstractAlgorithm implements Callable<RealSignal
 
 	@Override
 	public String getName() {
-		return "Simulation with noise [SIM]";
+		return "Simulation with noise";
 	}
+	
+	@Override
+	public String[] getShortnames() {
+		return new String[] {"SIM", "SIMU"};
+	}
+
 
 	@Override
 	public int getComplexityNumberofFFT() {

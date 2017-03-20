@@ -58,7 +58,12 @@ public class Convolution extends AbstractAlgorithm implements Callable<RealSigna
 
 	@Override
 	public String getName() {
-		return "Convolution Noiseless [CONV]";
+		return "Convolution Noiseless";
+	}
+
+	@Override
+	public String[] getShortnames() {
+		return new String[] {"CONV"};
 	}
 
 	@Override
@@ -114,5 +119,4 @@ public class Convolution extends AbstractAlgorithm implements Callable<RealSigna
 	public double getStepFactor() {
 		return 0;
 	}
-
 }

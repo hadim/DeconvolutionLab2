@@ -115,8 +115,6 @@ public class Algorithm {
 		else
 			algo =  getDefaultAlgorithm();
 		
-		if (algo != null)
-			algo.setShortname(shortname);
 		return algo;
 	}
 
@@ -129,7 +127,7 @@ public class Algorithm {
 	 */
 	public static AbstractAlgorithmPanel getPanel(String shortname) {
 		for (AbstractAlgorithmPanel panel : getAvailableAlgorithms()) {
-			for(String sn : panel.getShortname())
+			for(String sn : panel.getShortnames())
 				if (sn.equals(shortname.trim()))
 					return panel;
 			if (panel.getName().equals(shortname.trim()))
@@ -142,7 +140,7 @@ public class Algorithm {
 	public static ArrayList<String> getShortnames() {
 		ArrayList<String> list = new ArrayList<String>();
 		for (AbstractAlgorithmPanel algo : getAvailableAlgorithms()) {
-			for(String sn : algo.getShortname())
+			for(String sn : algo.getShortnames())
 				list.add(sn);
 		}
 		return list;

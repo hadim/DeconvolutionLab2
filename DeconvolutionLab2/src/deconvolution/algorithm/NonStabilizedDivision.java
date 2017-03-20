@@ -62,6 +62,11 @@ public class NonStabilizedDivision extends AbstractAlgorithm implements Callable
 	}
 
 	@Override
+	public String[] getShortnames() {
+		return new String[] {"DIV"};
+	}
+
+	@Override
 	public int getComplexityNumberofFFT() {
 		return 3;
 	}

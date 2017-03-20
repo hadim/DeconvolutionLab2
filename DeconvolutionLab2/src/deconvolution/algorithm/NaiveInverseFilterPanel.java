@@ -57,8 +57,8 @@ public class NaiveInverseFilterPanel extends AbstractAlgorithmPanel {
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] {"NIF", "IF"};
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
 
 	@Override

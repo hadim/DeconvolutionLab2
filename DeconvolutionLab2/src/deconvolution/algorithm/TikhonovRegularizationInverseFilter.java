@@ -120,8 +120,14 @@ public class TikhonovRegularizationInverseFilter extends AbstractAlgorithm imple
 
 	@Override
 	public String getName() {
-		return "Tikhonov Regularization [TRIF]";
+		return "Tikhonov Regularization";
 	}
+	
+	@Override
+	public String[] getShortnames() {
+		return new String[] {"TRIF"};
+	}
+
 
 	@Override
 	public double getMemoryFootprintRatio() {

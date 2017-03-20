@@ -55,7 +55,7 @@ public class RegularizedInverseFilterPanel extends AbstractAlgorithmPanel implem
 		reg = new RegularizationPanel(params[0]);
 		GridPanel pn = new GridPanel(false);
 		pn.place(0, 0, reg);
-		Config.register("Algorithm." + algo.getShortname(), "reg", reg.getText(), "0.1");
+		Config.register("Algorithm." + algo.getShortnames()[0], "reg", reg.getText(), "0.1");
 		reg.getText().addKeyListener(this);
 		reg.getSlider().addChangeListener(this);
 		return pn;
@@ -96,8 +96,8 @@ public class RegularizedInverseFilterPanel extends AbstractAlgorithmPanel implem
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] {"RIF", "LRIF"};
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
 
 	@Override

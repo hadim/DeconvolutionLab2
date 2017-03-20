@@ -35,7 +35,7 @@ import java.io.File;
 
 import javax.swing.filechooser.FileSystemView;
 
-import deconvolution.algorithm.Convolution;
+import deconvolution.algorithm.Simulation;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
 import ij.plugin.PlugIn;
@@ -43,27 +43,17 @@ import signal.RealSignal;
 
 public class DeconvolutionLab2_JavaCoding implements PlugIn {
 
-	private String desktop = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "Desktop";
-	private String root = desktop + File.separator + "Deconvolution" + File.separator;
-	private String res = root + "results" + File.separator + "bigradient" + File.separator;
-	private String data = root + "data" + File.separator + "bigradient" + File.separator;
+	private String desktop = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "Desktop" + File.separator;
 	
 	public DeconvolutionLab2_JavaCoding() {
-		
+		String path = desktop + "Deconvolution" + File.separator + "data" + File.separator + "bars" + File.separator;
 		Monitors monitors = new Monitors();
+		RealSignal image = Lab.openFile(monitors, path + "bars.tif");
+		RealSignal psf = Lab.openFile(monitors, path + "psf.tif");
 		
-		RealSignal image = Lab.openFile(filename);
-		
-		Convolution convolution = new Convolution();
-		
-	
-		RealSignal a = convolution.run(monitors, image, psf, fftlib, pad, apo, norm, threaded);
-		
-	}
-
-	private static String out(String root, String name) {
-		return "out stats " + root + name  + 
-				 " -out stack " + root + name + "_32 -out stack " + root + name + "_8 rescaled byte noshow";
+		Simulation convolution = new Simulation(100, 100, 10);
+		RealSignal a = convolution.run(image, psf);
+		Lab.showMIP(monitors, a, "a");
 	}
 		
 	public static void main(String arg[]) {

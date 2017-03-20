@@ -53,7 +53,7 @@ public class RichardsonLucyPanel extends AbstractAlgorithmPanel implements Chang
 		pn.place(1, 0, "<html><span \"nowrap\"><b>Iterations</b></span></html>");
 		pn.place(1, 1, "<html><span \"nowrap\"><i>N</i></span></html>");
 		pn.place(1, 2, spnIter);
-		Config.register("Algorithm." + algo.getShortname(), "iterations", spnIter, params[0]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "iterations", spnIter, params[0]);
 		spnIter.addChangeListener(this);
 		return pn;
 	}
@@ -74,8 +74,8 @@ public class RichardsonLucyPanel extends AbstractAlgorithmPanel implements Chang
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] {"RL"};
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
 
 	@Override

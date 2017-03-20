@@ -56,82 +56,98 @@ import signal.padding.Padding;
  */
 public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 
-    /** y is the input signal of the deconvolution. */
-	protected RealSignal	y			= null;
-	
-    /** h is the PSF signal for the deconvolution. */
-	protected RealSignal	h			= null;
-	
-    /** The controller takes the control of the algorithm, in 
-     * particular to do some operations at the starting, 
-     * at every iteration and at the end. */
-	protected Controller	controller	= null;
-    
-	/** This is the FFT used. */
-	protected AbstractFFT	fft			= null;
+	/** y is the input signal of the deconvolution. */
+	protected RealSignal			y;
 
-	/** Shortname of the algorithm given by the user, useful in particular to deal with the synonym. */
-	protected String		shortname	= "I";
+	/** h is the PSF signal for the deconvolution. */
+	protected RealSignal			h;
+
+	/**
+	 * The controller takes the control of the algorithm, in particular to do
+	 * some operations at the starting, at every iteration and at the end.
+	 */
+	protected Controller			controller;
+
+	/** This is the FFT used. */
+	protected AbstractFFT			fft	;
+
+	protected Monitors				monitors;
+	protected AbstractFFTLibrary	fftlib;
+	protected boolean				threaded;
 
 	/** Optimized implementation in term of memory footprint */
-	protected boolean optimizedMemoryFootprint	= true;
+	protected boolean				optimizedMemoryFootprint;
 
 	public AbstractAlgorithm() {
 		this.controller = new Controller();
-	}
-
-	public void setShortname(String shortname) {
-		this.shortname = shortname;
-	}
-
-	public String getShortname() {
-		return shortname;
+		monitors = Monitors.createDefaultMonitor();
+		fftlib = FFT.getFastestFFT();
+		optimizedMemoryFootprint = true;
+		threaded = true;
 	}
 
 	public void setOptimizedMemoryFootprint(boolean optimizedMemoryFootprint) {
 		this.optimizedMemoryFootprint = optimizedMemoryFootprint;
 	}
-	
+
 	public abstract String getName();
+	public abstract String[] getShortnames();
+
 	public abstract double getMemoryFootprintRatio();
+
 	public abstract int getComplexityNumberofFFT();
+
 	public abstract boolean isRegularized();
+
 	public abstract boolean isStepControllable();
+
 	public abstract boolean isIterative();
+
 	public abstract boolean isWaveletsBased();
+
 	public abstract void setParameters(double[] params);
+
 	public abstract double getRegularizationFactor();
+
 	public abstract double getStepFactor();
+
 	public abstract double[] getParameters();
+
 	public abstract double[] getDefaultParameters();
 
-	public RealSignal run(Monitors monitors, 
-			RealSignal image, RealSignal psf, 
-			AbstractFFTLibrary fftlib, Padding pad, Apodization apo, double norm, boolean threaded) {
+	public RealSignal run(RealSignal image, RealSignal psf) {
+		return run(image, psf, new Padding(), new Apodization(), 1);
+	}
+
+	public RealSignal run(RealSignal image, RealSignal psf, Padding pad, Apodization apo) {
+		return run(image, psf, pad, apo, 1);
+	}
+
+	public RealSignal run(RealSignal image, RealSignal psf, Padding pad, Apodization apo, double norm) {
 
 		if (image == null)
 			return null;
 		if (psf == null)
 			return null;
-		
+
 		if (fftlib != null)
 			fft = FFT.createFFT(monitors, fftlib, image.nx, image.ny, image.nz);
 		else
 			fft = FFT.createDefaultFFT(monitors, image.nx, image.ny, image.nz);
 		controller.setFFT(fft);
-		
+
 		y = pad.pad(monitors, image);
 		y.setName("y");
 		apo.apodize(monitors, y);
 		monitors.log("Input: " + y.dimAsString());
-		
+
 		h = psf.changeSizeAs(y);
 		h.setName("h");
-		h.normalize(norm);	
+		h.normalize(norm);
 		monitors.log("PSF: " + h.dimAsString() + " normalized " + (norm <= 0 ? "no" : norm));
 
 		String iterations = (isIterative() ? controller.getIterationMax() + " iterations" : "direct");
-		monitors.log(getShortname() + " is starting (" + iterations + ")");
+		monitors.log(getShortnames()[0] + " is starting (" + iterations + ")");
 		controller.setMonitors(monitors);
 		controller.start(y);
 
@@ -140,7 +156,7 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 			fft = FFT.createDefaultFFT(monitors, y.nx, y.ny, y.nz);
 		else
 			fft.init(monitors, y.nx, y.ny, y.nz);
-		monitors.log(getShortname() + " data ready");
+		monitors.log(getShortnames()[0] + " data ready");
 
 		double params[] = getParameters();
 		if (params != null) {
@@ -148,7 +164,7 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 				String s = " ";
 				for (double param : params)
 					s += "" + param + " ";
-				monitors.log(getShortname() + s);
+				monitors.log(getShortnames()[0] + s);
 			}
 		}
 		RealSignal x = null;
@@ -186,12 +202,24 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		return result;
 	}
 
+	public Monitors getMonitors() {
+		return monitors;
+	}
+
+	public void setMonitors(Monitors monitors) {
+		this.monitors = monitors;
+	}
+
 	public AbstractFFT getFFT() {
 		return fft;
 	}
 
 	public void setFFT(AbstractFFT fft) {
 		this.fft = fft;
+	}
+
+	public void setFFT(AbstractFFTLibrary fftlib) {
+		this.fftlib = fftlib;
 	}
 
 	public Controller getController() {
@@ -226,12 +254,12 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		s += (isStepControllable() ? ", &gamma=" + NumFormat.nice(getStepFactor()) : "");
 		return s;
 	}
-	
+
 	public String getParametersAsString() {
 		double p[] = getParameters();
-		String param  = "";
-		for(int i=0; i<p.length; i++)
-			if (i==p.length-1)
+		String param = "";
+		for (int i = 0; i < p.length; i++)
+			if (i == p.length - 1)
 				param += p[i];
 			else
 				param += p[i] + ", ";

@@ -66,8 +66,8 @@ public class StarkParkerPanel extends AbstractAlgorithmPanel implements ChangeLi
 		pn.place(2, 0, "<html><span \"nowrap\"><b>Regularization</b></span></html>");
 		pn.place(2, 1, 4, 1, "<html><span \"nowrap\">No regularization</i></span></html>");
 
-		Config.register("Algorithm." + algo.getShortname(), "iterations", spnIter, params[0]);
-		Config.register("Algorithm." + algo.getShortname(), "step", spnStep, params[1]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "iterations", spnIter, params[0]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "step", spnStep, params[1]);
 		spnIter.addChangeListener(this);
 		spnStep.addChangeListener(this);
 		return pn;
@@ -91,8 +91,8 @@ public class StarkParkerPanel extends AbstractAlgorithmPanel implements ChangeLi
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] { "BVLS", "SP" };
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
 
 	@Override

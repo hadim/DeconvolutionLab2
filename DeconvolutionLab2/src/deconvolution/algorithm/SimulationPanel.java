@@ -66,9 +66,9 @@ public class SimulationPanel extends AbstractAlgorithmPanel implements KeyListen
 		txtMean.addKeyListener(this);
 		txtStdev.addKeyListener(this);
 		txtPoisson.addKeyListener(this);
-		Config.register("Algorithm." + algo.getShortname(), "gaussian.mean", txtMean, params[0]);
-		Config.register("Algorithm." + algo.getShortname(), "gaussian.stdev", txtStdev, params[1]);
-		Config.register("Algorithm." + algo.getShortname(), "poisson", txtPoisson, params[2]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "gaussian.mean", txtMean, params[0]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "gaussian.stdev", txtStdev, params[1]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "poisson", txtPoisson, params[2]);
 		return pn;
 	}
 
@@ -98,17 +98,17 @@ public class SimulationPanel extends AbstractAlgorithmPanel implements KeyListen
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] {"SIM", "SIMU"};
-	}
-
-	@Override
 	public String getDocumentation() {
 		String s = "";
 		s += "<h1>" + getName() + "</h1>";
 		s += "<p>This algorithm is only used for simulation. It convolves the input image with the PSF and adds some noise.</p>";
 		s += "<p>The noise has a Gaussian distribution (mean, stdev) and a Poisson distribution (poisson).</p>";
 		return s;
+	}
+
+	@Override
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
 
 }

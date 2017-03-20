@@ -63,7 +63,7 @@ public class RichardsonLucyTVPanel extends AbstractAlgorithmPanel implements Key
 		pn.place(1, 1, "<html><span \"nowrap\"><i>N</i></span></html>");
 		pn.place(1, 2, spnIter);
 		pn.place(2, 0, 3, 1, reg);
-		Config.register("Algorithm." + algo.getShortname(), "reg", reg.getText(), "0.1");
+		Config.register("Algorithm." + algo.getShortnames()[0], "reg", reg.getText(), "0.1");
 		reg.getText().addKeyListener(this);
 		reg.getSlider().addChangeListener(this);
 		spnIter.addChangeListener(this);
@@ -111,8 +111,8 @@ public class RichardsonLucyTVPanel extends AbstractAlgorithmPanel implements Key
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] {"RLTV"};
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public class RichardsonLucyTVPanel extends AbstractAlgorithmPanel implements Key
 		s += "<p>It is a iterative algorithm, relative slow to compute the Total Variation at every iteration.s</p>";
 		s += "<p>It has a weighted parameter &lamdba; to control the effect of the total variation.</p>";
 		s += "<p></p>";
-		s += "<h3>Reference: Dey et al., Microscopy Research and Technics, 2006 " + getShortname() + "</p>";
+		s += "<h3>Reference: Dey et al., Microscopy Research and Technics, 2006.</p>";
 		return s;
 	}
 }

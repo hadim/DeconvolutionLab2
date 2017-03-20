@@ -52,6 +52,11 @@ public class Identity extends AbstractAlgorithm implements Callable<RealSignal> 
 	}
 	
 	@Override
+	public String[] getShortnames() {
+		return new String[] {"I"};
+	}
+	
+	@Override
 	public double getMemoryFootprintRatio() {
 		return 5.0;
 	}

@@ -73,9 +73,9 @@ public class ICTMPanel extends AbstractAlgorithmPanel implements KeyListener, Ac
 
 		pn.place(2, 0, 5, 1, reg);
 
-		Config.register("Algorithm." + algo.getShortname(), "iterations", spnIter, params[0]);
-		Config.register("Algorithm." + algo.getShortname(), "step", spnStep, params[1]);
-		Config.register("Algorithm." + algo.getShortname(), "reg", reg.getText(), "0.1");
+		Config.register("Algorithm." + algo.getShortnames()[0], "iterations", spnIter, params[0]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "step", spnStep, params[1]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "reg", reg.getText(), "0.1");
 		reg.getText().addKeyListener(this);
 		reg.getSlider().addChangeListener(this);
 		spnIter.addChangeListener(this);
@@ -125,10 +125,9 @@ public class ICTMPanel extends AbstractAlgorithmPanel implements KeyListener, Ac
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] {"ICTM"};
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
-
 
 	@Override
 	public String getDocumentation() {
@@ -138,7 +137,10 @@ public class ICTMPanel extends AbstractAlgorithmPanel implements KeyListener, Ac
 		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
 		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
 		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		s += "<p>Shortname: " + getShortname() + "</p>";
+		String shortname = "<p>Shortname: ";
+		for(String name : getShortnames())
+			shortname += name + " ";
+		s += shortname + "</p>";
 		return s;
 	}
 }

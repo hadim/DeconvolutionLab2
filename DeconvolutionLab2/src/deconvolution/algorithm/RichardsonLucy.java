@@ -72,7 +72,12 @@ public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSi
 
 	@Override
 	public String getName() {
-		return "Richardson-Lucy [RL]";
+		return "Richardson-Lucy";
+	}
+
+	@Override
+	public String[] getShortnames() {
+		return new String[] {"RL"};
 	}
 
 	@Override

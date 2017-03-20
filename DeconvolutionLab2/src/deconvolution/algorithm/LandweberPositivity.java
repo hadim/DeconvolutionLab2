@@ -79,7 +79,12 @@ public class LandweberPositivity extends AbstractAlgorithm implements Callable<R
 
 	@Override
 	public String getName() {
-		return "Non-Negative Least-Square [NNLS | LW+]";
+		return "Non-Negative Least-Square";
+	}
+	
+	@Override
+	public String[] getShortnames() {
+		return new String[] {"NNLS", "LW+"};
 	}
 
 	@Override

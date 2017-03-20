@@ -58,7 +58,7 @@ public class TikhonovRegularizationInverseFilterPanel extends AbstractAlgorithmP
 		GridPanel pn = new GridPanel(false);
 		pn.place(0, 0, reg);
 
-		Config.register("Algorithm." + algo.getShortname(), "reg", reg.getText(), "0.1");
+		Config.register("Algorithm." + algo.getShortnames()[0], "reg", reg.getText(), "0.1");
 		reg.getText().addKeyListener(this);
 		reg.getSlider().addChangeListener(this);
 		return pn;
@@ -105,8 +105,8 @@ public class TikhonovRegularizationInverseFilterPanel extends AbstractAlgorithmP
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] {"TRIF"};
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
 
 	@Override

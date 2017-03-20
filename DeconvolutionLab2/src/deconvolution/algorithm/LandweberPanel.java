@@ -66,8 +66,8 @@ public class LandweberPanel extends AbstractAlgorithmPanel implements ChangeList
 		pn.place(2, 0, "<html><span \"nowrap\"><b>Regularization</b></span></html>");
 		pn.place(2, 1, 4, 1, "<html><span \"nowrap\">No regularization</i></span></html>");
 
-		Config.register("Algorithm." + algo.getShortname(), "iterations", spnIter, params[0]);
-		Config.register("Algorithm." + algo.getShortname(), "step", spnStep, params[1]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "iterations", spnIter, params[0]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "step", spnStep, params[1]);
 		spnIter.addChangeListener(this);
 		spnStep.addChangeListener(this);
 		return pn;
@@ -91,8 +91,8 @@ public class LandweberPanel extends AbstractAlgorithmPanel implements ChangeList
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] {"LW", "LLS"};
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
 
 	@Override
@@ -103,7 +103,10 @@ public class LandweberPanel extends AbstractAlgorithmPanel implements ChangeList
 		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
 		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
 		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		s += "<p>Shortname: " + getShortname() + "</p>";
+		String shortname = "<p>Shortname: ";
+		for(String name : getShortnames())
+			shortname += name + " ";
+		s += shortname + "</p>";
 		return s;
 	}
 }

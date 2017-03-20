@@ -63,8 +63,8 @@ public class VanCittertPanel extends AbstractAlgorithmPanel implements ChangeLis
 		pn.place(1, 3, "<html><span \"nowrap\">Step <i>&gamma;</i></span></html>");
 		pn.place(1, 4, spnStep);
 
-		Config.register("Algorithm." + algo.getShortname(), "iterations", spnIter, params[0]);
-		Config.register("Algorithm." + algo.getShortname(), "step", spnStep, params[1]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "iterations", spnIter, params[0]);
+		Config.register("Algorithm." + algo.getShortnames()[0], "step", spnStep, params[1]);
 		spnIter.addChangeListener(this);
 		spnStep.addChangeListener(this);
 		return pn;
@@ -88,8 +88,8 @@ public class VanCittertPanel extends AbstractAlgorithmPanel implements ChangeLis
 	}
 
 	@Override
-	public String[] getShortname() {
-		return new String[] {"VC"};
+	public String[] getShortnames() {
+		return algo.getShortnames();
 	}
 	
 	@Override
@@ -100,7 +100,10 @@ public class VanCittertPanel extends AbstractAlgorithmPanel implements ChangeLis
 		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
 		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
 		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		s += "<p>Shortname: " + getShortname() + "</p>";
+		String shortname = "<p>Shortname: ";
+		for(String name : getShortnames())
+			shortname += name + " ";
+		s += shortname + "</p>";
 		return s;
 	}
 }

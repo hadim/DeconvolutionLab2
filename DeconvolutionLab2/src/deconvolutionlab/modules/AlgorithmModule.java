@@ -73,7 +73,7 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 	public String getCommand() {
 		String name = (String) cmb.getSelectedItem();
 		AbstractAlgorithmPanel algo = Algorithm.getPanel(name);
-		String cmd = "-algorithm " + algo.getShortname()[0] + " " + algo.getCommand();
+		String cmd = "-algorithm " + algo.getShortnames()[0] + " " + algo.getCommand();
 		String synopsis = name;
 		setSynopsis(synopsis);
 		setCommand(cmd);

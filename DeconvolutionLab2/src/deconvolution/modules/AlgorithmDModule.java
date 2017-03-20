@@ -59,7 +59,7 @@ public class AlgorithmDModule extends AbstractDModule implements Runnable {
 		}
 		AbstractAlgorithm algo = deconvolution.algo;
 		doc.clear();
-		String name = algo.getShortname();
+		String name = algo.getShortnames()[0];
 		AbstractAlgorithmPanel algoPanel = Algorithm.getPanel(name);
 		if (algoPanel != null)
 			doc.append(algoPanel.getDocumentation());
