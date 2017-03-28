@@ -33,7 +33,7 @@
 import java.io.File;
 
 import deconvolution.Deconvolution;
-import deconvolutionlab.Imaging;
+import deconvolutionlab.Imager;
 import deconvolutionlab.Lab;
 import deconvolutionlab.LabDialog;
 import ij.ImagePlus;
@@ -52,7 +52,7 @@ import signal.RealSignal;
 public class DL2 {
 
 	public static void lab() {
-		Lab.init(Imaging.Platform.MATLAB, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
+		Lab.init(Imager.Platform.MATLAB, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
 		LabDialog dlg = new LabDialog();
 		Lab.setVisible(dlg, false);
 	}

@@ -34,8 +34,8 @@ import java.io.File;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolutionlab.Constants;
-import deconvolutionlab.Imaging;
-import deconvolutionlab.Imaging.Platform;
+import deconvolutionlab.Imager;
+import deconvolutionlab.Imager.Platform;
 import deconvolutionlab.Lab;
 import deconvolutionlab.LabDialog;
 import deconvolutionlab.monitor.Monitors;
@@ -125,7 +125,7 @@ public class DeconvolutionLab2 {
 
 	public DeconvolutionLab2(String cmd) {
 		System.out.println("cmd: " + cmd);
-		Lab.init(Imaging.Platform.STANDALONE, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
+		Lab.init(Imager.Platform.STANDALONE, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
 		new Deconvolution("CommandLine", cmd).deconvolve();
 	}
 	

@@ -61,7 +61,7 @@ import deconvolution.Deconvolution;
 import deconvolution.DeconvolutionDialog;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
-import deconvolutionlab.Imaging;
+import deconvolutionlab.Imager;
 import deconvolutionlab.Lab;
 import deconvolutionlab.dialog.PatternDialog;
 import deconvolutionlab.dialog.SyntheticDialog;
@@ -115,7 +115,7 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 		pn.add(bnFile);
 		pn.add(bnDirectory);
 		pn.add(bnSynthetic);
-		if (Lab.getPlatform() == Imaging.Platform.IMAGEJ)
+		if (Lab.getPlatform() == Imager.Platform.IMAGEJ)
 			pn.add(bnPlatform);
 
 		JPanel panel = new JPanel();
@@ -130,7 +130,7 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 		bnFile.addActionListener(this);
 		bnDirectory.addActionListener(this);
 		bnSynthetic.addActionListener(this);
-		if (Lab.getPlatform() == Imaging.Platform.IMAGEJ)
+		if (Lab.getPlatform() == Imager.Platform.IMAGEJ)
 			bnPlatform.addActionListener(this);
 		getAction1Button().addActionListener(this);
 		getAction2Button().addActionListener(this);

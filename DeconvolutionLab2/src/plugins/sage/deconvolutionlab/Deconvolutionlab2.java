@@ -33,7 +33,7 @@ package plugins.sage.deconvolutionlab;
 
 import java.io.File;
 
-import deconvolutionlab.Imaging;
+import deconvolutionlab.Imager;
 import deconvolutionlab.Lab;
 import icy.plugin.abstract_.PluginActionable;
 
@@ -41,7 +41,7 @@ public class Deconvolutionlab2 extends PluginActionable {
 
 	@Override
 	public void run() {
-		Lab.init(Imaging.Platform.ICY, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
+		Lab.init(Imager.Platform.ICY, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
 		new DeconvolutionLabIcyFrame();
 	}
 

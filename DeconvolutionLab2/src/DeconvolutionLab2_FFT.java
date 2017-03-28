@@ -29,7 +29,7 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import deconvolutionlab.Imaging;
+import deconvolutionlab.Imager;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
 import ij.plugin.PlugIn;
@@ -38,7 +38,7 @@ public class DeconvolutionLab2_FFT implements PlugIn {
 
 	@Override
 	public void run(String arg) {
-		Lab.init(Imaging.Platform.IMAGEJ);
+		Lab.init(Imager.Platform.IMAGEJ);
 		Lab.checkFFT(Monitors.createDefaultMonitor());
 	}
 }

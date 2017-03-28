@@ -35,7 +35,7 @@ import java.io.File;
 
 import bilib.tools.NumFormat;
 import deconvolution.algorithm.Controller;
-import deconvolutionlab.Imaging.ContainerImage;
+import deconvolutionlab.Imager.ContainerImage;
 import deconvolutionlab.monitor.Monitors;
 import signal.Constraint;
 import signal.RealSignal;
@@ -61,7 +61,7 @@ public class Output {
 	private boolean				show		= true;
 
 	private View				view		= View.STACK;
-	private Imaging.Type	type		= Imaging.Type.FLOAT;
+	private Imager.Type	type		= Imager.Type.FLOAT;
 	private Dynamic				dynamic		= Dynamic.INTACT;
 
 	private int					frequency	= 0;
@@ -106,7 +106,7 @@ public class Output {
 					found = true;
 				}
 			}
-			for (Imaging.Type t : Imaging.Type.values()) {
+			for (Imager.Type t : Imager.Type.values()) {
 				if (p.toLowerCase().equals(t.name().toLowerCase())) {
 					type = t;
 					found = true;
@@ -129,7 +129,7 @@ public class Output {
 		}
 	}
 
-	public Output(View view, boolean show, boolean save, int frequency, String name, Dynamic dynamic, Imaging.Type type, boolean center) {
+	public Output(View view, boolean show, boolean save, int frequency, String name, Dynamic dynamic, Imager.Type type, boolean center) {
 		this.name = name;
 		this.show = show;
 		this.save = save;
@@ -140,7 +140,7 @@ public class Output {
 		this.frequency = frequency;
 	}
 
-	public Output(View view, boolean show, boolean save, int frequency, String name, Dynamic dynamic, Imaging.Type type, int px, int py, int pz) {
+	public Output(View view, boolean show, boolean save, int frequency, String name, Dynamic dynamic, Imager.Type type, int px, int py, int pz) {
 		this.name = name;
 		this.show = show;
 		this.save = save;
@@ -191,7 +191,7 @@ public class Output {
 	}
 
 	public String[] getAsString() {
-		String t = (type == Imaging.Type.FLOAT ? "" : type.name().toLowerCase());
+		String t = (type == Imager.Type.FLOAT ? "" : type.name().toLowerCase());
 		String d = (dynamic == Dynamic.INTACT ? "" : dynamic.name().toLowerCase());
 		String k = "";
 		if (!center)

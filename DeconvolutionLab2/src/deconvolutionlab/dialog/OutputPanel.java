@@ -48,7 +48,7 @@ import javax.swing.event.ChangeListener;
 import bilib.component.GridPanel;
 import bilib.component.HTMLPane;
 import bilib.component.SpinnerRangeInteger;
-import deconvolutionlab.Imaging;
+import deconvolutionlab.Imager;
 import deconvolutionlab.Output;
 import deconvolutionlab.Output.Dynamic;
 import deconvolutionlab.Output.View;
@@ -169,7 +169,7 @@ public class OutputPanel extends JPanel implements ActionListener, ChangeListene
 		else if (e.getSource() == bnOK) {
 			int freq = snpSnapshot.get();
 			Dynamic dynamic = Output.Dynamic.values()[cmbDynamic.getSelectedIndex()];
-			Imaging.Type type = Imaging.Type.values()[cmbType.getSelectedIndex()];
+			Imager.Type type = Imager.Type.values()[cmbType.getSelectedIndex()];
 			boolean show = chkShow.isSelected();
 			boolean save = chkSave.isSelected();
 			String name = txtName.getText();

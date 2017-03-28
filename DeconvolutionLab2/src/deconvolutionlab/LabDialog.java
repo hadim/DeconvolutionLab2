@@ -116,7 +116,7 @@ public class LabDialog extends JDialog implements ComponentListener, ActionListe
 	@Override
 	public void dispose() {
 		super.dispose();
-		if (Lab.getPlatform() == Imaging.Platform.STANDALONE)
+		if (Lab.getPlatform() == Imager.Platform.STANDALONE)
 			System.exit(0);
 	}
 

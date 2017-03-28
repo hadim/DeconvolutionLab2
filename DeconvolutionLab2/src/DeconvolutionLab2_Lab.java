@@ -31,7 +31,7 @@
 
 import java.io.File;
 
-import deconvolutionlab.Imaging;
+import deconvolutionlab.Imager;
 import deconvolutionlab.Lab;
 import deconvolutionlab.LabDialog;
 import ij.IJ;
@@ -41,7 +41,7 @@ public class DeconvolutionLab2_Lab implements PlugIn {
 
 	@Override
 	public void run(String arg) {
-		Lab.init(Imaging.Platform.IMAGEJ, IJ.getDirectory("plugins") + File.separator + "DeconvolutionLab2.config"); 
+		Lab.init(Imager.Platform.IMAGEJ, IJ.getDirectory("plugins") + File.separator + "DeconvolutionLab2.config"); 
 		LabDialog dlg = new LabDialog();
 		Lab.setVisible(dlg, false);
 	}

@@ -61,7 +61,7 @@ import deconvolution.Deconvolution;
 import deconvolution.DeconvolutionDialog;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
-import deconvolutionlab.Imaging;
+import deconvolutionlab.Imager;
 import deconvolutionlab.Lab;
 import deconvolutionlab.dialog.PatternDialog;
 import deconvolutionlab.dialog.SyntheticDialog;
@@ -78,7 +78,7 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 	private JButton			bnPlatform;
 
 	public ImageModule(boolean expanded) {
-		super("Image", "-image", (Lab.getPlatform() == Imaging.Platform.IMAGEJ ? "Active" : ""), "Check", expanded);
+		super("Image", "-image", (Lab.getPlatform() == Imager.Platform.IMAGEJ ? "Active" : ""), "Check", expanded);
 	}
 
 	@Override
@@ -115,7 +115,7 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 		pn.add(bnFile);
 		pn.add(bnDirectory);
 		pn.add(bnSynthetic);
-		if (Lab.getPlatform() == Imaging.Platform.IMAGEJ)
+		if (Lab.getPlatform() == Imager.Platform.IMAGEJ)
 			pn.add(bnPlatform);
 
 		JPanel panel = new JPanel();

@@ -50,7 +50,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
-import deconvolutionlab.Imaging;
+import deconvolutionlab.Imager;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.WindowManager;
@@ -63,11 +63,11 @@ import signal.ComplexComponent;
 import signal.ComplexSignal;
 import signal.RealSignal;
 
-public class IJImager extends Imaging {
+public class IJImager extends Imager {
 	
 	@Override
 	public Platform getPlatform() {
-		return Imaging.Platform.IMAGEJ;
+		return Imager.Platform.IMAGEJ;
 	}
 	
 	@Override
@@ -93,12 +93,12 @@ public class IJImager extends Imaging {
 	}
 
 	@Override
-	public RealSignal create() {
+	public RealSignal getActiveImage() {
 		return build(WindowManager.getCurrentImage());
 	}
 
 	@Override
-	public RealSignal create(String name) {
+	public RealSignal getImageByName(String name) {
 		ImagePlus imp = null;
 		if (name.equalsIgnoreCase("active"))
 			imp = WindowManager.getCurrentImage();
@@ -119,7 +119,7 @@ public class IJImager extends Imaging {
 	}
 
 	@Override
-	public void show(RealSignal signal, String title, Imaging.Type type, int z) {
+	public void show(RealSignal signal, String title, Imager.Type type, int z) {
 		ImagePlus imp = build(signal, type);
 		if (imp != null) {
 			imp.setTitle(title);
@@ -135,7 +135,7 @@ public class IJImager extends Imaging {
 	}
 
 	@Override
-	public void append(ContainerImage container, RealSignal signal, String title, Imaging.Type type) {		ImagePlus cont = (ImagePlus) container.object;
+	public void append(ContainerImage container, RealSignal signal, String title, Imager.Type type) {		ImagePlus cont = (ImagePlus) container.object;
 		if (container.object == null) {
 			ImageStack stack = new ImageStack(signal.nx, signal.ny);
 			stack.addSlice(build(signal, type).getProcessor());
@@ -152,7 +152,7 @@ public class IJImager extends Imaging {
 	}
 
 	@Override
-	public void save(RealSignal signal, String filename, Imaging.Type type) {
+	public void save(RealSignal signal, String filename, Imager.Type type) {
 		ImagePlus imp = build(signal, type);
 		if (imp != null) {
 			if (imp.getStackSize() == 1) {
@@ -201,7 +201,7 @@ public class IJImager extends Imaging {
 		return signal;
 	}
 
-	private ImagePlus build(RealSignal signal, Imaging.Type type) {
+	private ImagePlus build(RealSignal signal, Imager.Type type) {
 		if (signal == null)
 			return null;
 

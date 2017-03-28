@@ -41,7 +41,7 @@ import javax.swing.JPanel;
 
 import bilib.tools.NumFormat;
 import bilib.tools.WebBrowser;
-import deconvolutionlab.Imaging.ContainerImage;
+import deconvolutionlab.Imager.ContainerImage;
 import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
@@ -54,11 +54,23 @@ import signal.RealSignal;
 import signal.factory.SignalFactory;
 import signal.factory.Sphere;
 
+/**
+ * This class contains a collection of useful static methods to manage all the
+ * peripherical aspects of the deconvolution, such as load, display, or save an
+ * image.
+ * <p>
+ * At the construction of the class, the config is loaded. In practice, any
+ * deconvolution program has to start with Lab.init(Platform).
+ * 
+ * @author Daniel Sage
+ *
+ */
+
 public class Lab {
 
-	private static Imaging imaging;
-	private static ArrayList<JFrame> frames;
-	private static ArrayList<JDialog> dialogs;
+	private static Imager				imaging;
+	private static ArrayList<JFrame>	frames;
+	private static ArrayList<JDialog>	dialogs;
 
 	static {
 		frames = new ArrayList<JFrame>();
@@ -67,15 +79,23 @@ public class Lab {
 		Config.init(System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
 	}
 
-	public static Imaging.Platform getPlatform() {
-		return imaging.getPlatform();
+	/**
+	 * Initializes the Lab with a give platform.
+	 * 
+	 * @param platform
+	 *            The platform is ImageJ, ICY, or Matlab.
+	 */
+	public static void init(Imager.Platform platform) {
+		init(platform, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
 	}
 
-	public static void init(Imaging.Platform p) {
-		init(p, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
-	}
-
-	public static void init(Imaging.Platform platform, String config) {
+	/**
+	 * Initializes the Lab with a give platform and a given configuration file
+	 * 
+	 * @param platform
+	 * @param configFilename
+	 */
+	public static void init(Imager.Platform platform, String configFilename) {
 		switch (platform) {
 		case IMAGEJ:
 			imaging = new IJImager();
@@ -87,30 +107,44 @@ public class Lab {
 			imaging = new IJImager();
 			break;
 		}
-		
-		Config.init(System.getProperty("user.dir")+File.separator+"DeconvolutionLab2.config");
+
+		Config.init(configFilename);
 	}
 
+	/**
+	 * Returns the platform.
+	 * 
+	 * @return
+	 */
+	public static Imager.Platform getPlatform() {
+		return imaging.getPlatform();
+	}
+
+	/**
+	 * Open a web page on the DeconvolutionLab2.
+	 */
 	public static void help() {
 		WebBrowser.open(Constants.url);
 	}
 
+	/**
+	 * Checks the installed FFT libraries on a small (40, 30, 20) signal.
+	 * 
+	 * @param monitors
+	 */
 	public static void checkFFT(Monitors monitors) {
-
 		ArrayList<AbstractFFTLibrary> libraries = FFT.getInstalledLibraries();
-		for (int k = 1; k <= 3; k++)
-			for (AbstractFFTLibrary library : libraries) {
-				RealSignal y = new Sphere(3, 1).generate(40, 30, 20);
-				double chrono = System.nanoTime();
-				AbstractFFT fft = library.getDefaultFFT();
-				fft.init(monitors, y.nx, y.ny, y.nz);
-				RealSignal x = fft.inverse(fft.transform(y));
-				chrono = System.nanoTime() - chrono;
-				double residu = y.getEnergy() - x.getEnergy();
-				monitors.log(fft.getName() + " Test " + k);
-				monitors.log("\t residu of reconstruction: " + residu);
-				monitors.log("\t computation time (" + x.nx + "x" + x.ny + "x" + x.nz + ") " + NumFormat.time(chrono));
-			}
+		for (AbstractFFTLibrary library : libraries) {
+			RealSignal y = new Sphere(3, 1).generate(40, 30, 20);
+			double chrono = System.nanoTime();
+			AbstractFFT fft = library.getDefaultFFT();
+			fft.init(monitors, y.nx, y.ny, y.nz);
+			RealSignal x = fft.inverse(fft.transform(y));
+			chrono = System.nanoTime() - chrono;
+			double residu = y.getEnergy() - x.getEnergy();
+			monitors.log("\t residu of reconstruction: " + residu);
+			monitors.log("\t computation time (" + x.nx + "x" + x.ny + "x" + x.nz + ") " + NumFormat.time(chrono));
+		}
 	}
 
 	public static ContainerImage createContainer(Monitors monitors, String title) {
@@ -119,15 +153,22 @@ public class Lab {
 	}
 
 	public static void append(Monitors monitors, ContainerImage container, RealSignal signal, String title) {
-		imaging.append(container, signal, title, Imaging.Type.FLOAT);
+		imaging.append(container, signal, title, Imager.Type.FLOAT);
 		monitors.log("Add Live Real Signal " + title);
 	}
 
-	public static void append(Monitors monitors, ContainerImage container, RealSignal signal, String title, Imaging.Type type) {
+	public static void append(Monitors monitors, ContainerImage container, RealSignal signal, String title, Imager.Type type) {
 		imaging.append(container, signal, title, type);
 		monitors.log("Add Live Real Signal " + title);
 	}
 
+	/**
+	 * Displays a the module of complex signal.
+	 * 
+	 * @param monitors
+	 * @param signal
+	 * @param title
+	 */
 	public static void show(Monitors monitors, ComplexSignal signal, String title) {
 		if (signal == null) {
 			monitors.error("Show " + title + " this image does not exist.");
@@ -137,25 +178,58 @@ public class Lab {
 		imaging.show(signal, title, ComplexComponent.MODULE);
 	}
 
-	public static void show(Monitors monitors, ComplexSignal signal, String title, ComplexComponent complex) {
+	/**
+	 * Displays a real 3D signal a z-stack of images.
+	 * 
+	 * @param signal
+	 */
+	public static void show(RealSignal signal) {
 		if (signal == null) {
-			monitors.error("Show " + title + " this image does not exist.");
 			return;
 		}
-		monitors.log("Show Real Signal " + title);
-		imaging.show(signal, title, complex);
+		imaging.show(signal, signal.name, Imager.Type.FLOAT, signal.nz / 2);
 	}
 
+	/**
+	 * Displays a real 3D signal a z-stack of images.
+	 * 
+	 * @param monitors
+	 * @param signal
+	 */
+	public static void show(Monitors monitors, RealSignal signal) {
+		if (signal == null) {
+			monitors.error("This image does not exist.");
+			return;
+		}
+		monitors.log("Show Real Signal " + signal.name);
+		imaging.show(signal, signal.name, Imager.Type.FLOAT, signal.nz / 2);
+	}
+
+	/**
+	 * Displays a real 3D signal a z-stack of images.
+	 * 
+	 * @param monitors
+	 * @param signal
+	 * @param title
+	 */
 	public static void show(Monitors monitors, RealSignal signal, String title) {
 		if (signal == null) {
 			monitors.error("Show " + title + " this image does not exist.");
 			return;
 		}
 		monitors.log("Show Real Signal " + title);
-		imaging.show(signal, title, Imaging.Type.FLOAT, signal.nz / 2);
+		imaging.show(signal, title, Imager.Type.FLOAT, signal.nz / 2);
 	}
 
-	public static void show(Monitors monitors, RealSignal signal, String title, Imaging.Type type) {
+	/**
+	 * Displays a real 3D signal a z-stack of images using a given type.
+	 * 
+	 * @param monitors
+	 * @param signal
+	 * @param title
+	 * @param type
+	 */
+	public static void show(Monitors monitors, RealSignal signal, String title, Imager.Type type) {
 		if (signal == null) {
 			monitors.error("Show " + title + " this image does not exist.");
 			return;
@@ -164,7 +238,17 @@ public class Lab {
 		imaging.show(signal, title, type, signal.nz / 2);
 	}
 
-	public static void show(Monitors monitors, RealSignal signal, String title, Imaging.Type type, int z) {
+	/**
+	 * Displays a real 3D signal a z-stack of images using a given type and
+	 * shows the slice number z.
+	 * 
+	 * @param monitors
+	 * @param signal
+	 * @param title
+	 * @param type
+	 * @param z
+	 */
+	public static void show(Monitors monitors, RealSignal signal, String title, Imager.Type type, int z) {
 		if (signal == null) {
 			monitors.error("Show " + title + " this image does not exist.");
 			return;
@@ -174,16 +258,15 @@ public class Lab {
 	}
 
 	public static void save(Monitors monitors, RealSignal signal, String filename) {
-		imaging.save(signal, filename, Imaging.Type.FLOAT);
+		imaging.save(signal, filename, Imager.Type.FLOAT);
 		monitors.log("Save Real Signal " + filename);
 	}
 
-	public static void save(Monitors monitors, RealSignal signal, String filename, Imaging.Type type) {
+	public static void save(Monitors monitors, RealSignal signal, String filename, Imager.Type type) {
 		imaging.save(signal, filename, type);
 		monitors.log("Save Real Signal " + filename);
 	}
 
-	
 	public static RealSignal createSynthetic(Monitors monitors, String cmd) {
 		RealSignal signal = SignalFactory.createFromCommand(cmd);
 		if (signal == null)
@@ -193,8 +276,35 @@ public class Lab {
 		return signal;
 	}
 
+	/**
+	 * Return the active image.
+	 * 
+	 * @param monitors
+	 * @return
+	 */
+	public static RealSignal getImage() {
+		return getImager().getActiveImage();
+	}
+
+	/**
+	 * Return an image from the platform with a specified name.
+	 * 
+	 * @param monitors
+	 * @return
+	 */
+	public static RealSignal getImage(String name) {
+		return getImager().getImageByName(name);
+	}
+
+	/**
+	 * Return an image from the platform with a specified name.
+	 * 
+	 * @param monitors
+	 * @param name
+	 * @return
+	 */
 	public static RealSignal getImage(Monitors monitors, String name) {
-		RealSignal signal = getImager().create(name);
+		RealSignal signal = getImager().getImageByName(name);
 		if (signal == null)
 			monitors.error("Unable to get " + name);
 		else
@@ -202,6 +312,24 @@ public class Lab {
 		return signal;
 	}
 
+	/**
+	 * Open an image from the disk.
+	 * 
+	 * @param monitors
+	 * @param filename
+	 * @return
+	 */
+	public static RealSignal openFile(String filename) {
+		return imaging.open(filename);
+	}
+
+	/**
+	 * Open an image from the disk.
+	 * 
+	 * @param monitors
+	 * @param filename
+	 * @return
+	 */
 	public static RealSignal openFile(Monitors monitors, String filename) {
 		RealSignal signal = imaging.open(filename);
 		if (signal == null)
@@ -211,8 +339,24 @@ public class Lab {
 		return signal;
 	}
 
+	/**
+	 * Open a series of image from a directory.
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static RealSignal openDir(String path) {
+		return openDir(Monitors.createDefaultMonitor(), path);
+	}
+
+	/**
+	 * Open a series of image from a directory.
+	 * 
+	 * @param monitors
+	 * @param path
+	 * @return
+	 */
 	public static RealSignal openDir(Monitors monitors, String path) {
-		
 		String parts[] = path.split(" pattern ");
 		String dirname = path;
 		String regex = "";
@@ -255,14 +399,31 @@ public class Lab {
 		return signal;
 	}
 
+	public static void showOrthoview(RealSignal signal, String title, int hx, int hy, int hz) {
+		if (signal == null) {
+			return;
+		}
+		imaging.show(signal.createOrthoview(hx, hy, hz), title, Imager.Type.FLOAT, 0);
+	}
+
 	public static void showOrthoview(Monitors monitors, RealSignal signal, String title, int hx, int hy, int hz) {
 		if (signal == null) {
 			monitors.error("Show Orthoview " + title + " this image does not exist.");
 			return;
 		}
-		imaging.show(signal.createOrthoview(hx, hy, hz), title, Imaging.Type.FLOAT, 0);
+		imaging.show(signal.createOrthoview(hx, hy, hz), title, Imager.Type.FLOAT, 0);
 	}
 
+	public static void showOrthoview(RealSignal signal) {
+		if (signal == null) {
+			return;
+		}
+		int hx = signal.nx / 2;
+		int hy = signal.ny / 2;
+		int hz = signal.nz / 2;
+		imaging.show(signal.createOrthoview(hx, hy, hz), signal.name, Imager.Type.FLOAT, 0);
+	}
+	
 	public static void showOrthoview(Monitors monitors, RealSignal signal, String title) {
 		if (signal == null) {
 			monitors.error("Show Orthoview " + title + " this image does not exist.");
@@ -271,25 +432,39 @@ public class Lab {
 		int hx = signal.nx / 2;
 		int hy = signal.ny / 2;
 		int hz = signal.nz / 2;
-		imaging.show(signal.createOrthoview(hx, hy, hz), title, Imaging.Type.FLOAT, 0);
+		imaging.show(signal.createOrthoview(hx, hy, hz), title, Imager.Type.FLOAT, 0);
 	}
 
+	public static void showMIP(RealSignal signal) {
+		if (signal == null) {
+			return;
+		}
+		imaging.show(signal.createMIP(), signal.name, Imager.Type.FLOAT, 0);
+	}
+	
 	public static void showMIP(Monitors monitors, RealSignal signal, String title) {
 		if (signal == null) {
 			monitors.error("Show MIP " + title + " this image does not exist.");
 			return;
 		}
-		imaging.show(signal.createMIP(), title, Imaging.Type.FLOAT, 0);
+		imaging.show(signal.createMIP(), title, Imager.Type.FLOAT, 0);
 	}
 
-	public static void showMontage(Monitors monitors, RealSignal signal, String title) {
+	public static void showPlanar(RealSignal signal) {
 		if (signal == null) {
-			monitors.error("Show Montage " + title + " this image does not exist.");
 			return;
 		}
-		imaging.show(signal.createMontage(), title, Imaging.Type.FLOAT, 0);
+		imaging.show(signal.createMontage(), signal.name, Imager.Type.FLOAT, 0);
 	}
-
+	
+	public static void showPlanar(Monitors monitors, RealSignal signal, String title) {
+		if (signal == null) {
+			monitors.error("Show Planar " + title + " this image does not exist.");
+			return;
+		}
+		imaging.show(signal.createMontage(), title, Imager.Type.FLOAT, 0);
+	}
+/*
 	public static RealSignal create(Monitors monitors, String name) {
 		RealSignal signal = imaging.create(name);
 		if (signal != null)
@@ -307,8 +482,8 @@ public class Lab {
 			monitors.error("Impossible to create the real signal from the active window");
 		return signal;
 	}
-
-	public static Imaging getImager() {
+*/
+	public static Imager getImager() {
 		return imaging;
 	}
 
@@ -317,14 +492,14 @@ public class Lab {
 			return imaging.getSelectedImage();
 		return "";
 	}
-	
+
 	public static void setVisible(JDialog dialog, boolean modal) {
 		if (dialog == null)
 			return;
 		dialogs.add(dialog);
 		imaging.setVisible(dialog, modal);
 	}
-	
+
 	public static void setVisible(JPanel panel, String name, int x, int y) {
 		JFrame frame = new JFrame(name);
 		frame.getContentPane().add(panel);
@@ -338,17 +513,14 @@ public class Lab {
 		frames.add(frame);
 		frame.setVisible(true);
 	}
-	
+
 	public static void close() {
-		for(JFrame frame : frames)
+		for (JFrame frame : frames)
 			if (frame != null)
 				frame.dispose();
-		for(JDialog dialog : dialogs)
+		for (JDialog dialog : dialogs)
 			if (dialog != null)
 				dialog.dispose();
 	}
-
-
-	
 
 }

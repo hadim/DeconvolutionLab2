@@ -2,7 +2,7 @@ package plugins.sage.deconvolutionlab;
 
 import java.io.File;
 
-import deconvolutionlab.Imaging;
+import deconvolutionlab.Imager;
 import deconvolutionlab.Lab;
 import deconvolutionlab.Output.View;
 import deconvolutionlab.dialog.OutputDialog;
@@ -14,7 +14,7 @@ public class Test extends PluginActionable {
 	@Override
 	public void run() {
 		
-		Lab.init(Imaging.Platform.ICY, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
+		Lab.init(Imager.Platform.ICY, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
 		IcyFrame icf = new IcyFrame();
 		icf.add(new OutputDialog(View.FIGURE).getContentPane());	
 		icf.pack();

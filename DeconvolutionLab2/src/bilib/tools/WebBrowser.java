@@ -50,13 +50,11 @@ public class WebBrowser {
 				e.printStackTrace();
 			}
 		}
-		
 		JFrame frame = new JFrame("Help");
 		JLabel lbl = new JLabel(url);
 		frame.add(lbl);
 		frame.pack();
-		frame.setVisible(true);
-		
+		frame.setVisible(true);	
 		return false;
 	}
 

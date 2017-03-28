@@ -35,7 +35,7 @@ import java.io.File;
 import javax.swing.filechooser.FileSystemView;
 
 import deconvolution.Deconvolution;
-import deconvolutionlab.Imaging;
+import deconvolutionlab.Imager;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFT;
@@ -88,7 +88,7 @@ public class DeconvolutionLab2_Course_SpectralAnaylsis implements PlugIn {
 		AbstractFFT fft = FFT.createDefaultFFT(monitors, nx, ny, nz);
 		ComplexSignal L = ComplexSignalFactory.laplacian(nx, ny, nz);
 		RealSignal laplacian = fft.inverse(L).circular().rescale(monitors);
-		Lab.save(monitors, laplacian, res + "laplacian.tif", Imaging.Type.BYTE);
+		Lab.save(monitors, laplacian, res + "laplacian.tif", Imager.Type.BYTE);
 		
 		RealSignal h = new DoG(2, 3.6).generate(nx, ny, nz);
 		h.times(0.7f);

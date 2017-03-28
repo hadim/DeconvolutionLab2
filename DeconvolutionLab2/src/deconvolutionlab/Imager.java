@@ -41,7 +41,7 @@ import signal.ComplexComponent;
 import signal.ComplexSignal;
 import signal.RealSignal;
 
-public abstract class Imaging {
+public abstract class Imager {
 
 	public enum Type {FLOAT, SHORT, BYTE};
 	public enum Platform {IMAGEJ, ICY, STANDALONE, MATLAB};
@@ -52,11 +52,11 @@ public abstract class Imaging {
 
 	public abstract void setVisible(JDialog dialog, boolean modal);
 	public abstract Platform getPlatform();
-	public abstract RealSignal create();
-	public abstract RealSignal create(String name);
+	public abstract RealSignal getActiveImage();
+	public abstract RealSignal getImageByName(String name);
 	public abstract ContainerImage createContainer(String title);
 	public abstract void show(ComplexSignal signal, String title, ComplexComponent complex);
-	public abstract void show(RealSignal signal, String title, Imaging.Type type, int z);
+	public abstract void show(RealSignal signal, String title, Imager.Type type, int z);
 	public abstract void append(ContainerImage container,  RealSignal signal, String title, Type type);
 	public abstract void save(RealSignal signal, String filename, Type type);
 	public abstract RealSignal open(String filename);
@@ -65,10 +65,10 @@ public abstract class Imaging {
 	public abstract boolean isSelectable();
 	
 
-	public static ArrayList<Imaging> getImagings() {
-		ArrayList<Imaging> imagings = new ArrayList<Imaging>();
+	public static ArrayList<Imager> getImagings() {
+		ArrayList<Imager> imagings = new ArrayList<Imager>();
 		try {
-			Imaging imaging = new IJImager();
+			Imager imaging = new IJImager();
 			if (imaging != null) {
 				imagings.add(imaging);
 			}
@@ -77,7 +77,7 @@ public abstract class Imaging {
 		}
 
 		try {
-			Imaging imaging = new IcyImager();
+			Imager imaging = new IcyImager();
 			if (imaging != null) {
 				imagings.add(imaging);
 			}
@@ -88,9 +88,9 @@ public abstract class Imaging {
 	}
 
 	public static ArrayList<String> getImagingByName() {
-		ArrayList<Imaging> imagings = getImagings();
+		ArrayList<Imager> imagings = getImagings();
 		ArrayList<String> names = new ArrayList<String>();
-		for (Imaging imaging : imagings)
+		for (Imager imaging : imagings)
 			names.add(imaging.getName());
 		return names;
 	}

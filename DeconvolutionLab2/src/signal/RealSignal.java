@@ -649,4 +649,57 @@ public class RealSignal extends Signal implements SignalListener {
 		return preview;
 	}
 
+	public RealSignal log10() {
+		int nxy = nx * ny;
+		for (int k = 0; k < nz; k++)
+		for (int i = 0; i < nxy; i++) {
+			data[k][i] = (float)Math.log10(data[k][i]);
+		}
+		return this;
+	}
+
+	public RealSignal log() {
+		int nxy = nx * ny;
+		for (int k = 0; k < nz; k++)
+		for (int i = 0; i < nxy; i++) {
+			data[k][i] = (float)Math.log(data[k][i]);
+		}
+		return this;
+	}
+	
+	public RealSignal exp() {
+		int nxy = nx * ny;
+		for (int k = 0; k < nz; k++)
+		for (int i = 0; i < nxy; i++) {
+			data[k][i] = (float)Math.exp(data[k][i]);
+		}
+		return this;
+	}
+	
+	public RealSignal abs() {
+		int nxy = nx * ny;
+		for (int k = 0; k < nz; k++)
+		for (int i = 0; i < nxy; i++) {
+			data[k][i] = (float)Math.abs(data[k][i]);
+		}
+		return this;
+	}
+	
+	public RealSignal sqrt() {
+		int nxy = nx * ny;
+		for (int k = 0; k < nz; k++)
+		for (int i = 0; i < nxy; i++) {
+			data[k][i] = (float)Math.sqrt(data[k][i]);
+		}
+		return this;
+	}
+	
+	public RealSignal sqr() {
+		int nxy = nx * ny;
+		for (int k = 0; k < nz; k++)
+		for (int i = 0; i < nxy; i++) {
+			data[k][i] = (float)(data[k][i]*data[k][i]);
+		}
+		return this;
+	}
 }

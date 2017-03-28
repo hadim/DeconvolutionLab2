@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
-import deconvolutionlab.Imaging;
+import deconvolutionlab.Imager;
 import deconvolutionlab.Lab;
 import icy.file.Saver;
 import icy.gui.frame.IcyFrameEvent;
@@ -54,11 +54,11 @@ import signal.ComplexComponent;
 import signal.ComplexSignal;
 import signal.RealSignal;
 
-public class IcyImager extends Imaging {
+public class IcyImager extends Imager {
 
 	@Override
 	public Platform getPlatform() {
-		return Imaging.Platform.ICY;
+		return Imager.Platform.ICY;
 	}
 
 	@Override
@@ -97,12 +97,12 @@ public class IcyImager extends Imaging {
 	}
 
 	@Override
-    public RealSignal create() {
+    public RealSignal getActiveImage() {
 		return build(Icy.getMainInterface().getActiveSequence());
 	}
 	
 	@Override
-    public RealSignal create(String name) {
+    public RealSignal getImageByName(String name) {
 		ArrayList<Sequence> sequences = Icy.getMainInterface().getSequences(name);
 		for(Sequence sequence : sequences)
 			if (sequence.getName().equals(name))
@@ -139,7 +139,7 @@ public class IcyImager extends Imaging {
     }
 	
 	@Override
-	public void save(RealSignal signal, String filename, Imaging.Type type) {
+	public void save(RealSignal signal, String filename, Imager.Type type) {
 		Sequence sequence = build(signal, type);
 		File file = new File(filename);
 		Saver.save(sequence, file, false, true);
@@ -158,20 +158,20 @@ public class IcyImager extends Imaging {
 		return signal;
 	}
 	
-	private Sequence build(RealSignal signal, Imaging.Type type) {
+	private Sequence build(RealSignal signal, Imager.Type type) {
 		int nx = signal.nx;
 		int ny = signal.ny;
 		int nz = signal.nz;
 		Sequence sequence = new Sequence();
 		for (int z = 0; z < nz; z++) {
-			if (type == Imaging.Type.SHORT) {
+			if (type == Imager.Type.SHORT) {
 				short[] plane = Array1DUtil.arrayToShortArray(signal.data[z], false);
 				IcyBufferedImage image = new IcyBufferedImage(nx, ny, 1, DataType.USHORT);
 				Array1DUtil.shortArrayToArray(plane, image.getDataXY(0), image.isSignedDataType());
 				image.dataChanged();
 				sequence.setImage(0, z, image);
 			}
-			else if (type == Imaging.Type.BYTE) {
+			else if (type == Imager.Type.BYTE) {
 				byte[] plane = Array1DUtil.arrayToByteArray(signal.data[z]);
 				IcyBufferedImage image = new IcyBufferedImage(nx, ny, 1, DataType.UBYTE);
 				Array1DUtil.byteArrayToArray(plane, image.getDataXY(0), image.isSignedDataType());

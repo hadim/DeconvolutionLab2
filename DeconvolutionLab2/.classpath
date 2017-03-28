@@ -4,6 +4,5 @@
 	<classpathentry kind="var" path="ICY_HOME/icy.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="ij"/>
-	<classpathentry kind="lib" path="lib/jtransforms.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

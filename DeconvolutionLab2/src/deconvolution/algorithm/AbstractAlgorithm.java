@@ -199,6 +199,7 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 
 		RealSignal result = pad.crop(monitors, x);
 		SignalCollector.free(x);
+		result.setName("Output of " + this.getShortnames()[0]);
 		return result;
 	}
 
