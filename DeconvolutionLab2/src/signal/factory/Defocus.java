@@ -41,6 +41,7 @@ public class Defocus extends SignalFactory {
 
 	public Defocus(double fwhm, double low2fwhm, double up2fwhm) {
 		super(new double[] {fwhm, low2fwhm, up2fwhm});
+		setParameters(new double[] { fwhm, low2fwhm, up2fwhm });
 	}
 
 	@Override
@@ -70,12 +71,12 @@ public class Defocus extends SignalFactory {
 	
 	@Override
 	public void fill(RealSignal signal) {
-		double sigma = 2.0 * Math.sqrt(2.0 * Math.log(2.0));
+		double sigma = fwhm;
 		double zup = zc - low2fwhm;
 		double zlw = zc + up2fwhm;
 		double Q = 2.0*Math.PI;
 		
-		double A0 = (amplitude-background) * (sigma * sigma * Q);
+		double A0 = (sigma * sigma * Q);
 		double aup = 2.0 / ((zup-zc)*(zup-zc));
 		double alw = 2.0 / ((zlw-zc)*(zlw-zc));
 		for(int z=0; z<nz; z++) {
@@ -90,10 +91,8 @@ public class Defocus extends SignalFactory {
 			for(int x=0; x<nx; x++)
 			for(int y=0; y<ny; y++) {
 				double r2 = (x-xc)*(x-xc) + (y-yc)*(y-yc);
-				signal.data[z][x+nx*y] = (float)(A * Math.exp(-K*r2) + background);
+				signal.data[z][x+nx*y] = (float)(amplitude * Math.exp(-K*r2));
 			}
 		}
 	}
-
-
 }

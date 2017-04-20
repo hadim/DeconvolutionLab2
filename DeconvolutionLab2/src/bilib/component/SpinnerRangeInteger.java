@@ -1,14 +1,12 @@
 /*
- * DeconvolutionLab2
+ * bilib --- Java Bioimaging Library ---
+ * 
+ * Author: Daniel Sage, Biomedical Imaging Group, EPFL, Lausanne, Switzerland
  * 
  * Conditions of use: You are free to use this software for research or
  * educational purposes. In addition, we expect you to include adequate
  * citations and acknowledgments whenever you present or publish results that
  * are based on it.
- * 
- * Reference: DeconvolutionLab2: An Open-Source Software for Deconvolution
- * Microscopy D. Sage, L. Donati, F. Soulez, D. Fortun, G. Schmit, A. Seitz,
- * R. Guiet, C. Vonesch, M Unser, Methods of Elsevier, 2017.
  */
 
 /*

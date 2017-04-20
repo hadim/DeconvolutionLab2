@@ -36,11 +36,12 @@ import signal.RealSignal;
 public class Ramp extends SignalFactory {
 
 	private double orientationX = 1;
-	private double orientationY = 0;
-	private double orientationZ = 0;
+	private double orientationY = 1;
+	private double orientationZ = 1;
 
 	public Ramp(double orientationX, double orientationY, double orientationZ) {
 		super(new double[] {orientationX, orientationY, orientationZ});
+		setParameters(new double[] {orientationX, orientationY, orientationZ});
 	}
 
 	@Override
@@ -70,20 +71,20 @@ public class Ramp extends SignalFactory {
 
 	@Override
 	public void fill(RealSignal signal) {
-		double A = (amplitude-background);
 		double ox = orientationX;
 		double oy = orientationY;
 		double oz = orientationZ;
-		double diag = Math.sqrt(nx*nx + ny*ny + nz*nz);
-		double len = Math.sqrt(ox*ox + oy*oy + oz*oz);
+		double mx = 1 / (3.0*nx);
+		double my = 1 / (3.0*ny);
+		double mz = 1 / (3.0*nz);
 		for(int x=0; x<nx; x++)
 		for(int y=0; y<ny; y++)
 		for(int z=0; z<nz; z++) {
-			double dx = (xc-x);
-			double dy = (yc-y);
-			double dz = (zc-z);
-			double r = (dx*ox + dy*oy + dz*oz) / (diag * len);
-			signal.data[z][x+nx*y] = (float)(A * r + background);
+			double dx = (xc-x) * mx;
+			double dy = (yc-y) * my;
+			double dz = (zc-z) * mz;
+			signal.data[z][x+nx*y] = (float)(dx*ox + dy*oy + dz*oz);
 		}
+		signal.rescale(0, amplitude);
 	}
 }

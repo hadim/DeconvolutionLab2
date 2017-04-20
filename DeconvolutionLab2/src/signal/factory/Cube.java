@@ -68,7 +68,6 @@ public class Cube extends SignalFactory {
 
 	@Override
 	public void fill(RealSignal signal) {
-		double A = (amplitude-background);
 		for(int x=0; x<nx; x++)
 		for(int y=0; y<ny; y++)
 		for(int z=0; z<nz; z++) {
@@ -78,7 +77,7 @@ public class Cube extends SignalFactory {
 			double rx = 1.0- 1.0 / (1.0 + Math.exp(-dx/slope));
 			double ry = 1.0- 1.0 / (1.0 + Math.exp(-dy/slope));
 			double rz = 1.0- 1.0 / (1.0 + Math.exp(-dz/slope));
-			signal.data[z][x+nx*y] = (float)(A * (rx *ry * rz) + background);
+			signal.data[z][x+nx*y] = (float)(amplitude * (rx *ry * rz));
 		}
 
 	}

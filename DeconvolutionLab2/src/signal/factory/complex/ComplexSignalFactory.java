@@ -77,13 +77,30 @@ public class ComplexSignalFactory {
 				for (int x = 0; x <= xsize; x++) {
 					wx = Math.PI * x / xsize;
 					wy = Math.PI * y / ysize;
-					wz = Math.PI * z / ysize;
+					wz = Math.PI * z / zsize;
 					function[x][y][z] = (float) ((wx * wx + wy * wy + wz * wz));
 				}
 		return createHermitian("Laplacian", nx, ny, nz, function);
 	}
+	
+	public static ComplexSignal directionalDerivative(int nx, int ny, int nz, double vx, double vy, double vz) {
+		int xsize = nx / 2;
+		int ysize = ny / 2;
+		int zsize = nz / 2;
+		float[][][] function = new float[xsize + 1][ysize + 1][zsize + 1];
+		double wx, wy, wz;
+		for (int z = 0; z <= zsize; z++)
+			for (int y = 0; y <= ysize; y++)
+				for (int x = 0; x <= xsize; x++) {
+					wx = Math.PI * x / xsize;
+					wy = Math.PI * y / ysize;
+					wz = Math.PI * z / zsize;
+					function[x][y][z] = (float) ((wx * vx + vy * wy + vz * wz));
+				}
+		return createHermitian("Directional Derivative", nx, ny, nz, function);
+	}
 
-	public static ComplexSignal airySimulated(int nx, int ny, int nz, double mu) {
+	public static ComplexSignal rings(int nx, int ny, int nz, double mu) {
 		int xsize = nx / 2;
 		int ysize = ny / 2;
 		int zsize = nz / 2;
@@ -103,6 +120,61 @@ public class ComplexSignalFactory {
 							- 1.0 / (1.0 + Math.exp(-K * (wr - 0.4 * mu))));
 				}
 		return createHermitian("Airy", nx, ny, nz, function);
+	}
+
+	public static ComplexSignal createHermitian(String name, int nx, int ny, int nz, float[][][] firstQuadrantReal, float[][][] firstQuadrantImag) {
+		ComplexSignal signal = new ComplexSignal(name, nx, ny, nz);
+		int xsize = firstQuadrantReal.length - 1;
+		int ysize = firstQuadrantReal[0].length - 1;
+		int zsize = firstQuadrantReal[0][0].length - 1;
+		if (xsize >= 1 && ysize >= 1 && zsize >= 1) {
+			for (int z = 0; z <= zsize; z++)
+				for (int y = 0; y <= ysize; y++)
+					for (int x = 0; x <= xsize; x++) {
+						signal.data[z][2 * (x + nx * y)] = firstQuadrantReal[x][y][z];
+						signal.data[z][2 * (x + nx * y)+1] = firstQuadrantImag[x][y][z];
+					}
+			for (int z = 0; z < zsize; z++)
+				for (int y = 0; y < ysize; y++)
+					for (int x = 0; x < xsize; x++) {
+						int a = nx - 1 - x;
+						int b = nx * (ny - 1 - y);
+						signal.data[z][2 * (a + nx * y)] = firstQuadrantReal[x + 1][y][z];
+						signal.data[z][2 * (a + b)] = firstQuadrantReal[x + 1][y + 1][z];
+						signal.data[z][2 * (x + b)] = firstQuadrantReal[x][y + 1][z];
+						signal.data[z][1 + 2 * (a + nx * y)] = firstQuadrantImag[x + 1][y][z];
+						signal.data[z][1 + 2 * (a + b)] = firstQuadrantImag[x + 1][y + 1][z];
+						signal.data[z][1 + 2 * (x + b)] = firstQuadrantImag[x][y + 1][z];
+						int c = nz - 1 - z;
+						signal.data[c][2 * (x + nx * y)] = firstQuadrantReal[x][y][z + 1];
+						signal.data[c][2 * (a + nx * y)] = firstQuadrantReal[x + 1][y][z + 1];
+						signal.data[c][2 * (a + b)] = firstQuadrantReal[x + 1][y + 1][z + 1];
+						signal.data[c][2 * (x + b)] = firstQuadrantReal[x][y + 1][z + 1];
+						signal.data[c][1 + 2 * (x + nx * y)] = firstQuadrantImag[x][y][z + 1];
+						signal.data[c][1 + 2 * (a + nx * y)] = firstQuadrantImag[x + 1][y][z + 1];
+						signal.data[c][1 + 2 * (a + b)] = firstQuadrantImag[x + 1][y + 1][z + 1];
+						signal.data[c][1 + 2 * (x + b)] = firstQuadrantImag[x][y + 1][z + 1];
+					}
+		}
+		if (zsize == 0) {
+			for (int y = 0; y <= ysize; y++)
+				for (int x = 0; x <= xsize; x++) {
+					signal.data[0][2 * (x + nx * y)] = firstQuadrantReal[x][y][0];
+					signal.data[0][1 + 2 * (x + nx * y)] = firstQuadrantImag[x][y][0];
+				}
+			for (int y = 0; y < ysize; y++)
+				for (int x = 0; x < xsize; x++) {
+					int a = nx - 1 - x;
+					int b = nx * (ny - 1 - y);
+					signal.data[0][2 * (a + nx * y)] = firstQuadrantReal[x + 1][y][0];
+					signal.data[0][2 * (a + b)] = firstQuadrantReal[x + 1][y + 1][0];
+					signal.data[0][2 * (x + b)] = firstQuadrantReal[x][y + 1][0];
+					signal.data[0][1 + 2 * (a + nx * y)] = firstQuadrantImag[x + 1][y][0];
+					signal.data[0][1 + 2 * (a + b)] = firstQuadrantImag[x + 1][y + 1][0];
+					signal.data[0][1 + 2 * (x + b)] = firstQuadrantImag[x][y + 1][0];
+				}
+		}
+		return signal;
 	}
 
 	public static ComplexSignal createHermitian(String name, int nx, int ny, int nz, float[][][] firstQuadrant) {
@@ -147,5 +219,4 @@ public class ComplexSignalFactory {
 		}
 		return signal;
 	}
-
 }

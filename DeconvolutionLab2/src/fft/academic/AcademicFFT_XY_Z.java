@@ -96,4 +96,10 @@ public class AcademicFFT_XY_Z extends AbstractFFT {
 	public String getName() {
 		return "AcademicFFT XY and Z";
 	}
+	
+	@Override
+	public boolean isMultithreadable() {
+		return false;
+	}
+
 }

@@ -36,11 +36,12 @@ import signal.RealSignal;
 public class DoubleHelix extends SignalFactory {
 
 	private double fwhm = 3.0;
-	private double dist = 10;
+	private double dist = 30;
 	private double delta = 10;
 
 	public DoubleHelix(double fwhm, double dist, double delta) {
 		super(new double[] {fwhm, dist, delta});
+		setParameters(new double[] {fwhm, dist, delta});
 	}
 
 	@Override
@@ -71,7 +72,6 @@ public class DoubleHelix extends SignalFactory {
 	@Override
 	public void fill(RealSignal signal) {
 		double K = 0.5 / (fwhm*fwhm);
-		double A = (amplitude-background);
 		double T = Math.PI/(delta*2.0);
 		for(int z=0; z<nz; z++) {
 			double cosa = Math.cos((z-zc)*T);
@@ -83,7 +83,7 @@ public class DoubleHelix extends SignalFactory {
 				double u1 = (u - dist * 0.5);
 				double u2 = (u + dist * 0.5);
 				double p = Math.exp(-((u1 * u1 + v * v) * K)) + Math.exp(-((u2 * u2 + v * v) * K));
-				signal.data[z][x+nx*y] = (float)(A * p + background);
+				signal.data[z][x+nx*y] = (float)(amplitude * p);
 			}
 		}
 	}

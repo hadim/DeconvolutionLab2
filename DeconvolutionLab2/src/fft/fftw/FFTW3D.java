@@ -74,4 +74,10 @@ public class FFTW3D extends AbstractFFT {
 	public String getName() {
 		return "FFTW2";
 	}
+	
+	@Override
+	public boolean isMultithreadable() {
+		return true;
+	}
+
 }

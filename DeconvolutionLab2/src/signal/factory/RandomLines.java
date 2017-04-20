@@ -37,10 +37,11 @@ import signal.RealSignal;
 
 public class RandomLines extends SignalFactory {
 
-	private double number = 3.0;
+	private double number = 100.0;
 
 	public RandomLines(double number) {
 		super(new double[] {number});
+		setParameters(new double[] {number});
 	}
 
 	@Override
@@ -66,8 +67,6 @@ public class RandomLines extends SignalFactory {
 	@Override
 	public void fill(RealSignal signal) {
 		Random rand = new Random(12345);
-		float A = (float)(amplitude - background);
-		signal.fill((float) (background));
 		double Q = Math.sqrt(3)*1.5;
 		for (int index = 0; index < number; index++) {
 			double x1 = -rand.nextDouble() * nx;
@@ -92,12 +91,12 @@ public class RandomLines extends SignalFactory {
 						double z = z1 + s * dz;
 						int k = (int) Math.round(z);
 						if (k >= 1 && k < nz-1) {
-							//for(int ii=i-1; ii<=i+1; ii++)
-							//for(int jj=j-1; jj<=j+1; jj++)
-							//for(int kk=k-1; kk<=k+1; kk++) {
-								double p = Q - Math.sqrt((x - i) * (x - i) + (y - j) * (y - j) + (z - k) * (z - k));
-								signal.data[k][i + nx * j] =  Math.max(signal.data[k][i + nx * j], (float)(p*A));
-							//}
+							for(int ii=i-1; ii<=i+1; ii++)
+							for(int jj=j-1; jj<=j+1; jj++)
+							for(int kk=k-1; kk<=k+1; kk++) {
+								double p = 1.0 - Math.sqrt((x - i) * (x - i) + (y - j) * (y - j) + (z - k) * (z - k))/Q;
+								signal.data[k][i + nx * j] =  Math.max(signal.data[k][i + nx * j], (float)(p*amplitude));
+							}
 						}
 					}
 				}

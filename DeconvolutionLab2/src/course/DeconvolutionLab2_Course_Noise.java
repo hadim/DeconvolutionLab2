@@ -58,10 +58,10 @@ public class DeconvolutionLab2_Course_Noise implements PlugIn {
 		int nz = 1;
 		String size = " size " + nx + " " + ny + " " + nz;
 			
-		RealSignal im = new Cube(50, 0.25).intensity(0, 100).center(0.2, 0.5, 0).generate(nx, ny, nz);
-		RealSignal i1 = new Cube(50, 0.25).intensity(0, 70).center(0.4, 0.5, 0).generate(nx, ny, nz);
-		RealSignal i2 = new Cube(50, 0.25).intensity(0, 40).center(0.6, 0.5, 0).generate(nx, ny, nz);
-		RealSignal i3 = new Cube(50, 0.25).intensity(0, 10).center(0.8, 0.5, 0).generate(nx, ny, nz);
+		RealSignal im = new Cube(50, 0.25).intensity(100).center(0.2, 0.5, 0).generate(nx, ny, nz);
+		RealSignal i1 = new Cube(50, 0.25).intensity(70).center(0.4, 0.5, 0).generate(nx, ny, nz);
+		RealSignal i2 = new Cube(50, 0.25).intensity(40).center(0.6, 0.5, 0).generate(nx, ny, nz);
+		RealSignal i3 = new Cube(50, 0.25).intensity(10).center(0.8, 0.5, 0).generate(nx, ny, nz);
 		im.plus(i1);
 		im.plus(i2);
 		im.plus(i3);

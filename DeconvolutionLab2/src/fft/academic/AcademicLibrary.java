@@ -49,11 +49,6 @@ public class AcademicLibrary extends AbstractFFTLibrary {
 	public String getLocation() {
 		return AcademicLibrary.class.getCanonicalName();
 	}
-
-	@Override
-	public boolean isMultithreadable() {
-		return false;
-	}
 	
 	@Override
 	public String getCredit() {

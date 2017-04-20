@@ -42,9 +42,9 @@ public class Landweber extends AbstractAlgorithm implements Callable<RealSignal>
 
 	private double gamma = 1.0;
 
-	public Landweber(int iter, double gamma) {
+	public Landweber(int iterMax, double gamma) {
 		super();
-		controller.setIterationMax(iter);
+		this.iterMax = iterMax;
 		this.gamma = gamma;
 	}
 
@@ -87,7 +87,7 @@ public class Landweber extends AbstractAlgorithm implements Callable<RealSignal>
 
 	@Override
 	public int getComplexityNumberofFFT() {
-		return 3 + (controller.needSpatialComputation() ? 2 * controller.getIterationMax() : 0);
+		return 3 + (controller.needSpatialComputation() ? 2 * iterMax : 0);
 	}
 
 	@Override
@@ -120,7 +120,7 @@ public class Landweber extends AbstractAlgorithm implements Callable<RealSignal>
 		if (params == null)
 			return;
 		if (params.length > 0)
-			controller.setIterationMax((int) Math.round(params[0]));
+			iterMax = (int) Math.round(params[0]);
 		if (params.length > 1)
 			gamma = (float) params[1];
 	}
@@ -132,7 +132,7 @@ public class Landweber extends AbstractAlgorithm implements Callable<RealSignal>
 
 	@Override
 	public double[] getParameters() {
-		return new double[] { controller.getIterationMax(), gamma };
+		return new double[] { iterMax, gamma };
 	}
 
 	@Override

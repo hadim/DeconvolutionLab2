@@ -86,6 +86,7 @@ public abstract class AbstractFFT {
 	}
 	
 	public abstract String getName();
+	public abstract boolean isMultithreadable();
 
 	public int getSizeX() {
 		return nx;

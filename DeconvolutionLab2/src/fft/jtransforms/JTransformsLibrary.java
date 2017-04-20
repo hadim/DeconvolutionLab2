@@ -61,11 +61,6 @@ public class JTransformsLibrary extends AbstractFFTLibrary {
 	}
 
 	@Override
-	public boolean isMultithreadable() {
-		return true;
-	}
-
-	@Override
 	public String getCredit() {
 		return "JTransforms of Piotr Wendykier";
 	}

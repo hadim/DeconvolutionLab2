@@ -70,14 +70,14 @@ public class DeconvolutionLab2_Course_Piecewise implements PlugIn {
 		int spacing = 16;
 
 		Random rand = new Random(1234);
-		RealSignal x = new Constant().intensity(0, 10).generate(nx, ny, nz);
+		RealSignal x = new Constant().intensity(10).generate(nx, ny, nz);
 		for(int i = 0; i< 12; i++) {
 			double xc = (rand.nextDouble()*0.6 + 0.2);
 			double yc = (rand.nextDouble()*0.6 + 0.2);
 			double zc = (rand.nextDouble()*0.6 + 0.2);
 			double size = 15 + (rand.nextDouble()*30);
 			double ampl = (rand.nextDouble()+0.5)*10;
-			x.plus(new Cube(size, 0.1).intensity(0, ampl).center(xc, yc, zc).generate(nx, ny, nz));
+			x.plus(new Cube(size, 0.1).intensity(ampl).center(xc, yc, zc).generate(nx, ny, nz));
 		}
 		Lab.show(monitors, x, "reference");
 		Lab.save(monitors, x, res + "ref.tif");

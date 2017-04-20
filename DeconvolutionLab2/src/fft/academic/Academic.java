@@ -71,4 +71,10 @@ public class Academic extends AbstractFFT {
 	public String getName() {
 		return "AcademicFFT";
 	}
+	
+	@Override
+	public boolean isMultithreadable() {
+		return false;
+	}
+
 }

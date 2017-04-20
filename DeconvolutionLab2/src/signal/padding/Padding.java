@@ -35,7 +35,6 @@ import java.util.ArrayList;
 
 import deconvolutionlab.monitor.Monitors;
 import signal.RealSignal;
-import signal.SignalCollector;
 
 public class Padding {
 	

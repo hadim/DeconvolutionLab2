@@ -31,6 +31,7 @@
 
 package deconvolution.algorithm;
 
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -38,11 +39,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import bilib.tools.NumFormat;
+import deconvolution.Stats;
+import deconvolutionlab.Output;
 import deconvolutionlab.monitor.Monitors;
+import deconvolutionlab.monitor.Verbose;
 import fft.AbstractFFT;
-import fft.AbstractFFTLibrary;
 import fft.FFT;
-import signal.Operations;
+import signal.Constraint;
 import signal.RealSignal;
 import signal.SignalCollector;
 import signal.apodization.Apodization;
@@ -62,28 +65,28 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 	/** h is the PSF signal for the deconvolution. */
 	protected RealSignal			h;
 
-	/**
-	 * The controller takes the control of the algorithm, in particular to do
-	 * some operations at the starting, at every iteration and at the end.
-	 */
-	protected Controller			controller;
-
-	/** This is the FFT used. */
-	protected AbstractFFT			fft	;
-
-	protected Monitors				monitors;
-	protected AbstractFFTLibrary	fftlib;
 	protected boolean				threaded;
 
 	/** Optimized implementation in term of memory footprint */
 	protected boolean				optimizedMemoryFootprint;
 
+	protected int iterMax = 0;
+	
+	protected AbstractFFT fft;
+	protected Controller controller;
+	
 	public AbstractAlgorithm() {
-		this.controller = new Controller();
-		monitors = Monitors.createDefaultMonitor();
-		fftlib = FFT.getFastestFFT();
+		setController(new Controller());
 		optimizedMemoryFootprint = true;
 		threaded = true;
+		fft = FFT.getFastestFFT().getDefaultFFT();
+	}
+	
+	public AbstractAlgorithm(Controller controller) {
+		this.controller = controller;
+		optimizedMemoryFootprint = true;
+		threaded = true;
+		fft = FFT.getFastestFFT().getDefaultFFT();
 	}
 
 	public void setOptimizedMemoryFootprint(boolean optimizedMemoryFootprint) {
@@ -92,70 +95,67 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 
 	public abstract String getName();
 	public abstract String[] getShortnames();
-
 	public abstract double getMemoryFootprintRatio();
-
 	public abstract int getComplexityNumberofFFT();
-
 	public abstract boolean isRegularized();
-
 	public abstract boolean isStepControllable();
-
 	public abstract boolean isIterative();
-
 	public abstract boolean isWaveletsBased();
-
 	public abstract void setParameters(double[] params);
-
 	public abstract double getRegularizationFactor();
-
 	public abstract double getStepFactor();
-
 	public abstract double[] getParameters();
-
 	public abstract double[] getDefaultParameters();
 
 	public RealSignal run(RealSignal image, RealSignal psf) {
-		return run(image, psf, new Padding(), new Apodization(), 1);
+		return run(image, psf, new Stats(Stats.Mode.NO));
 	}
 
-	public RealSignal run(RealSignal image, RealSignal psf, Padding pad, Apodization apo) {
-		return run(image, psf, pad, apo, 1);
-	}
-
-	public RealSignal run(RealSignal image, RealSignal psf, Padding pad, Apodization apo, double norm) {
+	public RealSignal run(RealSignal image, RealSignal psf, Stats stats) {
+		Padding pad = controller.getPadding();
+		Apodization apo = controller.getApodization();
+		double norm = controller.getNormalizationPSF();
+		
+		fft = controller.getFFT();
+		controller.setIterationsMax(iterMax);
 
 		if (image == null)
 			return null;
+		
 		if (psf == null)
 			return null;
+		
+		// Prepare the controller and the outputs
 
-		if (fftlib != null)
-			fft = FFT.createFFT(monitors, fftlib, image.nx, image.ny, image.nz);
-		else
-			fft = FFT.createDefaultFFT(monitors, image.nx, image.ny, image.nz);
-		controller.setFFT(fft);
-
+		Monitors monitors = controller.getMonitors();
+		monitors.setVerbose(controller.getVerbose());
+		monitors.log("Path: " + controller.toStringPath());
+		monitors.log("Algorithm: " + getName());
+		
+		// Prepare the signal and the PSF
 		y = pad.pad(monitors, image);
 		y.setName("y");
 		apo.apodize(monitors, y);
 		monitors.log("Input: " + y.dimAsString());
-
 		h = psf.changeSizeAs(y);
 		h.setName("h");
 		h.normalize(norm);
 		monitors.log("PSF: " + h.dimAsString() + " normalized " + (norm <= 0 ? "no" : norm));
 
-		String iterations = (isIterative() ? controller.getIterationMax() + " iterations" : "direct");
+		String iterations = (isIterative() ? iterMax + " iterations" : "direct");
+
+		controller.setIterationsMax(iterMax);
+		
 		monitors.log(getShortnames()[0] + " is starting (" + iterations + ")");
 		controller.setMonitors(monitors);
-		controller.start(y);
-
+		
+		controller.start(y, stats);
 		h.circular();
-		if (fft == null)
-			fft = FFT.createDefaultFFT(monitors, y.nx, y.ny, y.nz);
-		else
-			fft.init(monitors, y.nx, y.ny, y.nz);
+
+		// FFT
+		fft.init(monitors, y.nx, y.ny, y.nz);
+		controller.setFFT(fft);
+		
 		monitors.log(getShortnames()[0] + " data ready");
 
 		double params[] = getParameters();
@@ -191,44 +191,29 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 			e.printStackTrace();
 			x = y.duplicate();
 		}
-		x.setName("x");
-		controller.finish(x);
-		monitors.log(getName() + " is finished");
 		SignalCollector.free(y);
 		SignalCollector.free(h);
-
+		x.setName("x");
 		RealSignal result = pad.crop(monitors, x);
+		
+		controller.finish(result);
+		monitors.log(getName() + " is finished");
+
 		SignalCollector.free(x);
 		result.setName("Output of " + this.getShortnames()[0]);
 		return result;
 	}
 
-	public Monitors getMonitors() {
-		return monitors;
-	}
-
-	public void setMonitors(Monitors monitors) {
-		this.monitors = monitors;
-	}
-
-	public AbstractFFT getFFT() {
-		return fft;
-	}
-
-	public void setFFT(AbstractFFT fft) {
-		this.fft = fft;
-	}
-
-	public void setFFT(AbstractFFTLibrary fftlib) {
-		this.fftlib = fftlib;
+	public void setController(Controller controller) {
+		this.controller = controller;
 	}
 
 	public Controller getController() {
 		return controller;
 	}
 
-	public void setController(Controller controller) {
-		this.controller = controller;
+	public int getIterationsMax() {
+		return iterMax;
 	}
 
 	public int getIterations() {
@@ -250,7 +235,7 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 	public String toString() {
 		String s = "";
 		s += getName();
-		s += (isIterative() ? ", " + controller.getIterationMax() + " iterations" : " (direct)");
+		s += (isIterative() ? ", " + iterMax + " iterations" : " (direct)");
 		s += (isRegularized() ? ", &lambda=" + NumFormat.nice(getRegularizationFactor()) : "");
 		s += (isStepControllable() ? ", &gamma=" + NumFormat.nice(getStepFactor()) : "");
 		return s;
@@ -266,4 +251,148 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 				param += p[i] + ", ";
 		return param;
 	}
+	
+
+	public AbstractFFT getFFT() {
+		return controller.getFFT();
+	}
+
+	public void setFFT(AbstractFFT fft) {
+		this.fft = fft;
+		controller.setFFT(fft);
+	}
+
+	public String getPath() {
+		return controller.getPath();
+	}
+
+	public void setPath(String path) {
+		controller.setPath(path);
+	}
+
+	public boolean isSystem() {
+		return controller.isSystem();
+	}
+
+	public void setSystem(boolean system) {
+		controller.setSystem(system);
+	}
+
+	public boolean isMultithreading() {
+		return controller.isMultithreading();
+	}
+
+	public void setMultithreading(boolean multithreading) {
+		controller.setMultithreading(multithreading);
+	}
+
+	public boolean isDisplayFinal() {
+		return controller.isDisplayFinal();
+	}
+
+	public void setDisplayFinal(boolean displayFinal) {
+		controller.setDisplayFinal(displayFinal);
+	}
+
+	public double getNormalizationPSF() {
+		return controller.getNormalizationPSF();
+	}
+
+	public void setNormalizationPSF(double normalizationPSF) {
+		controller.setNormalizationPSF(normalizationPSF);
+	}
+
+	public double getEpsilon() {
+		return controller.getEpsilon();
+	}
+
+	public void setEpsilon(double epsilon) {
+		controller.setEpsilon(epsilon);
+	}
+
+	public Padding getPadding() {
+		return controller.getPadding();
+	}
+
+	public void setPadding(Padding padding) {
+		controller.setPadding(padding);
+	}
+
+	public Apodization getApodization() {
+		return controller.getApodization();
+	}
+
+	public void setApodization(Apodization apodization) {
+		controller.setApodization(apodization);
+	}
+
+	public Monitors getMonitors() {
+		return controller.getMonitors();
+	}
+
+	public void setMonitors(Monitors monitors) {
+		controller.setMonitors(monitors);
+	}
+
+	public Verbose getVerbose() {
+		return controller.getVerbose();
+	}
+
+	public void setVerbose(Verbose verbose) {
+		controller.setVerbose(verbose);
+	}
+
+	public Constraint.Mode getConstraint() {
+		return controller.getConstraint();
+	}
+
+	public void setConstraint(Constraint.Mode constraint) {
+		controller.setConstraint(constraint);
+	}
+
+	public Stats getStats() {
+		return controller.getStats();
+	}
+
+	public void setStats(Stats stats) {
+		controller.setStats(stats);
+	}
+
+	public double getResiduMin() {
+		return controller.getResiduMin();
+	}
+
+	public void setResiduMin(double residuMin) {
+		controller.setResiduMin(residuMin);
+	}
+
+	public double getTimeLimit() {
+		return controller.getTimeLimit();
+	}
+
+	public void setTimeLimit(double timeLimit) {
+		controller.setTimeLimit(timeLimit);
+	}
+
+	public String getReference() {
+		return controller.getReference();
+	}
+
+	public void setReference(String reference) {
+		controller.setReference(reference);
+	}
+
+	public ArrayList<Output> getOuts() {
+		return controller.getOuts();
+	}
+
+	public void setOuts(ArrayList<Output> outs) {
+		controller.setOuts(outs);
+	}
+
+	public void addOutput(Output out) {
+		controller.addOutput(out);
+	}
+
+
 }

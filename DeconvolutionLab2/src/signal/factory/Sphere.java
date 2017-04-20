@@ -40,6 +40,7 @@ public class Sphere extends SignalFactory {
 
 	public Sphere(double radius, double slope) {
 		super(new double[] {radius, slope});
+		setParameters(new double[] {radius, slope});
 	}
 
 	@Override
@@ -67,12 +68,11 @@ public class Sphere extends SignalFactory {
 
 	@Override
 	public void fill(RealSignal signal) {
-		double A = (amplitude-background);
 		for(int x=0; x<nx; x++)
 		for(int y=0; y<ny; y++)
 		for(int z=0; z<nz; z++) {
 			double dr = Math.sqrt((x-xc)*(x-xc) + (y-yc)*(y-yc) + (z-zc)*(z-zc)) - radius;
-			signal.data[z][x+nx*y] = (float)(A * (1.0- 1.0 / (1.0 + Math.exp(-dr/slope))) + background);
+			signal.data[z][x+nx*y] = (float)(amplitude * (1.0- 1.0 / (1.0 + Math.exp(-dr/slope))));
 		}
 	}
 }

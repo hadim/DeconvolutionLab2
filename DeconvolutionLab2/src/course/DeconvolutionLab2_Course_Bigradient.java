@@ -35,13 +35,13 @@ import java.io.File;
 
 import javax.swing.filechooser.FileSystemView;
 
+import bilib.tools.Files;
 import deconvolution.Deconvolution;
 import ij.plugin.PlugIn;
 
 public class DeconvolutionLab2_Course_Bigradient implements PlugIn {
 
-	private String desktop = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "Desktop";
-	private String root = desktop + File.separator + "Deconvolution" + File.separator;
+	private String root = Files.getDesktop() + File.separator + "Deconvolution" + File.separator;
 	private String res = root + "results" + File.separator + "bigradient" + File.separator;
 	private String data = root + "data" + File.separator + "bigradient" + File.separator;
 	

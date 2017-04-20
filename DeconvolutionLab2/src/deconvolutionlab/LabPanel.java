@@ -52,22 +52,23 @@ import bilib.component.PanelImage;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolutionlab.dialog.BatchDialog;
-import deconvolutionlab.modules.AboutModule;
-import deconvolutionlab.modules.AbstractModule;
-import deconvolutionlab.modules.AlgorithmModule;
-import deconvolutionlab.modules.BatchModule;
-import deconvolutionlab.modules.BorderModule;
-import deconvolutionlab.modules.CommandModule;
-import deconvolutionlab.modules.ConfigModule;
-import deconvolutionlab.modules.ControllerModule;
-import deconvolutionlab.modules.FFTModule;
-import deconvolutionlab.modules.GroupedModulePanel;
-import deconvolutionlab.modules.ImageModule;
-import deconvolutionlab.modules.LanguageModule;
-import deconvolutionlab.modules.LicenceModule;
-import deconvolutionlab.modules.OutputModule;
-import deconvolutionlab.modules.PSFModule;
-import deconvolutionlab.modules.RunningModule;
+import deconvolutionlab.module.AboutModule;
+import deconvolutionlab.module.AbstractModule;
+import deconvolutionlab.module.AlgorithmModule;
+import deconvolutionlab.module.BatchModule;
+import deconvolutionlab.module.BorderModule;
+import deconvolutionlab.module.CommandModule;
+import deconvolutionlab.module.ComputationModule;
+import deconvolutionlab.module.ConfigModule;
+import deconvolutionlab.module.ControllerModule;
+import deconvolutionlab.module.DirectoryModule;
+import deconvolutionlab.module.GroupedModulePanel;
+import deconvolutionlab.module.ImageModule;
+import deconvolutionlab.module.LanguageModule;
+import deconvolutionlab.module.LicenceModule;
+import deconvolutionlab.module.OutputModule;
+import deconvolutionlab.module.PSFModule;
+import deconvolutionlab.module.RunningModule;
 import deconvolutionlab.system.SystemInfo;
 
 public class LabPanel extends JPanel implements ActionListener, ChangeListener {
@@ -87,13 +88,14 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 	private AboutModule			about;
 	private LicenceModule		licence;
 	private OutputModule		output;
-	private FFTModule			fourier;
+	private ComputationModule	computation;
 	private BorderModule		border;
 	private ConfigModule		config;
 	private BatchModule			batch;
 	private LanguageModule		language;
 	private CommandModule		command;
 	private RunningModule		running;
+	private DirectoryModule		directory;
 
 	private ControllerModule	controller;
 
@@ -109,7 +111,7 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		psf = new PSFModule(false);
 		algo = new AlgorithmModule(true);
 		output = new OutputModule(true);
-		fourier = new FFTModule(false);
+		computation = new ComputationModule(false);
 		border = new BorderModule(false);
 		controller = new ControllerModule(false);
 		batch = new BatchModule(false);
@@ -119,7 +121,9 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		config = new ConfigModule(false);
 		command = new CommandModule();
 		running = new RunningModule(false);
-		modules = new AbstractModule[] { image, psf, algo, output, controller, border, fourier, batch, running };
+		directory = new DirectoryModule(false);
+
+		modules = new AbstractModule[] { image, psf, algo, output, controller, border, computation, batch, directory };
 		Command.active(modules, command);
 		Command.command();
 
@@ -212,7 +216,7 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		list.add(image);
 		list.add(psf);
 		list.add(algo);
-		list.add(running);
+		list.add(directory);
 		return list;
 	}
 
@@ -220,8 +224,8 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		ArrayList<AbstractModule> list = new ArrayList<AbstractModule>();
 		list.add(output);
 		list.add(controller);
+		list.add(computation);
 		list.add(border);
-		list.add(fourier);
 		return list;
 	}
 

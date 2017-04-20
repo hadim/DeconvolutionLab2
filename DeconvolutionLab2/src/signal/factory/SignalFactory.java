@@ -35,6 +35,7 @@ import java.util.ArrayList;
 
 import javax.swing.SwingWorker;
 
+import bilib.tools.NumFormat;
 import deconvolution.Command;
 import signal.RealSignal;
 
@@ -43,7 +44,6 @@ public abstract class SignalFactory {
 	protected double	fractXC		= 0.5;
 	protected double	fractYC		= 0.5;
 	protected double	fractZC		= 0.5;
-	protected double	background	= 0.0;
 	protected double	amplitude	= 1.0;
 	protected double	xc;
 	protected double	yc;
@@ -79,20 +79,47 @@ public abstract class SignalFactory {
 				SignalFactory factory = SignalFactory.getFactoryByName(shape);
 				if (factory == null)
 					return null;
-				double amplitude = params.length > 0 ? params[0] : 1;
-				double background = params.length > 1 ? params[1] : 0;
-				factory.intensity(background, amplitude);
+				
 				int np = factory.getParameters().length;
-				double[] features = new double[np];
-				for (int i = 0; i < Math.min(np, params.length); i++)
-					features[i] = params[i + 2];
-				factory.setParameters(features);
-				int nx = params.length > np + 2 ? (int) Math.round(params[np + 2]) : 128;
-				int ny = params.length > np + 3 ? (int) Math.round(params[np + 3]) : 128;
-				int nz = params.length > np + 4 ? (int) Math.round(params[np + 4]) : 128;
-				double cx = params.length > np + 5 ? params[np + 5] : 0.5;
-				double cy = params.length > np + 6 ? params[np + 6] : 0.5;
-				double cz = params.length > np + 7 ? params[np + 7] : 0.5;
+				double parameters[] = new double[np];
+				if (np >= 1 && params.length >= 1)
+					parameters[0] = params[0];
+				if (np >= 2 && params.length >= 2)
+					parameters[1] = params[1];
+				if (np >= 3 && params.length >= 3)
+					parameters[2] = params[2];
+				if (np >= 4 && params.length >= 4)
+					parameters[3] = params[3];
+
+				double size[] = NumFormat.parseNumbersAfter("size", cmd);
+				int nx = 128;
+				int ny = 128;
+				int nz = 32;
+				if (size.length > 0)
+					nx = (int) size[0];
+				if (size.length > 1)
+					ny = (int) size[1];
+				if (size.length > 2)
+					nz = (int) size[2];
+
+				double intensity[] = NumFormat.parseNumbersAfter("intensity", cmd);
+				double amplitude = 255;
+				if (intensity.length > 0)
+					amplitude = intensity[0];
+				
+				double center[] = NumFormat.parseNumbersAfter("center", cmd);
+				double cx = 0.5;
+				double cy = 0.5;
+				double cz = 0.5;
+				if (center.length > 0)
+					cx = center[0];
+				if (center.length > 1)
+					cy = center[1];
+				if (center.length > 2)
+					cz = center[2];
+				
+				factory.intensity(amplitude);
+				factory.setParameters(parameters);
 				factory = factory.center(cx, cy, cz);
 				return factory.generate(nx, ny, nz);
 			}
@@ -111,23 +138,27 @@ public abstract class SignalFactory {
 
 	public static ArrayList<SignalFactory> getAll() {
 		ArrayList<SignalFactory> list = new ArrayList<SignalFactory>();
-		list.add(new AirySimulated(1));	
-		list.add(new Astigmatism(3, 0.2));	
+		list.add(new Airy(5, 1, 0.5, 3));	
+		list.add(new Astigmatism(5, 1));	
+		list.add(new AxialDiffractionSimulation(10, 10, 2));	
 		list.add(new Constant());
 		list.add(new Cross(1, 1, 30));
 		list.add(new Cube(10 ,1));
+		list.add(new CubeSphericalBeads(3, 0.5, 8, 16));
 		list.add(new Defocus(3, 10, 10));
+		list.add(new DirectionalDerivative(1, 1, 0));	
+		list.add(new DirectionalMotionBlur(3, 30, 3));
 		list.add(new DoG(3, 4));
-		list.add(new DoubleHelix(3, 10, 10));
+		list.add(new DoubleConeWave(60, 5, 15, 10));
+		list.add(new DoubleHelix(3, 30, 10));
 		list.add(new Gaussian(3, 3, 3));
-		list.add(new GridSpots(3, 1, 10));
 		list.add(new Impulse());
-		//list.add(new MotionBlur(3, 30, 3));
-		list.add(new Ramp(1, 0, 0));
-		list.add(new RandomLines(3));
+		list.add(new Laplacian());
+		list.add(new Ramp(1, 1, 1));
+		list.add(new RandomLines(100));
 		list.add(new Sinc(3, 3, 3));
 		list.add(new Sphere(10, 1));
-		list.add(new Torus(10));
+		list.add(new Torus(30));
 		return list;
 	}
 	
@@ -135,10 +166,8 @@ public abstract class SignalFactory {
 		ArrayList<SignalFactory> list = new ArrayList<SignalFactory>();
 		list.add(new Cube(10, 1));
 		list.add(new Sphere(10, 1));
-		list.add(new GridSpots(3, 1, 10));
 		list.add(new Constant());
 		list.add(new Cross(1, 1, 30));
-		list.add(new DoG(3, 4));
 		list.add(new Gaussian(3, 3, 3));
 		list.add(new Impulse());
 		list.add(new Ramp(1, 0, 0));
@@ -149,20 +178,22 @@ public abstract class SignalFactory {
 
 	public static ArrayList<SignalFactory> getPSF() {
 		ArrayList<SignalFactory> list = new ArrayList<SignalFactory>();
-		list.add(new AirySimulated(1));	
-		list.add(new Astigmatism(3, 0.2));	
-		list.add(new Cross(3, 1, 10));
-		list.add(new Cube(10, 1));
+		list.add(new Airy(5, 1, 0.5, 3));	
+		list.add(new Astigmatism(5, 1));	
+		list.add(new AxialDiffractionSimulation(10, 10, 2));	
+		list.add(new Cross(1, 1, 30));
+		list.add(new CubeSphericalBeads(3, 0.5, 8, 16));
 		list.add(new Defocus(3, 10, 10));
+		list.add(new DirectionalDerivative(1, 1, 0));	
+		list.add(new DirectionalMotionBlur(3, 30, 3));
 		list.add(new DoG(3, 4));
-		list.add(new DoubleHelix(3, 10, 10));
+		list.add(new DoubleConeWave(60, 5, 15, 10));
+		list.add(new DoubleHelix(3, 30, 10));
 		list.add(new Gaussian(3, 3, 3));
-		//list.add(new MotionBlur(3, 30, 3));
 		list.add(new Impulse());
- 		list.add(new Sinc(3, 3, 3));
+		list.add(new Laplacian());
+		list.add(new Sinc(3, 3, 3));
 		list.add(new Sphere(10, 1));
-		list.add(new RandomLines(3));
-		list.add(new Torus(10));
 		return list;
 	}
 
@@ -182,8 +213,7 @@ public abstract class SignalFactory {
 		return this;
 	}
 
-	public SignalFactory intensity(double background, double amplitude) {
-		this.background = background;
+	public SignalFactory intensity(double amplitude) {
 		this.amplitude = amplitude;
 		return this;
 	}

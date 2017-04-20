@@ -32,174 +32,110 @@
 package deconvolution;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import bilib.tools.NumFormat;
 import deconvolution.algorithm.AbstractAlgorithm;
 import deconvolution.algorithm.Controller;
-import deconvolutionlab.Constants;
 import deconvolutionlab.Lab;
 import deconvolutionlab.Output;
-import deconvolutionlab.OutputCollection;
-import deconvolutionlab.TableStats;
-import deconvolutionlab.monitor.ConsoleMonitor;
+import deconvolutionlab.monitor.AbstractMonitor;
 import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.monitor.StatusMonitor;
 import deconvolutionlab.monitor.TableMonitor;
-import deconvolutionlab.monitor.Verbose;
 import deconvolutionlab.system.SystemInfo;
-import fft.AbstractFFTLibrary;
 import signal.RealSignal;
 import signal.SignalCollector;
-import signal.apodization.Apodization;
-import signal.factory.SignalFactory;
-import signal.padding.Padding;
 
+/**
+ * This class is the main class to run deconvolution with or without user interface.
+ * 
+ * All the parameters are given in the command line (String variable command).
+ * 
+ * @author Daniel Sage
+ *
+ */
 public class Deconvolution implements Runnable {
 
 	public enum Finish {
 		DIE, ALIVE, KILL
 	};
 
-	public AbstractAlgorithm					algo				= null;
-
-	private String								path;
-	public double								norm				= 1.0;
-	public Padding								pad					= new Padding();
-	public Apodization							apo					= new Apodization();
-	private OutputCollection					outs;
-	private Verbose								verbose				= Verbose.Log;
-	private AbstractFFTLibrary					fft;
-	private int									flagMonitor			= 3;
-	private int									flagStats			= 0;
-	private boolean								flagDisplay			= true;
-	private boolean								flagMultithreading	= true;
-	private boolean								flagSystem			= true;
-
-	public Monitors								monitors			= new Monitors();
-
+	private AbstractAlgorithm					algo				= null;
+	private Controller							controller 			= new Controller();
 	private String								command				= "";
-	private boolean								live				= false;
-
 	private Features							report				= new Features();
-
 	private String								name				= "";
-
-	private ArrayList<DeconvolutionListener>	listeners			= new ArrayList<DeconvolutionListener>();	
 	public RealSignal							image;
 	public RealSignal							psf;
 	private RealSignal							deconvolvedImage;
-
 	private Finish								finish				= Finish.DIE;
 	private DeconvolutionDialog					dialog;
 	
-	private TableStats tableStats;
-	
 	public Deconvolution(String name, String command) {
-		this.name = name; 
+		this.name = name;
 		this.finish = Finish.DIE;
 		setCommand(command);
-		tableStats = new TableStats(name, Constants.widthGUI, 240, path, (flagStats & 2) == 2);
 	}
 
 	public Deconvolution(String name, String command, Finish finish) {
 		this.name = name;
 		this.finish = finish;
 		setCommand(command);
-		tableStats = new TableStats(name, Constants.widthGUI, 240, path, (flagStats & 2) == 2);
 	}
 
 	public void setCommand(String command) {
 		this.command = command;
-		Command.decode(command, this);
+		controller = Command.decodeController(command);
+		algo = Command.decodeAlgorithm(command);
+		algo.setController(controller);
 		this.command = command;
 		if (name.equals("") && algo != null)
 			name = algo.getShortnames()[0];
-		live = false;
-	}
-
-	/**
-	 * This method runs the deconvolution without graphical user interface.
-	 * 
-	 * @param exit
-	 *            System.exit call is true
-	 */
-	public RealSignal deconvolve(RealSignal image, RealSignal psf) {
-		this.image = image;
-		this.psf = psf;
-		runDeconvolve();
-		return deconvolvedImage;
 	}
 
 	public RealSignal deconvolve() {
-		this.image = null;
-		this.psf = null;
-		runDeconvolve();
-		return deconvolvedImage;
+		return deconvolve(image, psf);
 	}
+	
+	public RealSignal deconvolve(RealSignal image, RealSignal psf) {
+		this.image = image;
+		this.psf = psf;
+		for(AbstractMonitor monitor : controller.getMonitors())
+			if (monitor instanceof TableMonitor)
+				Lab.setVisible(((TableMonitor)monitor).getPanel(), "Monitor of " + name, 10, 10);
 
-	/**
-	 * This method runs the deconvolution without graphical user interface.
-	 * 
-	 * @param exit
-	 *            System.exit call is true
-	 */
-	private void runDeconvolve() {
-		if ((flagMonitor & 2) == 2) {
-			TableMonitor tableMonitor = new TableMonitor(name , Constants.widthGUI, 240);
-			monitors.add(tableMonitor);
-			Lab.setVisible(tableMonitor.getPanel(), "Monitor of " + name, 10, 10);
-		}
-
-		if ((flagMonitor & 1) == 1) 
-			monitors.add(new ConsoleMonitor());
-
-		if ((flagStats & 1) == 1) {
-			Lab.setVisible(tableStats.getPanel(), "Stats of " + name, 50, 50);
-		}
-
-		if (fft == null) {
+		if (controller.getFFT() == null) {
 			run();
-			return;
+			return deconvolvedImage;
 		}
-
-		if (!fft.isMultithreadable()) {
+		
+		if (!controller.getFFT().isMultithreadable()) {
 			run();
-			return;
+			return deconvolvedImage;
 		}
 
-		if (flagMultithreading) {
+		if (controller.isMultithreading()) {
 			Thread thread = new Thread(this);
 			thread.setPriority(Thread.MIN_PRIORITY);
 			thread.start();
 		}
 		else {
 			run();
-		}
-		
+		}	
+		return deconvolvedImage;
 	}
 
 	/**
 	 * This method runs the deconvolution with a graphical user interface.
-	 * 
-	 * @param job
-	 *            Name of the job of deconvolution
 	 */
 	public void launch() {
-		monitors = new Monitors();
 		TableMonitor tableMonitor = null;
-		if ((flagMonitor & 2) == 2) {
-			tableMonitor = new TableMonitor(name , Constants.widthGUI, 240);
-			monitors.add(tableMonitor);
-		}
-		if ((flagMonitor & 1) == 1)
-			monitors.add(new ConsoleMonitor());
-		if (flagStats == 0) {
-			tableStats = null;
-		}
-
-		dialog = new DeconvolutionDialog(DeconvolutionDialog.Module.ALL, this, tableMonitor, tableStats);
-		monitors.add(new StatusMonitor(dialog.getProgressBar()));
+		for(AbstractMonitor monitor : controller.getMonitors())
+			if (monitor instanceof TableMonitor)
+				tableMonitor = (TableMonitor)monitor;
+		
+		dialog = new DeconvolutionDialog(DeconvolutionDialog.Module.ALL, this, tableMonitor, controller.getStats());
+		controller.getMonitors().add(new StatusMonitor(dialog.getProgressBar()));
 
 		Lab.setVisible(dialog, false);
 	}
@@ -207,20 +143,13 @@ public class Deconvolution implements Runnable {
 	@Override
 	public void run() {
 		double chrono = System.nanoTime();
-
-		if (flagSystem)
+		Monitors monitors = controller.getMonitors();
+		
+		if (controller.isSystem())
 			SystemInfo.activate();
 
-		for (DeconvolutionListener listener : listeners)
-			listener.started();
+		report.add("Path", controller.toStringPath());
 
-		live = true;
-		if (monitors != null)
-			monitors.setVerbose(verbose);
-
-		report.add("Path", checkPath(path));
-		monitors.log("Path: " + checkPath(path));
-		
 		if (image == null)
 			image = openImage();
 
@@ -244,7 +173,6 @@ public class Deconvolution implements Runnable {
 			return;
 		}
 		report.add("PSF", psf.dimAsString());
-		monitors.log("PSF: " + psf.dimAsString());
 
 		if (algo == null) {
 			monitors.error("Algorithm: not valid");
@@ -253,40 +181,15 @@ public class Deconvolution implements Runnable {
 			return;
 		}
 
-		Controller controller = algo.getController();
-		if (controller == null) {
-			monitors.error("Controller: not valid");
-			if (finish == Finish.KILL)
-				System.exit(-104);
-			return;
-		}
-		
-		if (flagStats > 0)
-			controller.setTableStats(tableStats);
-		
-		report.add("FFT", fft.getLibraryName());
-
-		if (outs != null) {
-			outs.setPath(path);
-			controller.setOutputs(outs);
-		}
-
-		monitors.log("Algorithm: " + algo.getName());
+		report.add("FFT", controller.getFFT().getName());
 		report.add("Algorithm", algo.getName());
-		algo.setController(controller);
-		
-		algo.setFFT(fft);
-		algo.setMonitors(monitors);
-		
-		deconvolvedImage = algo.run(image, psf, pad, apo, norm);
 
-		live = false;
-		for (DeconvolutionListener listener : listeners)
-			listener.finish();
+		algo.setController(controller);
+		deconvolvedImage = algo.run(image, psf, controller.getStats());
 
 		report.add("End", NumFormat.time(System.nanoTime() - chrono));
 
-		if (flagDisplay)
+		if (controller.isDisplayFinal())
 			Lab.show(monitors, deconvolvedImage, "Result of " + algo.getShortnames()[0]);
 
 		if (finish == Finish.KILL) {
@@ -298,7 +201,6 @@ public class Deconvolution implements Runnable {
 			die();
 	}
 
-	
 	public void close() {
 		if (dialog != null)
 			dialog.dispose();
@@ -309,15 +211,13 @@ public class Deconvolution implements Runnable {
 		image = null;
 		psf = null;
 		deconvolvedImage = null;
-		monitors = null;
 		System.gc();
 	}
-	
+
 	public void die() {
 		SignalCollector.free(image);
 		SignalCollector.free(psf);
 	}
-
 
 	/**
 	 * This methods make a recap of the deconvolution. Useful before starting
@@ -329,7 +229,7 @@ public class Deconvolution implements Runnable {
 		Features features = new Features();
 		Token image = Command.extract(command, "-image");
 		features.add("Image", image == null ? "keyword -image not found" : image.parameters);
-
+		double norm = controller.getNormalizationPSF();
 		String normf = (norm < 0 ? " (no normalization)" : " (normalization to " + norm + ")");
 		Token psf = Command.extract(command, "-psf");
 		features.add("PSF", psf == null ? "keyword -psf not found" : psf.parameters + " norm:" + normf);
@@ -343,46 +243,21 @@ public class Deconvolution implements Runnable {
 			features.add("Stopping Criteria", controller.getStoppingCriteriaAsString(algo));
 			features.add("Reference", controller.getReference());
 			features.add("Constraint", controller.getConstraintAsString());
-			features.add("Padding", pad.toString());
-			features.add("Apodization", apo.toString());
-			features.add("FFT", fft == null ? "null" : fft.getLibraryName());
+			features.add("Padding", controller.getPadding().toString());
+			features.add("Apodization", controller.getApodization().toString());
+			features.add("FFT", controller.getFFT() == null ? "null" : controller.getFFT().getName());
 		}
-		features.add("Path", path);
+		features.add("Path", controller.getPath());
 
-		String monitor = "";
-		if (flagMonitor == 0)
-			monitor = "no ";
-		if (flagMonitor == 1)
-			monitor = "console (" + verbose.name().toLowerCase() + ")";
-		if (flagMonitor == 2)
-			monitor = "table (" + verbose.name().toLowerCase() + ")";
-		if (flagMonitor == 3)
-			monitor = "console table (" + verbose.name().toLowerCase() + ")";
-		String stats = "";
-		if (flagStats == 0)
-			stats = "no ";
-		if (flagStats == 1)
-			stats = "show ";
-		if (flagStats == 2)
-			stats = "save ";
-		if (flagStats == 3)
-			stats = "show save";
-		String running = "";
-		running += "multithreading: " + (flagMultithreading ? "on " : "off ");
-		running += " display: " + (flagDisplay ? "on " : "off ");
-		running += " system: " + (flagSystem ? "shown" : "hidden ");
-
-		features.add("Monitor", monitor);
-		features.add("Stats", stats);
-		features.add("Running", running);
-		if (outs == null)
-			features.add("Output", "not valid");
-		else
-			for (Output out : outs)
-				features.add("Output " + out.getName(), out.toString());
+		features.add("Monitor", controller.toStringMonitor());
+		if (controller.getStats() != null)
+			features.add("Stats", controller.getStats().toStringStats());
+		features.add("Running", controller.toStringRunning());
+		
+		for (Output out : controller.getOuts())
+			features.add("Output " + out.getName(), out.toString());
 		return features;
 	}
-
 
 	public Features checkOutput() {
 		Features features = new Features();
@@ -394,38 +269,15 @@ public class Deconvolution implements Runnable {
 		int sizi = deconvolvedImage.nx * deconvolvedImage.ny * deconvolvedImage.nz;
 		float totali = stati[0] * sizi;
 		features.add("<html><b>Deconvolved Image</b></html>", "");
-		features.add("Size", deconvolvedImage.dimAsString() + " " + NumFormat.bytes(sizi*4));
-		features.add("Mean (stdev)", NumFormat.nice(stati[0])  + " (" + NumFormat.nice(stati[3]) + ")");
+		features.add("Size", deconvolvedImage.dimAsString() + " " + NumFormat.bytes(sizi * 4));
+		features.add("Mean (stdev)", NumFormat.nice(stati[0]) + " (" + NumFormat.nice(stati[3]) + ")");
 		features.add("Min ... Max", NumFormat.nice(stati[1]) + " ... " + NumFormat.nice(stati[2]));
-		features.add("Energy (int)", NumFormat.nice(stati[5])  + " (" + NumFormat.nice(totali) + ")");
+		features.add("Energy (int)", NumFormat.nice(stati[5]) + " (" + NumFormat.nice(totali) + ")");
 		return features;
-	}
-	
-	public boolean isLive() {
-		return live;
 	}
 
 	public void abort() {
-		live = false;
 		algo.getController().abort();
-	}
-
-	public String checkPath(String path) {
-		File dir = new File(path);
-		if (dir.exists()) {
-			if (dir.isDirectory()) {
-				if (dir.canWrite())
-					return path + " (writable)";
-				else
-					return path + " (non-writable)";
-			}
-			else {
-				return path + " (non-directory)";
-			}
-		}
-		else {
-			return path + " (not-valid)";
-		}
 	}
 
 	public RealSignal openImage() {
@@ -436,7 +288,7 @@ public class Deconvolution implements Runnable {
 			return null;
 		String arg = token.option.trim();
 		String cmd = token.parameters.substring(arg.length(), token.parameters.length()).trim();
-		image = createRealSignal(monitors, arg, cmd, path);
+		image = createRealSignal(controller.getMonitors(), arg, cmd, controller.getPath());
 		return image;
 	}
 
@@ -448,7 +300,7 @@ public class Deconvolution implements Runnable {
 			return null;
 		String arg = token.option.trim();
 		String cmd = token.parameters.substring(arg.length(), token.parameters.length()).trim();
-		psf = createRealSignal(monitors, arg, cmd, path);
+		psf = createRealSignal(controller.getMonitors(), arg, cmd, controller.getPath());
 		return psf;
 	}
 
@@ -461,7 +313,7 @@ public class Deconvolution implements Runnable {
 		if (arg.equalsIgnoreCase("platform")) {
 			signal = Lab.getImage(monitors, cmd);
 		}
-	
+
 		if (arg.equalsIgnoreCase("file")) {
 			File file = new File(path + File.separator + cmd);
 			if (file != null) {
@@ -476,7 +328,7 @@ public class Deconvolution implements Runnable {
 				}
 			}
 		}
-		
+
 		if (arg.equalsIgnoreCase("dir") || arg.equalsIgnoreCase("directory")) {
 			File file = new File(path + File.separator + cmd);
 			if (file != null) {
@@ -494,43 +346,20 @@ public class Deconvolution implements Runnable {
 		return signal;
 	}
 
-	public void addDeconvolutionListener(DeconvolutionListener listener) {
-		listeners.add(listener);
-	}
-
-	public OutputCollection getOuts() {
-		return outs;
-	}
-
-	public void setAlgorithm(AbstractAlgorithm algo, Controller controller) {
+	public void setAlgorithm(AbstractAlgorithm algo) {
 		this.algo = algo;
-		if (algo != null && controller != null) {
-			algo.setController(controller);
-		}
 	}
 
-	public AbstractAlgorithm getAlgo() {
+	public AbstractAlgorithm getAlgorithm() {
 		return algo;
 	}
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-
-	public String getPath() {
-		return path;
-	}
-
-	public void setNormalization(double norm) {
-		this.norm = norm;
-	}
-
-	public void setPadding(Padding pad) {
-		this.pad = pad;
-	}
 	
-	public Padding getPadding() {
-		return pad;
+	public void setController(Controller controller) {
+		this.controller = controller;
+	}
+
+	public Controller getController() {
+		return controller;
 	}
 	
 	public RealSignal getOutput() {
@@ -552,44 +381,13 @@ public class Deconvolution implements Runnable {
 	public String getName() {
 		return name;
 	}
-	
-	public void setApodization(Apodization apo) {
-		this.apo = apo;
-	}
 
-	public Apodization getApodization() {
-		return apo;
-	}
-
-	public void setOutput(OutputCollection outs) {
-		this.outs = outs;
-	}
-
-	public void setVerbose(Verbose verbose) {
-		this.verbose = verbose;
-	}
-
-	public void setFFT(AbstractFFTLibrary fft) {
-		this.fft = fft;
-	}
-
-	public void setMonitor(int flagMonitor) {
-		this.flagMonitor = flagMonitor;
-	}
-
-	public void setStats(int flagStats) {
-		this.flagStats = flagStats;
-	}
-
-	public void setFlags(boolean flagDisplay, boolean flagMultithreading, boolean flagSystem) {
-		this.flagDisplay = flagDisplay;
-		this.flagMultithreading = flagMultithreading;
-		this.flagSystem = flagSystem;
+	public Monitors getMonitors() {
+		return controller.getMonitors();
 	}
 
 	public String getCommand() {
 		return command;
 	}
-
 
 }

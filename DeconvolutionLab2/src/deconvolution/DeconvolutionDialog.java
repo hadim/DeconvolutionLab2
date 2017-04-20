@@ -55,15 +55,14 @@ import javax.swing.JToolBar;
 
 import bilib.component.BorderToggledButton;
 import bilib.component.PanelImage;
-import deconvolution.modules.AlgorithmDModule;
-import deconvolution.modules.ImageDModule;
-import deconvolution.modules.PSFDModule;
-import deconvolution.modules.RecapDModule;
-import deconvolution.modules.ReportDModule;
+import deconvolution.capsule.AlgorithmCapsule;
+import deconvolution.capsule.ImageCapsule;
+import deconvolution.capsule.PSFCapsule;
+import deconvolution.capsule.RecapCapsule;
+import deconvolution.capsule.ReportCapsule;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 import deconvolutionlab.Lab;
-import deconvolutionlab.TableStats;
 import deconvolutionlab.monitor.StatusMonitor;
 import deconvolutionlab.monitor.TableMonitor;
 
@@ -103,27 +102,25 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 	private boolean				flagMonitor	= false;
 	private boolean				flagStats	= false;
 
-	private ImageDModule		image;
-	private PSFDModule			psf;
-	private RecapDModule		recap;
-	private AlgorithmDModule	algorithm;
-	private ReportDModule		report;
+	private ImageCapsule		image;
+	private PSFCapsule			psf;
+	private RecapCapsule		recap;
+	private AlgorithmCapsule	algorithm;
+	private ReportCapsule		report;
 
-	private TableStats			tableStats;
 	private TableMonitor		tableMonitor;
 
-	public DeconvolutionDialog(Module module, Deconvolution deconvolution, TableMonitor tableMonitor, TableStats tableStats) {
+	public DeconvolutionDialog(Module module, Deconvolution deconvolution, TableMonitor tableMonitor, Stats stats) {
 		super(new JFrame(), deconvolution.getName());
 
 		this.deconvolution = deconvolution;
 		this.tableMonitor = tableMonitor;
-		this.tableStats = tableStats;
 
-		image = new ImageDModule(deconvolution);
-		psf = new PSFDModule(deconvolution);
-		recap = new RecapDModule(deconvolution);
-		algorithm = new AlgorithmDModule(deconvolution);
-		report = new ReportDModule(deconvolution);
+		image = new ImageCapsule(deconvolution);
+		psf = new PSFCapsule(deconvolution);
+		recap = new RecapCapsule(deconvolution);
+		algorithm = new AlgorithmCapsule(deconvolution);
+		report = new ReportCapsule(deconvolution);
 
 		// Panel status bar on bottom
 		progress.setAlignmentX(JLabel.CENTER_ALIGNMENT);
@@ -160,8 +157,8 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		cards.add(report.getName(), report.getPane());
 		if (tableMonitor != null)
 			cards.add("Monitor", tableMonitor.getPanel());
-		if (tableStats != null)
-			cards.add("Stats", tableStats.getPanel());
+		if (stats != null)
+			cards.add("Stats", stats.getPanel());
 
 		// Panel Main
 		JPanel panel = new JPanel();
@@ -181,7 +178,7 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 			tool.add(bnAlgo);
 			if (tableMonitor != null)
 				tool.add(bnMonitor);
-			if (tableStats != null)
+			if (stats != null)
 				tool.add(bnStats);
 			tool.add(bnReport);
 			panel.add(tool, BorderLayout.NORTH);
@@ -200,7 +197,7 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		bnRecap.addActionListener(this);
 		if (tableMonitor != null)
 			bnMonitor.addActionListener(this);
-		if (tableStats != null)
+		if (stats != null)
 			bnStats.addActionListener(this);
 		bnReport.addActionListener(this);
 
@@ -222,17 +219,17 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		}
 		if (module == Module.IMAGE) {
 			toggle(bnImage);
-			deconvolution.monitors.add(new StatusMonitor(getProgressBar()));
+			deconvolution.getMonitors().add(new StatusMonitor(getProgressBar()));
 			image.update();
 		}
 		if (module == Module.PSF) {
 			toggle(bnPSF);
-			deconvolution.monitors.add(new StatusMonitor(getProgressBar()));
+			deconvolution.getMonitors().add(new StatusMonitor(getProgressBar()));
 			psf.update();
 		}
 		if (module == Module.ALGO) {
 			toggle(bnAlgo);
-			deconvolution.monitors.add(new StatusMonitor(getProgressBar()));
+			deconvolution.getMonitors().add(new StatusMonitor(getProgressBar()));
 			algorithm.update();
 		}
 		if (module == Module.RECAP) {
@@ -285,8 +282,6 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 			toggle(bnRecap);
 			if (tableMonitor != null)
 				tableMonitor.clear();
-			if (tableStats != null)
-				tableStats.clear();
 
 			bnStart.setEnabled(true);
 		}

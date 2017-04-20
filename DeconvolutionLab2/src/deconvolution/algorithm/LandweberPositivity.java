@@ -43,9 +43,9 @@ public class LandweberPositivity extends AbstractAlgorithm implements Callable<R
 
 	private double gamma = 1.0;
 
-	public LandweberPositivity(int iter, double gamma) {
+	public LandweberPositivity(int iterMax, double gamma) {
 		super();
-		controller.setIterationMax(iter);
+		this.iterMax = iterMax;
 		controller.setConstraint(Constraint.Mode.NONNEGATIVE);
 		this.gamma = gamma;
 	}
@@ -89,7 +89,7 @@ public class LandweberPositivity extends AbstractAlgorithm implements Callable<R
 
 	@Override
 	public int getComplexityNumberofFFT() {
-		return 3 + controller.getIterationMax() * 2;
+		return 3 + iterMax * 2;
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class LandweberPositivity extends AbstractAlgorithm implements Callable<R
 		if (params == null)
 			return;
 		if (params.length > 0)
-			controller.setIterationMax((int) Math.round(params[0]));
+			iterMax = (int) Math.round(params[0]);
 		if (params.length > 1)
 			gamma = (float) params[1];
 	}
@@ -134,7 +134,7 @@ public class LandweberPositivity extends AbstractAlgorithm implements Callable<R
 
 	@Override
 	public double[] getParameters() {
-		return new double[] { controller.getIterationMax(), gamma };
+		return new double[] { iterMax, gamma };
 	}
 
 	@Override

@@ -41,6 +41,7 @@ public class Gaussian extends SignalFactory {
 
 	public Gaussian(double sigmaX, double sigmaY, double sigmaZ) {
 		super(new double[] {sigmaX, sigmaY, sigmaZ});
+		setParameters(new double[] {sigmaX, sigmaY, sigmaZ});
 	}
 
 	@Override
@@ -77,7 +78,7 @@ public class Gaussian extends SignalFactory {
 		for(int y=0; y<ny; y++)
 		for(int z=0; z<nz; z++) {
 			double r2 = KX*(x-xc)*(x-xc) + KY*(y-yc)*(y-yc) + KZ*(z-zc)*(z-zc);
-			signal.data[z][x+nx*y] = (float)((amplitude-background) * Math.exp(-r2) + background);
+			signal.data[z][x+nx*y] = (float)(amplitude * Math.exp(-r2));
 		}
 	}
 

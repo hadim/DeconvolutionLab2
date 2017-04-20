@@ -31,7 +31,6 @@
 
 package signal.factory;
 
-import deconvolutionlab.Lab;
 import signal.Operations;
 import signal.RealSignal;
 
@@ -43,6 +42,7 @@ public class Sinc extends SignalFactory {
 	
 	public Sinc(double periodX, double periodY, double periodZ) {
 		super(new double[] {periodX, periodY, periodZ});
+		setParameters(new double[] {periodX, periodY, periodZ});
 	}
 
 	@Override
@@ -83,8 +83,9 @@ public class Sinc extends SignalFactory {
 			double v = 1.0;
 			if (r > Operations.epsilon)
 				v = Math.sin(r) / r;
-			signal.data[z][x+nx*y] = (float)((amplitude-background) * v + background);
+			signal.data[z][x+nx*y] = (float)(v);
 		}
+		signal.rescale(0, amplitude);
 	}
 
 

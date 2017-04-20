@@ -86,4 +86,10 @@ public class JTransformsFFT_XYZ extends AbstractFFT {
 	public String getName() {
 		return "JTransforms XYZ";
 	}
+
+	@Override
+	public boolean isMultithreadable() {
+		return true;
+	}
+
 }

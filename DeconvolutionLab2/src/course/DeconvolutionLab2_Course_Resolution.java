@@ -35,11 +35,15 @@ import java.io.File;
 import javax.swing.filechooser.FileSystemView;
 
 import deconvolution.Deconvolution;
+import deconvolution.Stats;
+import deconvolution.algorithm.Controller;
+import deconvolution.algorithm.Convolution;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
 import ij.plugin.PlugIn;
 import signal.RealSignal;
-import signal.factory.GridSpots;
+import signal.factory.Airy;
+import signal.factory.CubeSphericalBeads;
 
 public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 
@@ -59,39 +63,82 @@ public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 		new File(res + "RL").mkdir();
 	
 		int nx = 128;
-		int ny = 128;
-		int nz = 128;
-		int spacing = 16;
+		int ny = 120;
+		int nz = 122;
+		int spacing = 12;
+		int border = 6;
 		
-		RealSignal x = new GridSpots(3, 0.1, spacing).intensity(0, 255).generate(nx, ny, nz);
-		Lab.show(monitors, x, "reference");
-		Lab.save(monitors, x, res + "ref.tif");
+		RealSignal x = new CubeSphericalBeads(4, 0.1, spacing, border).intensity(400).generate(nx, ny, nz);
+		//RealSignal x = new Sphere(30, 1).generate(nx, ny, nz);
+		//RealSignal x = new Constant().intensity(0, 255).generate(nx, ny, nz);
+		//Lab.show(monitors, x, "reference");
+		//Lab.showOrthoview(x);
+		//Lab.showMIP(x);
+		//Lab.save(monitors, x, res + "ref.tif");
+
+		//RealSignal h = new Gaussian(3, 3, 1).generate(nx, ny, nz);
+		RealSignal h = new Airy(100, 50, 0.5, 0.1).generate(nx, ny, nz);
+		Lab.show(monitors, h, "psf");
+		Lab.showOrthoview(h);
+		Lab.showMIP(h);
+		Lab.save(monitors, h, res + "psf.tif");
+		Lab.save(monitors, h.createOrthoview(), res + "psfo.tif");
+		Lab.save(monitors, h.createMIP(), res + "psfp.tif");
 
 		String algo  = " ";
-		String ground = " -image file " + res + "ref.tif ";
-		//String psf   = " -psf file ../../Data/resolution/psfgl.tif";
-		String psf = " -psf synthetic gaussian 100.0 0.0 1.2 1.2 3.6 size " + nx + " " + ny + " " + nz;
-		String signal  = " -image file signal.tif -reference " + res + "ref.tif -disable monitor";
-		
-		String paramout = " intact float  (" + spacing + "," + spacing + "," + spacing + ")";
-		
-		algo  = " -algorithm CONV  -out stats @3 PR -out stack PR -out ortho PRo ";
-		new Deconvolution("run", ground + "-reference reference.tif -psf synthetic impulse 100 0 size 128 128 128 " + algo).deconvolve();
+		String param = " -reference " + res + "ref.tif -stats show -display no -monitor no -system no";
+		String conv = " -image file " + res + "conv.tif ";
+		String ref = " -image file " + res + "ref.tif ";
+		String psf = " -psf file " + res + "psf.tif ";
 
-		algo  = " -algorithm SIM 0 1.5 0  -out stats @3 SIM -out stack signal -out ortho SIGNALo ";
-		new Deconvolution("run", ground + psf + algo).deconvolve();
+		Controller controller = new Controller();
+		controller.setSystem(true);
+		controller.setReference(res + "ref.tif");
+		controller.setStatsMode(Stats.Mode.SHOW);
+		
+		Convolution convo = new Convolution();
+		convo.setController(controller);
+		RealSignal y = convo.run(x, h);
+		Lab.show(y);
+		/*
+		algo  = " -algorithm NIF -out mip NIFp ";
+		new Deconvolution("nif", conv + psf + algo + param).deconvolve();
+/*
+//		algo  = " -algorithm TRIF 10e-5 -pad NO NO 0 32 -out mip trifppad -out ortho trifopad ";
+//		new Deconvolution("trif", conv + psf + algo + param).deconvolve();
 
-		algo  = " -algorithm NIF -out ortho NIF " + paramout;
+		algo  = " -algorithm TRIF 10e-5 -out mip TRIFo ";
+		new Deconvolution("trif", conv + psf + algo + param).deconvolve();
+		
+		algo  = " -algorithm TRIF 10e-5 -pad NO NO 100 100 -out mip TRIFoapo ";
+		new Deconvolution("TRIF apo", conv + psf + algo + param).deconvolve();
+
+
+//		algo  = " -algorithm TRIF 10e-4  -pad NO NO 0 20 -out mip trif_ppad -out ortho trif_opad";
+//		new Deconvolution("trif", conv + psf + algo + param).deconvolve();
+
+		//algo  = " -algorithm TRIF 10e-6 -out mip trif_p -out ortho trif_o -stats show";
+		//new Deconvolution("trif", conv + psf + algo + param).deconvolve();
+		/*
+
+		for(int i=-8; i<=-2; i+=20) {
+			algo  = " -algorithm TRIF " + Math.pow(10, i) + " -out mip nifp" + i + " -out ortho nifo" + i + " -stats show";
+			new Deconvolution("trif", conv + psf + algo + param).deconvolve();
+		}
+
+		algo  = " -algorithm SIM 0 1 0  -out ortho simo  -system no -monitor no";
+		new Deconvolution("run", ref + psf + algo).deconvolve();
+
+		algo  = " -algorithm NIF -out ortho nifo  -system -monitor";
 		new Deconvolution("run", signal + psf + algo).deconvolve();
-
 		for(int i=0; i<=24; i++) {
 			double p = Math.pow(10, i-18);
 			algo  = " -algorithm RIF " + p + " -out ortho @5 RIF/RIF" + i + paramout;
 			new Deconvolution("run", signal + psf + algo).deconvolve();
 		}
-		
-		algo  = " -algorithm LW+ 305 1 -out stats @3 LW+ nosave -out ortho @25 LW+/LW+" + paramout;
+		algo  = " -algorithm LW+ 30 1 -out stats @3 LW+ nosave -out ortho @s5 LW+/LW+" + paramout;
 		new Deconvolution("run", signal + psf + algo).deconvolve();
+	*/	
 	}
 	
 	public static void main(String arg[]) {

@@ -45,9 +45,9 @@ public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
 	private double	gamma	= 1.0;
 	private double	lambda	= 1.0;
 
-	public ICTM(int iter, double gamma, double lambda) {
+	public ICTM(int iterMax, double gamma, double lambda) {
 		super();
-		controller.setIterationMax(iter);
+		this.iterMax = iterMax;
 		controller.setConstraint(Constraint.Mode.NONNEGATIVE);
 		this.gamma = gamma;
 		this.lambda = lambda;
@@ -91,7 +91,7 @@ public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
 
 	@Override
 	public int getComplexityNumberofFFT() {
-		return 3 + controller.getIterationMax() * 2;
+		return 3 + iterMax * 2;
 	}
 
 	@Override
@@ -124,7 +124,7 @@ public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
 		if (params == null)
 			return;
 		if (params.length > 0)
-			controller.setIterationMax((int) Math.round(params[0]));
+			iterMax = (int) Math.round(params[0]);
 		if (params.length > 1)
 			gamma = (float) params[1];
 		if (params.length > 2)
@@ -138,7 +138,7 @@ public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
 
 	@Override
 	public double[] getParameters() {
-		return new double[] { controller.getIterationMax(), gamma, lambda };
+		return new double[] { iterMax, gamma, lambda };
 	}
 
 	@Override

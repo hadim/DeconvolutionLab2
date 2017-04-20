@@ -50,22 +50,21 @@ public class Output {
 		INTACT, RESCALED, NORMALIZED, CLIPPED
 	};
 
-	private ContainerImage		container	= null;
-	private int					px			= 0;
-	private int					py			= 0;
-	private int					pz			= 0;
-	private boolean				center		= true;
+	private ContainerImage	container	= null;
+	private int				px			= 0;
+	private int				py			= 0;
+	private int				pz			= 0;
+	private boolean			center		= true;
 
-	private String				name		= "";
-	private boolean				save		= true;
-	private boolean				show		= true;
+	private String			name		= "";
+	private boolean			save		= true;
+	private boolean			show		= true;
 
-	private View				view		= View.STACK;
-	private Imager.Type	type		= Imager.Type.FLOAT;
-	private Dynamic				dynamic		= Dynamic.INTACT;
+	private View			view		= View.STACK;
+	private Imager.Type		type		= Imager.Type.FLOAT;
+	private Dynamic			dynamic		= Dynamic.INTACT;
 
-	private int					frequency	= 0;
-	private String				path		= "";
+	private int				frequency	= 0;
 
 	public Output(View view, int frequency, String param) {
 		String[] tokens = param.trim().split(" ");
@@ -168,10 +167,6 @@ public class Output {
 		return name;
 	}
 
-	public void setPath(String path) {
-		this.path = path;
-	}
-
 	public int extractFrequency(String param) {
 		String line = param.trim();
 		if (!line.startsWith("@"))
@@ -205,21 +200,24 @@ public class Output {
 	}
 
 	public void executeStarting(Monitors monitors, RealSignal signal, Controller controller) {
+		if (signal == null)
+			return;
 		execute(monitors, signal, controller, true, false, false, 0);
 	}
 
 	public void executeFinal(Monitors monitors, RealSignal signal, Controller controller) {
+		if (signal == null)
+			return;
 		execute(monitors, signal, controller, false, false, true, 0);
 	}
 
 	public void executeIterative(Monitors monitors, RealSignal signal, Controller controller, int iter) {
+		if (signal == null)
+			return;
 		execute(monitors, signal, controller, false, true, false, iter);
 	}
 
-	public void execute(Monitors monitors, RealSignal signal, Controller controller, boolean start, boolean live, boolean finish, int iter) {
-		if (signal == null)
-			return;
-
+	private void execute(Monitors monitors, RealSignal signal, Controller controller, boolean start, boolean live, boolean finish, int iter) {
 		String title = name;
 		if (live)
 			if (!is(iter))
@@ -240,20 +238,20 @@ public class Output {
 			break;
 		case CLIPPED:
 			x = signal.duplicate();
-			float[] stats = controller.getStatsInput();
+			float[] stats = controller.getStats().getStatsInput();
 			if (stats != null)
 				constraint.clipped(x, stats[1], stats[2]);
 			break;
 		case NORMALIZED:
 			x = signal.duplicate();
-			float[] stats1 = controller.getStatsInput();
+			float[] stats1 = controller.getStats().getStatsInput();
 			if (stats1 != null)
 				constraint.normalized(x, stats1[0], stats1[3]);
 			break;
 		default:
 			x = signal;
 		}
-		String filename = path + File.separator + title + ".tif";
+		String filename = controller.getPath() + File.separator + title + ".tif";
 
 		switch (view) {
 		case STACK:

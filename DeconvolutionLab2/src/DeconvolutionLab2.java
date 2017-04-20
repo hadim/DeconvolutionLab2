@@ -120,7 +120,6 @@ public class DeconvolutionLab2 {
 		System.out.println("Keywords of {command}: ");
 		for (String keyword : Command.keywords)
 			System.out.println("\t" + keyword);
-
 	}
 
 	public DeconvolutionLab2(String cmd) {
@@ -128,6 +127,4 @@ public class DeconvolutionLab2 {
 		Lab.init(Imager.Platform.STANDALONE, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
 		new Deconvolution("CommandLine", cmd).deconvolve();
 	}
-	
-
 }

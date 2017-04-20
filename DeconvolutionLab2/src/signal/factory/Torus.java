@@ -39,6 +39,7 @@ public class Torus extends SignalFactory {
 	
 	public Torus(double radius) {
 		super(new double[] {radius});
+		setParameters(new double[] {radius});
 	}
 
 	@Override
@@ -64,23 +65,16 @@ public class Torus extends SignalFactory {
 
 	@Override
 	public void fill(RealSignal signal) {
-		float A = (float)(amplitude-background);
-		float B = (float)(background);
 		double thick = radius * 0.2;
 		double thick2 = thick * thick;
-		double hx = nx * 0.5;
-		double hy = ny * 0.5;
-		double hz = nz * 0.5;
-		for(int i=0; i<nx; i++)
+			for(int i=0; i<nx; i++)
 		for(int j=0; j<ny; j++) {
-			double dxy = Math.abs(radius - dist(i, j, hx, hy));
+			double dxy = Math.abs(radius - dist(i, j, xc, yc));
 			if (dxy < thick) {
 				for(int k=0; k<nz; k++) {
-					double dz = k - hz;
+					double dz = k - zc;
 					if (dxy*dxy + dz*dz < thick2)
-						signal.data[k][i+j*nx] = A;
-					else
-						signal.data[k][i+j*nx] = B;
+						signal.data[k][i+j*nx] = (float)(amplitude * (1.0-(dxy*dxy + dz*dz)/thick2));
 				}
 			}
 		}

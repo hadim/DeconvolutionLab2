@@ -31,14 +31,21 @@
 
 package deconvolution.algorithm;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import bilib.tools.NumFormat;
 import deconvolution.Deconvolution;
-import deconvolutionlab.OutputCollection;
-import deconvolutionlab.TableStats;
+import deconvolution.Stats;
+import deconvolutionlab.Constants;
+import deconvolutionlab.Output;
+import deconvolutionlab.monitor.AbstractMonitor;
+import deconvolutionlab.monitor.ConsoleMonitor;
 import deconvolutionlab.monitor.Monitors;
+import deconvolutionlab.monitor.TableMonitor;
+import deconvolutionlab.monitor.Verbose;
 import deconvolutionlab.system.SystemUsage;
 import fft.AbstractFFT;
 import fft.FFT;
@@ -46,71 +53,90 @@ import signal.Assessment;
 import signal.ComplexSignal;
 import signal.Constraint;
 import signal.RealSignal;
-import signal.SignalCollector;
+import signal.apodization.Apodization;
+import signal.padding.Padding;
 
 /**
- * This is an important class to manage all the common task
- * of the algorithm. 
- * The method start() is called before at the starting of the
- * algorithm.
- * The method ends() is called at the end of every iterations
- * for the iterative algorithm. It returns true if one the
- * stopping criteria is true.
- * The method finish() is called when the algorithm is completely
- * terminated.
+ * This is an important class to manage all the common task of the algorithm.
+ * The method start() is called before at the starting of the algorithm. The
+ * method ends() is called at the end of every iterations for the iterative
+ * algorithm. It returns true if one the stopping criteria is true. The method
+ * finish() is called when the algorithm is completely terminated.
  * 
- * @author sage
+ * @author Daniel Sage
  *
  */
 public class Controller {
 
-	private int					iterationsMax		= 100;
-	private double				timeMax				= 1000;
-	private double				residuMin			= -1;
+	private String				path;
+	private boolean				system;
+	private boolean				multithreading;
+	private boolean				displayFinal;
+	private double				normalizationPSF;
+	private double				epsilon;
+	
+	private Padding				padding;
+	private Apodization			apodization;
+	private ArrayList<Output>	outs;
+	private Stats				stats;
+	private Constraint.Mode		constraintMode;
+	private double				residuMin;
+	private double				timeLimit;
+	private String				reference;
+	private Monitors			monitors;
+	private Verbose				verbose;
+	private AbstractFFT			fft;
 
-	private boolean				doResidu			= false;
-	private boolean				doTime				= false;
-	private boolean				doReference			= false;
-	private boolean				doConstraint		= false;
-	private boolean				abort				= false;
+	private int					iterationsMax	= 100;
 
-	private double				timeStarting		= 0;
-	private double				memoryStarting		= 0;
-	private double				residu				= Double.MAX_VALUE;
-	private int					iterations			= 0;
-	private double				memoryPeak			= 0;
-	private double				snr					= 0;
-	private double				psnr				= 0;
+	private boolean				doResidu		= false;
+	private boolean				doTime			= false;
+	private boolean				doReference		= false;
+	private boolean				doConstraint	= false;
+	private boolean				abort			= false;
 
-	private Constraint.Mode		constraint			= Constraint.Mode.NO;
-	private OutputCollection	outs				= null;
-	private String				referenceName		= "";
+	private double				timeStarting	= 0;
+	private double				memoryStarting	= 0;
+	private double				residu			= Double.MAX_VALUE;
+	private int					iterations		= 0;
+	private double				memoryPeak		= 0;
+	private double				snr				= 0;
+	private double				psnr			= 0;
+
 	private RealSignal			refImage;
 	private RealSignal			prevImage;
 	private RealSignal			x;
-
-	private Timer				timer;
-	private AbstractFFT			fft;
-
-	private TableStats			tableStats;
-	private float[]				statsInput;
 	
-	private Monitors			monitors			= new Monitors();
+	private Timer				timer;
 
 	public Controller() {
-		constraint = Constraint.Mode.NO;
 		doResidu = false;
 		doTime = false;
 		doReference = false;
 		doConstraint = false;
-	}
+		timeStarting = System.nanoTime();
+		
+		setPath(System.getProperty("user.dir"));
+		setSystem(true);
+		setMultithreading(true);
+		setDisplayFinal(true);
+		setFFT(FFT.getFastestFFT().getDefaultFFT());
+		setNormalizationPSF(1);
+		setEpsilon(1e-6);
+		setPadding(new Padding());
+		setApodization(new Apodization());
 
-	public void setTableStats(TableStats tableStats) {
-		this.tableStats = tableStats;
-	}
+		monitors = new Monitors();
+		monitors.add(new ConsoleMonitor());
+		monitors.add(new TableMonitor("Monitor", Constants.widthGUI, 240));
 
-	public void setMonitors(Monitors monitors) {
-		this.monitors = monitors;
+		setVerbose(Verbose.Log);
+		setStats(new Stats(Stats.Mode.NO));
+		setConstraint(Constraint.Mode.NO);
+		setResiduMin(-1);
+		setTimeLimit(-1);
+		setReference("");
+		setOuts(new ArrayList<Output>());
 	}
 
 	public void setFFT(AbstractFFT fft) {
@@ -121,47 +147,27 @@ public class Controller {
 		this.abort = true;
 	}
 
-	public int getIterationMax() {
-		return iterationsMax;
-	}
-
-	public void setIterationMax(int iterationsMax) {
+	public void setIterationsMax(int iterationsMax) {
 		this.iterationsMax = iterationsMax;
-	}
-
-	public void setTimeStop(double timeMax) {
-		this.doTime = true;
-		this.timeMax = timeMax * 1e9;
-	}
-
-	public void setResiduStop(double residuMin) {
-		this.doResidu = true;
-		this.residuMin = residuMin;
-	}
-
-	public void setReference(String referenceName) {
-		this.doReference = true;
-		this.referenceName = referenceName;
-	}
-
-	public void setConstraint(Constraint.Mode constraint) {
-		this.doConstraint = true;
-		this.constraint = constraint;
-	}
-	
-	public void setOutputs(OutputCollection outs) {
-		this.outs = outs;
 	}
 
 	public boolean needSpatialComputation() {
 		return doConstraint || doResidu || doReference;
 	}
-	
-	public void start(RealSignal x) {
+
+	/**
+	 * Call one time at the beginning of the algorithms
+	 * 
+	 * @param x
+	 *            the input signal
+	 */
+	public void start(RealSignal x, Stats stats) {
 		this.x = x;
-		statsInput = x.getStats();
-		if (tableStats != null)
-			tableStats.nextStats(monitors, stats());
+		this.stats = stats;
+		
+		stats.show();
+		stats.addInput(x);
+		
 		iterations = 0;
 		timer = new Timer();
 		timer.schedule(new Updater(), 0, 100);
@@ -172,20 +178,23 @@ public class Controller {
 			Constraint.setModel(x);
 
 		if (doReference) {
-			refImage = new Deconvolution("Reference", "-image file " + referenceName).openImage();
+			refImage = new Deconvolution("Reference", "-image file " + reference).openImage();
 			if (refImage == null)
-				monitors.error("Impossible to load the reference image " + referenceName);
+				monitors.error("Impossible to load the reference image " + reference);
 			else
 				monitors.log("Reference image loaded");
 		}
+		for (Output out : outs)
+			out.executeStarting(monitors, x, this);
 
-		if (outs != null)
-			outs.executeStarting(monitors, x, this);
 		this.prevImage = x;
 	}
 
 	public boolean ends(ComplexSignal X) {
-		boolean out = outs == null ? false : outs.hasShow(iterations);
+
+		boolean out = false;
+		for (Output output : outs)
+			out = out | output.is(iterations);
 
 		if (doConstraint || doResidu || doReference || out) {
 			if (fft == null)
@@ -203,28 +212,27 @@ public class Controller {
 		if (doConstraint || doResidu || doReference)
 			compute(iterations, x, doConstraint, doResidu, doReference);
 
-		if (outs != null)
-			outs.executeIterative(monitors, x, this, iterations);
+		for (Output out : outs)
+			out.executeIterative(monitors, x, this, iterations);
 
 		iterations++;
 		double p = iterations * 100.0 / iterationsMax;
 		monitors.progress("Iterative " + iterations + "/" + iterationsMax, p);
-		double timeElapsed = getTimeNano();
+		double timeElapsed = getTimeSecond();
 		boolean stopIter = (iterations >= iterationsMax);
-		boolean stopTime = doTime && (timeElapsed >= timeMax);
+		boolean stopTime = doTime && (timeElapsed >= timeLimit);
 		boolean stopResd = doResidu && (residu <= residuMin);
 		monitors.log("@" + iterations + " Time: " + NumFormat.seconds(timeElapsed));
 
-		if (tableStats != null)
-			tableStats.nextStats(monitors, stats());
-
+		addStats();
+		
 		String prefix = "Stopped>> by ";
 		if (abort)
 			monitors.log(prefix + "abort");
 		if (stopIter)
 			monitors.log(prefix + "iteration " + iterations + " > " + iterationsMax);
 		if (stopTime)
-			monitors.log(prefix + "time " + timeElapsed + " > " + timeMax);
+			monitors.log(prefix + "time " + timeElapsed + " > " + timeLimit);
 		if (stopResd)
 			monitors.log(prefix + "residu " + NumFormat.nice(residu) + " < " + NumFormat.nice(residuMin));
 
@@ -240,11 +248,11 @@ public class Controller {
 		if (con || res || ref)
 			compute(iterations, x, con, res, ref);
 
-		if (tableStats != null)
-			tableStats.lastStats(monitors, stats());
-
-		if (outs != null)
-			outs.executeFinal(monitors, x, this);
+		addStats();
+		stats.save(monitors, path);
+		
+		for (Output out : outs)
+			out.executeFinal(monitors, x, this);
 
 		monitors.log("Time: " + NumFormat.seconds(getTimeNano()) + " Peak:" + getMemoryAsString());
 		if (timer != null)
@@ -255,8 +263,8 @@ public class Controller {
 		if (x == null)
 			return;
 
-		if (con && constraint != null)
-			new Constraint(monitors).apply(x, constraint);
+		if (con && constraintMode != null)
+			new Constraint(monitors).apply(x, constraintMode);
 
 		if (ref && refImage != null) {
 			String s = "";
@@ -275,57 +283,35 @@ public class Controller {
 		}
 	}
 
-	public String[] stats() {
-		if (tableStats == null)
-			return null;
-		float params[] = null;
-		if (x != null)
-			params = x.getStats();
-		String[] row = new String[12];
-		row[0] = "" + iterations;
-		row[1] = (params == null ? "-" : "" + params[0]);
-		row[2] = (params == null ? "-" : "" + params[1]);
-		row[3] = (params == null ? "-" : "" + params[2]);
-		row[4] = (params == null ? "-" : "" + params[3]);
-		row[5] = (params == null ? "-" : "" + params[5]);
-		row[6] = NumFormat.seconds(getTimeNano());
-		row[7] = NumFormat.bytes(SystemUsage.getHeapUsed());
-		row[8] = SignalCollector.sumarize();
-		row[9] = doReference ? NumFormat.nice(psnr) : "n/a";
-		row[10] = doReference ? NumFormat.nice(snr) : "n/a";
-		row[11] = doResidu ? NumFormat.nice(residu) : "n/a";
-		return row;
+	private void addStats() {
+		String pnsrText = doReference ? NumFormat.nice(psnr) : "n/a";
+		String snrText = doReference ? NumFormat.nice(snr) : "n/a";
+		String residuText = doResidu ? NumFormat.nice(residu) : "n/a";
+	
+		stats.add(x, iterations, NumFormat.seconds(getTimeNano()), pnsrText, snrText, residuText);
 	}
 
 	public double getTimeNano() {
 		return (System.nanoTime() - timeStarting);
 	}
-
-	public Constraint.Mode getConstraint() {
-		return constraint;
-	}
-
-	public String getReference() {
-		return doReference ? referenceName : "no ground-truth";
+	
+	public double getTimeSecond() {
+		return (System.nanoTime() - timeStarting) * 1e-9;
 	}
 
 	public String getConstraintAsString() {
 		if (!doConstraint)
 			return "no";
-		if (constraint == null)
+		if (constraintMode == null)
 			return "null";
-		return constraint.name().toLowerCase();
+		return constraintMode.name().toLowerCase();
 	}
 
 	public String getStoppingCriteriaAsString(AbstractAlgorithm algo) {
-		String stop = algo.isIterative() ? "iterations limit=" + getIterationMax() + ", " : "direct, ";
-		stop += doTime ? ", time limit=" + NumFormat.nice(timeMax * 1e-9) : " no time limit" + ", ";
+		String stop = algo.isIterative() ? "iterations limit=" + algo.getIterationsMax() + ", " : "direct, ";
+		stop += doTime ? ", time limit=" + NumFormat.nice(timeLimit * 1e-9) : " no time limit" + ", ";
 		stop += doResidu ? ", residu limit=" + NumFormat.nice(residuMin) : " no residu limit";
 		return stop;
-	}
-
-	public float[] getStatsInput() {
-		return statsInput;
 	}
 
 	public double getMemory() {
@@ -342,6 +328,305 @@ public class Controller {
 
 	private void update() {
 		memoryPeak = Math.max(memoryPeak, SystemUsage.getHeapUsed());
+	}
+
+	public AbstractFFT getFFT() {
+		return fft;
+	}
+
+	/**
+	 * @return the path
+	 */
+	public String getPath() {
+		return path;
+	}
+
+	/**
+	 * @param path
+	 *            the path to set
+	 */
+	public void setPath(String path) {
+		this.path = path;
+	}
+
+	/**
+	 * @return the system
+	 */
+	public boolean isSystem() {
+		return system;
+	}
+
+	/**
+	 * @param system
+	 *            the system to set
+	 */
+	public void setSystem(boolean system) {
+		this.system = system;
+	}
+
+	/**
+	 * @return the multithreading
+	 */
+	public boolean isMultithreading() {
+		return multithreading;
+	}
+
+	/**
+	 * @param multithreading
+	 *            the multithreading to set
+	 */
+	public void setMultithreading(boolean multithreading) {
+		this.multithreading = multithreading;
+	}
+
+	/**
+	 * @return the displayFinal
+	 */
+	public boolean isDisplayFinal() {
+		return displayFinal;
+	}
+
+	/**
+	 * @param displayFinal
+	 *            the displayFinal to set
+	 */
+	public void setDisplayFinal(boolean displayFinal) {
+		this.displayFinal = displayFinal;
+	}
+
+	/**
+	 * @return the normalizationPSF
+	 */
+	public double getNormalizationPSF() {
+		return normalizationPSF;
+	}
+
+	/**
+	 * @param normalizationPSF
+	 *            the normalizationPSF to set
+	 */
+	public void setNormalizationPSF(double normalizationPSF) {
+		this.normalizationPSF = normalizationPSF;
+	}
+
+	/**
+	 * @return the epsilon
+	 */
+	public double getEpsilon() {
+		return epsilon;
+	}
+
+	/**
+	 * @param epsilon
+	 *            the epsilon to set
+	 */
+	public void setEpsilon(double epsilon) {
+		this.epsilon = epsilon;
+	}
+
+	/**
+	 * @return the padding
+	 */
+	public Padding getPadding() {
+		return padding;
+	}
+
+	/**
+	 * @param padding
+	 *            the padding to set
+	 */
+	public void setPadding(Padding padding) {
+		this.padding = padding;
+	}
+
+	/**
+	 * @return the apodization
+	 */
+	public Apodization getApodization() {
+		return apodization;
+	}
+
+	/**
+	 * @param apodization
+	 *            the apodization to set
+	 */
+	public void setApodization(Apodization apodization) {
+		this.apodization = apodization;
+	}
+
+	/**
+	 * @return the monitors
+	 */
+	public Monitors getMonitors() {
+		return monitors;
+	}
+
+	/**
+	 * @param monitors
+	 *            the monitors to set
+	 */
+	public void setMonitors(Monitors monitors) {
+		this.monitors = monitors;
+	}
+
+	/**
+	 * @return the verbose
+	 */
+	public Verbose getVerbose() {
+		return verbose;
+	}
+
+	/**
+	 * @param verbose
+	 *            the verbose to set
+	 */
+	public void setVerbose(Verbose verbose) {
+		this.verbose = verbose;
+	}
+
+	public Constraint.Mode getConstraint() {
+		return constraintMode;
+	}
+
+	public void setConstraint(Constraint.Mode constraintMode) {
+		doConstraint = constraintMode != Constraint.Mode.NO;
+		this.constraintMode = constraintMode;
+	}
+
+	/**
+	 * @return the stats
+	 */
+	public Stats getStats() {
+		return stats;
+	}
+
+	/**
+	 * @param stats
+	 *            the stats to set
+	 */
+	public void setStats(Stats stats) {
+		this.stats = stats;
+	}
+
+	/**
+	 * @return the residuMin
+	 */
+	public double getResiduMin() {
+		return residuMin;
+	}
+
+	/**
+	 * @param residuMin
+	 *            the residuMin to set
+	 */
+	public void setResiduMin(double residuMin) {
+		doResidu = residuMin > 0;
+		this.residuMin = residuMin;
+	}
+
+	/**
+	 * @return the timeLimit
+	 */
+	public double getTimeLimit() {
+		return timeLimit;
+	}
+
+	/**
+	 * @param timeLimit
+	 *            the timeLimit to set
+	 */
+	public void setTimeLimit(double timeLimit) {
+		doTime = timeLimit > 0;
+		this.timeLimit = timeLimit;
+	}
+
+	/**
+	 * @return the reference
+	 */
+	public String getReference() {
+		return reference;
+	}
+
+	/**
+	 * @param reference
+	 *            the reference to set
+	 */
+	public void setReference(String reference) {
+		doReference = false;
+		if (reference == null)
+			return;
+		if (reference.equals(""))
+			return;
+		doReference = true;
+		this.reference = reference;
+	}
+
+	/**
+	 * @return the outs
+	 */
+	public ArrayList<Output> getOuts() {
+		return outs;
+	}
+
+	/**
+	 * @param outs
+	 *            the outs to set
+	 */
+	public void setOuts(ArrayList<Output> outs) {
+		this.outs = outs;
+	}
+
+	public void addOutput(Output out) {
+		this.outs.add(out);
+	}
+
+	public String toStringMonitor() {
+		String s = "[" + verbose.name().toLowerCase() + "] ";
+		for (AbstractMonitor monitor : monitors) {
+			s += "" + monitor.getName() + " ";
+		}
+		return s;
+	}
+
+	/**
+	 * @return the stats
+	 */
+	public Stats.Mode getStatsMode() {
+		return stats.getMode();
+	}
+
+	/**
+	 * @param stats
+	 *            the stats to set
+	 */
+	public void setStatsMode(Stats.Mode mode) {
+		this.stats = new Stats(mode);
+	}
+
+	public String toStringRunning() {
+		String s = "";
+		s += "system " + (system ? "shown" : "hidden ");
+		s += ", multithreading " + (multithreading ? "on" : "off ");
+		s += ", display final " + (displayFinal ? "on " : "off ");
+		return s;
+	}
+
+	public String toStringPath() {
+		File dir = new File(path);
+		if (dir.exists()) {
+			if (dir.isDirectory()) {
+				if (dir.canWrite())
+					return path + " (writable)";
+				else
+					return path + " (non-writable)";
+			}
+			else {
+				return path + " (non-directory)";
+			}
+		}
+		else {
+			return path + " (not-valid)";
+		}
 	}
 
 	private class Updater extends TimerTask {

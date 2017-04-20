@@ -185,6 +185,21 @@ public class RealSignal extends Signal implements SignalListener {
 	}
 
 	/**
+	 * Subtracts a scalar term (in-place processing)
+	 * 
+	 * @param term
+	 * @return the instance of the calling object
+	 */
+	public RealSignal minus(float term) {
+		int nxy = nx * ny;
+		for (int k = 0; k < nz; k++)
+			for (int i = 0; i < nxy; i++) {
+				data[k][i] -= term;
+			}
+		return this;
+	}
+
+	/**
 	 * Takes the maximum (in-place processing)
 	 * 
 	 * @param factor
@@ -528,8 +543,8 @@ public class RealSignal extends Signal implements SignalListener {
 	public RealSignal createMIP() {
 		String n = "mip(" + name + ")";
 
-		int vx = nx + nz + 1;
-		int vy = ny + nz + 1;
+		int vx = nx + nz;
+		int vy = ny + nz;
 		RealSignal view = new RealSignal(n, vx, vy, 1);
 
 		for (int x = 0; x < nx; x++)
@@ -542,14 +557,14 @@ public class RealSignal extends Signal implements SignalListener {
 		for (int z = 0; z < nz; z++)
 			for (int y = 0; y < ny; y++)
 				for (int x = 0; x < nx; x++) {
-					int index = nx + 1 + z + vx * y;
+					int index = nx + z + vx * y;
 					view.data[0][index] = Math.max(view.data[0][index], data[z][x + nx * y]);
 				}
 
 		for (int z = 0; z < nz; z++)
 			for (int x = 0; x < nx; x++)
 				for (int y = 0; y < ny; y++) {
-					int index = x + vx * (ny + 1 + z);
+					int index = x + vx * (ny + z);
 					view.data[0][index] = Math.max(view.data[0][index], data[z][x + nx * y]);
 				}
 		return view;
@@ -703,4 +718,15 @@ public class RealSignal extends Signal implements SignalListener {
 		return this;
 	}
 
+	public RealSignal rescale(double min, double max) {
+		int nxy = nx * ny;
+		float minf = (float)min;
+		float stats[] = getStats();
+		float a = ((float)max-minf) / (stats[2] - stats[1]);
+		for(int k=0; k<nz; k++)
+		for(int i=0; i<nxy; i++) {
+			data[k][i] = a*(data[k][i] - stats[1]) + minf;
+		}
+		return this;
+	}
 }

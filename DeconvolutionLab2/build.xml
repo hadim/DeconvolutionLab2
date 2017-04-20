@@ -40,11 +40,9 @@
 		      <header><![CDATA[${javadoc.header}]]></header>
 		      <footer><![CDATA[${javadoc.footer}]]></footer>
 		      <bottom><![CDATA[${javadoc.bottom}]]></bottom>
-
 		</javadoc>
 		<copy toDir="${fiji}" file="../DeconvolutionLab_2.jar" />
 		<copy toDir="${matlab}" file="../DeconvolutionLab_2.jar" />
-
 		<copy toDir="${imagej}" file="../DeconvolutionLab_2.jar" />
 
 	</target>

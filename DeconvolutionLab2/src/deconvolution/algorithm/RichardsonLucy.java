@@ -42,7 +42,7 @@ public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSi
 
 	public RichardsonLucy(int iter) {
 		super();
-		controller.setIterationMax(iter);
+		this.iterMax = iterMax;
 	}
 
 	// x(k+1) = x(k) *. Hconj * ( y /. H x(k))
@@ -82,7 +82,7 @@ public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSi
 
 	@Override
 	public int getComplexityNumberofFFT() {
-		return 1 + 5 * controller.getIterationMax();
+		return 1 + 5 * iterMax;
 	}
 
 	@Override
@@ -115,7 +115,7 @@ public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSi
 		if (params == null)
 			return;
 		if (params.length > 0)
-			controller.setIterationMax((int) Math.round(params[0]));
+			iterMax = (int) Math.round(params[0]);
 	}
 
 	@Override
@@ -125,7 +125,7 @@ public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSi
 
 	@Override
 	public double[] getParameters() {
-		return new double[] { controller.getIterationMax() };
+		return new double[] { iterMax };
 	}
 
 	@Override

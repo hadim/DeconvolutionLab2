@@ -43,7 +43,6 @@ public abstract class AbstractFFTLibrary {
 	public abstract String getLibraryName();
 	public abstract String getCredit();
 	public abstract String getLicence();
-	public abstract boolean isMultithreadable();
 	public abstract String getLocation();
 	
 	public boolean isInstalled() {

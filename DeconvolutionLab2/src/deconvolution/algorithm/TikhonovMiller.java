@@ -44,9 +44,9 @@ public class TikhonovMiller extends AbstractAlgorithm implements Callable<RealSi
 	private double gamma = 1.0;
 	private double lambda = 1.0;
 	
-	public TikhonovMiller(int iter, double gamma, double lambda) {
+	public TikhonovMiller(int iterMax, double gamma, double lambda) {
 		super();
-		controller.setIterationMax(iter);
+		this.iterMax = iterMax;
 		this.gamma = gamma;
 		this.lambda = lambda;
 	}
@@ -79,7 +79,7 @@ public class TikhonovMiller extends AbstractAlgorithm implements Callable<RealSi
 
 	@Override
 	public int getComplexityNumberofFFT() {
-		return 3 + (controller.needSpatialComputation() ? 2 * controller.getIterationMax() : 0);
+		return 3 + (controller.needSpatialComputation() ? 2 * iterMax : 0);
 	}
 
 	@Override
@@ -122,7 +122,7 @@ public class TikhonovMiller extends AbstractAlgorithm implements Callable<RealSi
 		if (params == null)
 			return;
 		if (params.length > 0)
-			controller.setIterationMax((int)Math.round(params[0]));
+			iterMax = (int) Math.round(params[0]);
 		if (params.length > 1)
 			gamma = (float)params[1];
 		if (params.length > 2)
@@ -136,7 +136,7 @@ public class TikhonovMiller extends AbstractAlgorithm implements Callable<RealSi
 	
 	@Override
 	public double[] getParameters() {
-		return new double[] {controller.getIterationMax(), gamma, lambda};
+		return new double[] {iterMax, gamma, lambda};
 	}
 
 	@Override

@@ -63,7 +63,7 @@ public class Constant extends SignalFactory {
 		for(int x=0; x<nx; x++)
 		for(int y=0; y<ny; y++)
 		for(int z=0; z<nz; z++) {
-			signal.data[z][x+nx*y] = (float)(amplitude + background);
+			signal.data[z][x+nx*y] = (float)(amplitude);
 		}
 	}
 

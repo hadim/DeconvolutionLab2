@@ -41,6 +41,7 @@ public class Cross extends SignalFactory {
 
 	public Cross(double thickness, double slope, double lengthPercentage) {
 		super(new double[] {thickness, slope, lengthPercentage});
+		setParameters(new double[] {thickness, slope, lengthPercentage});
 	}
 
 	@Override
@@ -71,7 +72,6 @@ public class Cross extends SignalFactory {
 	@Override
 	public void fill(RealSignal signal) {
 		double length = lengthPercentage * 0.01 * 0.5;
-		double A = (amplitude - background);
 		int x1 = (int) Math.round(xc - nx * length);
 		int x2 = (int) Math.round(xc + nx * length);
 		int y1 = (int) Math.round(yc - ny * length);
@@ -103,9 +103,10 @@ public class Cross extends SignalFactory {
 					dz = Math.sqrt(dz) - thickness;
 					double az = (1.0 - 1.0 / (1.0 + Math.exp(-dz / slope)));
 
-					signal.data[z][x + nx * y] = (float) (A * Math.max(Math.max(ax, ay), az) + background);
+					signal.data[z][x + nx * y] = (float) (Math.max(Math.max(ax, ay), az));
 				}
 		}
+		signal.rescale(0, amplitude);
 	}
 
 }

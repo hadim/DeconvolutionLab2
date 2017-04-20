@@ -125,11 +125,6 @@ public class FFTWLibrary extends AbstractFFTLibrary {
 	}
 
 	@Override
-	public boolean isMultithreadable() {
-		return true;
-	}
-
-	@Override
 	public String getCredit() {
 		return "http://www.fftw.org (FFTW Version 2)";
 	}
@@ -202,5 +197,4 @@ public class FFTWLibrary extends AbstractFFTLibrary {
 	public AbstractFFT getDefaultFFT() {
 		return new FFTW3D();
 	}
-
 }

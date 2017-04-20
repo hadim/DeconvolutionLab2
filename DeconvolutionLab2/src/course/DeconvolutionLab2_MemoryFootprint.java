@@ -76,8 +76,8 @@ public class DeconvolutionLab2_MemoryFootprint implements PlugIn {
 			SignalCollector.clear();
 			Deconvolution d = new Deconvolution("noise", " -algorithm " + cmd + psf + image + " -display no");
 			boolean optimized = i == 1;
-			d.getAlgo().setOptimizedMemoryFootprint(optimized);
-			String n = d.getAlgo().getName();
+			d.getAlgorithm().setOptimizedMemoryFootprint(optimized);
+			String n = d.getAlgorithm().getName();
 			double chrono = System.nanoTime();
 			d.run();
 			String energy = "" + d.getOutput().getEnergy();

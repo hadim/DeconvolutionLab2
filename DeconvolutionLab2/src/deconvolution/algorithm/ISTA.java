@@ -47,9 +47,9 @@ public class ISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 	private String waveletsName = "Haar";
 	private int scale = 3;
 	
-	public ISTA(int iter, double gamma, double lambda, String waveletsName, int scale) {
+	public ISTA(int iterMax, double gamma, double lambda, String waveletsName, int scale) {
 		super();
-		controller.setIterationMax(iter);
+		this.iterMax = iterMax;
 		this.gamma = gamma;
 		this.lambda = lambda;
 		this.waveletsName = waveletsName;
@@ -111,7 +111,7 @@ public class ISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 
 	@Override
 	public int getComplexityNumberofFFT() {
-		return 3 + 4 * controller.getIterationMax();
+		return 3 + 4 * iterMax;
 	}
 	
 	@Override
@@ -149,7 +149,7 @@ public class ISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 		if (params == null)
 			return;
 		if (params.length > 0)
-			controller.setIterationMax((int)Math.round(params[0]));
+			iterMax = (int) Math.round(params[0]);
 		if (params.length > 1)
 			gamma = (float)params[1];
 		if (params.length > 2)
@@ -165,7 +165,7 @@ public class ISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 	
 	@Override
 	public double[] getParameters() {
-		return new double[] {controller.getIterationMax(), gamma, lambda};
+		return new double[] {iterMax, gamma, lambda};
 	}
 	
 	@Override

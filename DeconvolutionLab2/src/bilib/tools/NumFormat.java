@@ -1,14 +1,12 @@
 /*
- * DeconvolutionLab2
+ * bilib --- Java Bioimaging Library ---
+ * 
+ * Author: Daniel Sage, Biomedical Imaging Group, EPFL, Lausanne, Switzerland
  * 
  * Conditions of use: You are free to use this software for research or
  * educational purposes. In addition, we expect you to include adequate
  * citations and acknowledgments whenever you present or publish results that
  * are based on it.
- * 
- * Reference: DeconvolutionLab2: An Open-Source Software for Deconvolution
- * Microscopy D. Sage, L. Donati, F. Soulez, D. Fortun, G. Schmit, A. Seitz,
- * R. Guiet, C. Vonesch, M Unser, Methods of Elsevier, 2017.
  */
 
 /*
@@ -45,6 +43,14 @@ public class NumFormat {
 			return def;
 	}
 
+	public static double[] parseNumbersAfter(String keyword, String line) {
+		String parts[] = line.trim().toLowerCase().split(keyword.toLowerCase());
+		if (parts.length == 2)
+			return parseNumbers(parts[1]);
+		else
+			return new double[0];
+	}
+
 	public static double[] parseNumbers(String line) {
 		ArrayList<String> num = new ArrayList<String>();
 		Pattern p = Pattern.compile("[-+]?[0-9]+[.]?[0-9]*([eE][-+]?[0-9]+)?");
@@ -60,7 +66,7 @@ public class NumFormat {
 
 	public static String nice(double a) {
 		double b = Math.abs(a);
-		String n = a < 0 ? "-" : " ";
+		String n = a < 0 ? "-" : "";
 		if (a == 0)
 			return "0.0";
 		if (b > 3000.0)

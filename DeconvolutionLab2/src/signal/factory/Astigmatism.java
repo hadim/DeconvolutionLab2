@@ -35,11 +35,12 @@ import signal.RealSignal;
 
 public class Astigmatism extends SignalFactory {
 
-	private double fwhm = 3.0;
-	private double factor = 0.20;
+	private double fwhm = 5.0;
+	private double factor = 1;
 	
 	public Astigmatism(double fwhm, double factor) {
 		super(new double[] {fwhm, factor});
+		setParameters(new double[] {fwhm, factor});
 	}
 
 	@Override
@@ -57,7 +58,7 @@ public class Astigmatism extends SignalFactory {
 		if (parameters.length >= 1)
 			this.fwhm = parameters[0];
 		if (parameters.length >= 2)
-			this.fwhm = parameters[1];
+			this.factor = parameters[1];
 	}
 
 	@Override
@@ -67,21 +68,25 @@ public class Astigmatism extends SignalFactory {
 	
 	@Override
 	public void fill(RealSignal signal) {
-		double A = (amplitude-background);
 		double sigma = 0.8493218 * fwhm; // 1/sqrt(-2*log(0.5))
+		factor = 1;
 		for(int z=0; z<nz; z++) {
-			double dx = (zc-z) * factor + 1;
-			double dy = 1/dx;
-			if (z-zc > 0) {
-				dy = (z-zc) * factor + 1;
+			double dx = 1.0;
+			double dy = 1.0;
+			if (z>zc) {
+				dy = (1.0-factor*(z-zc)/(double)nz);
 				dx = 1.0 / dy;
+			}
+			if (z<zc) {
+				dx = (1.0-factor*(zc-z)/(double)nz);
+				dy = 1.0 / dx;
 			}
 			double kx = 1.0 / (dx * dx * sigma * sigma * 2.0);
 			double ky = 1.0 / (dy * dy * sigma * sigma * 2.0);
 			for(int x=0; x<nx; x++)
 			for(int y=0; y<ny; y++) {
 				double r2 = kx*(x-xc)*(x-xc) + ky*(y-yc)*(y-yc);
-				signal.data[z][x+nx*y] = (float)(A * Math.exp(-r2) + background);
+				signal.data[z][x+nx*y] = (float)(amplitude * Math.exp(-r2));
 			}
 		}
 	}

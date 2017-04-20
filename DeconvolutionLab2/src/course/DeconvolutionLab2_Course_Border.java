@@ -60,13 +60,13 @@ public class DeconvolutionLab2_Course_Border implements PlugIn {
 		int ny = 200;
 		int nz = 40;
 	
-		RealSignal im = new Cube(22, .1).intensity(0, 100).center(0.25, 0.00, 0.05).generate(nx, ny, nz);
-		RealSignal i0 = new Cube(22, .1).intensity(0, 100).center(0.25, 0.05, 0.05).generate(nx, ny, nz);
-		RealSignal i1 = new Cube(22, .1).intensity(0, 100).center(0.25, 0.10, 0.05).generate(nx, ny, nz);
-		RealSignal i2 = new Cube(22, .1).intensity(0, 100).center(0.25, 0.15, 0.05).generate(nx, ny, nz);
+		RealSignal im = new Cube(22, .1).intensity(100).center(0.25, 0.00, 0.05).generate(nx, ny, nz);
+		RealSignal i0 = new Cube(22, .1).intensity(100).center(0.25, 0.05, 0.05).generate(nx, ny, nz);
+		RealSignal i1 = new Cube(22, .1).intensity(100).center(0.25, 0.10, 0.05).generate(nx, ny, nz);
+		RealSignal i2 = new Cube(22, .1).intensity(100).center(0.25, 0.15, 0.05).generate(nx, ny, nz);
 		im.max(i1.max(i2).max(i0));
 		
-		RealSignal g = new Gaussian(10, 10, 10).intensity(0, 101).generate(nx, ny, nz);
+		RealSignal g = new Gaussian(10, 10, 10).intensity(101).generate(nx, ny, nz);
 
 		Lab.save(monitors, im, res + "ref.tif");
 		Lab.save(monitors, g, res + "psf.tif");

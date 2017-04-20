@@ -39,7 +39,7 @@ public class FFTPanel extends JPanel implements MouseListener {
 		for (AbstractFFTLibrary lib : libs) {
 			String name = lib.getLibraryName();
 			String installed = lib.isInstalled() ? "Yes" : "No";
-			String multit = lib.isMultithreadable() ? "Yes" : "No";
+			String multit = lib.getDefaultFFT().isMultithreadable() ? "Yes" : "No";
 			String location = lib.getLocation();
 			table.append(new String[] { name, installed, multit, location });
 		}

@@ -42,9 +42,9 @@ public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<Real
 
 	private double lambda = 0.1;
 
-	public RichardsonLucyTV(int iter, double lambda) {
+	public RichardsonLucyTV(int iterMax, double lambda) {
 		super();
-		controller.setIterationMax(iter);
+		this.iterMax = iterMax;
 		this.lambda = lambda;
 	}
 
@@ -165,7 +165,7 @@ public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<Real
 
 	@Override
 	public int getComplexityNumberofFFT() {
-		return 1 + 7 * controller.getIterationMax();
+		return 1 + 7 * iterMax;
 	}
 
 	@Override
@@ -208,7 +208,7 @@ public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<Real
 		if (params == null)
 			return;
 		if (params.length > 0)
-			controller.setIterationMax((int)Math.round(params[0]));
+			iterMax = (int) Math.round(params[0]);
 		if (params.length > 1)
 			lambda = (float)params[1];
 	}
@@ -220,7 +220,7 @@ public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<Real
 	
 	@Override
 	public double[] getParameters() {
-		return new double[] {controller.getIterationMax(), lambda};
+		return new double[] {iterMax, lambda};
 	}
 	
 	@Override

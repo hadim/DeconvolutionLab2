@@ -56,15 +56,9 @@ public class Impulse extends SignalFactory {
 
 	@Override
 	public void fill(RealSignal signal) {
-		for(int x=0; x<nx; x++)
-		for(int y=0; y<ny; y++)
-		for(int z=0; z<nz; z++) {
-			signal.data[z][x+nx*y] = (float)(background);
-		}
 		int i = (int)(xc);
 		int j = (int)(yc);
 		int k = (int)(zc);
-
 		signal.data[k][i+nx*j] += (float)(amplitude);
 	}
 }

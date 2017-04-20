@@ -43,9 +43,9 @@ public class StarkParker extends AbstractAlgorithm implements Callable<RealSigna
 
 	private double gamma = 1.0;
 
-	public StarkParker(int iter, double gamma) {
+	public StarkParker(int iterMax, double gamma) {
 		super();
-		controller.setIterationMax(iter);
+		this.iterMax = iterMax;
 		this.gamma = gamma;
 	}
 
@@ -88,7 +88,7 @@ public class StarkParker extends AbstractAlgorithm implements Callable<RealSigna
 
 	@Override
 	public int getComplexityNumberofFFT() {
-		return 3 + controller.getIterationMax() * 2;
+		return 3 + iterMax * 2;
 	}
 
 	@Override
@@ -121,7 +121,7 @@ public class StarkParker extends AbstractAlgorithm implements Callable<RealSigna
 		if (params == null)
 			return;
 		if (params.length > 0)
-			controller.setIterationMax((int) Math.round(params[0]));
+			iterMax = (int) Math.round(params[0]);
 		if (params.length > 1)
 			gamma = (float) params[1];
 	}
@@ -133,7 +133,7 @@ public class StarkParker extends AbstractAlgorithm implements Callable<RealSigna
 
 	@Override
 	public double[] getParameters() {
-		return new double[] { controller.getIterationMax(), gamma };
+		return new double[] { iterMax, gamma };
 	}
 
 	@Override

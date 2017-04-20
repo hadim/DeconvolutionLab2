@@ -40,6 +40,7 @@ public class DoG extends SignalFactory {
 	
 	public DoG(double sigma1, double sigma2) {
 		super(new double[] {sigma1, sigma2});
+		setParameters(new double[] {sigma1, sigma2});
 	}
 
 	@Override
@@ -74,7 +75,7 @@ public class DoG extends SignalFactory {
 		for(int z=0; z<nz; z++) {
 			double r2 = (x-xc)*(x-xc) + (y-yc)*(y-yc) + (z-zc)*(z-zc);
 			double v = Math.exp(-K2*r2) - Math.exp(-K1*r2);
-			signal.data[z][x+nx*y] = (float)((amplitude-background) * v + background);
+			signal.data[z][x+nx*y] = (float)(amplitude * v);
 		}
 	}
 }
