@@ -35,7 +35,7 @@ import java.awt.Dimension;
 
 public class Constants {
 
-	public static String name = "DeconvolutionLab2 [Beta 2]";
+	public static String name = "DeconvolutionLab2";
 	public static String copyright = "\u00A9 2010-2017. Biomedical Imaging Group, EPFL.";
 	
 	public static String url = "http://bigwww.epfl.ch/deconvolution/";
@@ -44,7 +44,7 @@ public class Constants {
 			"DeconvolutionLab2 : An open-source software for deconvolution microscopy " +
 			"Methods, 2017.";
 	
-	public static String version = "(Beta 12.02.2017)";
+	public static String version = "(20.04.2017)";
 	
 	public static String authors = 
 			"Daniel Sage, " + 
