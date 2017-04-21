@@ -69,7 +69,7 @@ public class CommandModule extends AbstractModule {
 		super.actionPerformed(e);
 		if (e.getSource() == getAction2Button()) {
 			Deconvolution deconvolution = new Deconvolution("Check Command", Command.command());
-			DeconvolutionDialog d = new DeconvolutionDialog(DeconvolutionDialog.Module.RECAP, deconvolution, null, null);
+			DeconvolutionDialog d = new DeconvolutionDialog(DeconvolutionDialog.Module.RECAP, deconvolution);
 			Lab.setVisible(d, false);
 		}
 	}

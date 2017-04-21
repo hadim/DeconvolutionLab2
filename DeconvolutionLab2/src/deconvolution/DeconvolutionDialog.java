@@ -73,7 +73,7 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 	};
 
 	public enum Module {
-		ALL, RECAP, IMAGE, PSF, ALGO
+		ALL, RECAP, IMAGE, PSF, ALGO, RUN
 	};
 
 	private JButton				bnStart		= new JButton("Run");
@@ -89,6 +89,7 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 	private BorderToggledButton	bnReport	= new BorderToggledButton("Report");
 	private BorderToggledButton	bnMonitor	= new BorderToggledButton("Monitor");
 	private BorderToggledButton	bnStats		= new BorderToggledButton("Stats");
+	JToolBar tool = new JToolBar();
 
 	private Thread				thread		= null;
 
@@ -108,13 +109,10 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 	private AlgorithmCapsule	algorithm;
 	private ReportCapsule		report;
 
-	private TableMonitor		tableMonitor;
-
-	public DeconvolutionDialog(Module module, Deconvolution deconvolution, TableMonitor tableMonitor, Stats stats) {
+	public DeconvolutionDialog(Module module, Deconvolution deconvolution) {
 		super(new JFrame(), deconvolution.getName());
 
 		this.deconvolution = deconvolution;
-		this.tableMonitor = tableMonitor;
 
 		image = new ImageCapsule(deconvolution);
 		psf = new PSFCapsule(deconvolution);
@@ -155,10 +153,6 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		cards.add(psf.getName(), psf.getPane());
 		cards.add(algorithm.getName(), algorithm.getPane());
 		cards.add(report.getName(), report.getPane());
-		if (tableMonitor != null)
-			cards.add("Monitor", tableMonitor.getPanel());
-		if (stats != null)
-			cards.add("Stats", stats.getPanel());
 
 		// Panel Main
 		JPanel panel = new JPanel();
@@ -168,7 +162,6 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 
 		// Panel tool with all buttons
 		if (module == Module.ALL) {
-			JToolBar tool = new JToolBar();
 			tool.setFloatable(false);
 			tool.setLayout(new GridLayout(1, 6));
 			tool.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -176,10 +169,6 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 			tool.add(bnImage);
 			tool.add(bnPSF);
 			tool.add(bnAlgo);
-			if (tableMonitor != null)
-				tool.add(bnMonitor);
-			if (stats != null)
-				tool.add(bnStats);
 			tool.add(bnReport);
 			panel.add(tool, BorderLayout.NORTH);
 		}
@@ -195,10 +184,6 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		bnPSF.addActionListener(this);
 		bnAlgo.addActionListener(this);
 		bnRecap.addActionListener(this);
-		if (tableMonitor != null)
-			bnMonitor.addActionListener(this);
-		if (stats != null)
-			bnStats.addActionListener(this);
 		bnReport.addActionListener(this);
 
 		this.addWindowListener(this);
@@ -280,9 +265,6 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		}
 		else if (e.getSource() == bnReset) {
 			toggle(bnRecap);
-			if (tableMonitor != null)
-				tableMonitor.clear();
-
 			bnStart.setEnabled(true);
 		}
 		else if (e.getSource() == bnQuit) {
@@ -319,6 +301,24 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		bnPSF.setEnabled(true);
 		bnImage.setEnabled(true);
 		thread = null;
+	}
+
+	public void addStats(Stats stats) {
+		if (stats != null) {
+			cards.add("Stats", stats.getPanel());
+			tool.add(bnStats);
+			pack();
+			bnStats.addActionListener(this);
+		}
+	}
+	
+	public void addMonitor(TableMonitor tableMonitor) {
+		if (tableMonitor != null) {
+			cards.add("Monitor", tableMonitor.getPanel());
+			tool.add(bnMonitor);
+			pack();
+			bnMonitor.addActionListener(this);
+		}
 	}
 
 	public static void setLocationLaunch(Point l) {

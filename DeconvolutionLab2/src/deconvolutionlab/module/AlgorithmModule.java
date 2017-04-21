@@ -128,6 +128,7 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 		getAction2Button().addActionListener(this);
 		Config.register(getName(), "algorithm", cmb, Algorithm.getDefaultAlgorithm());
 		panel.setBorder(BorderFactory.createEtchedBorder());
+
 		return panel;
 	}
 
@@ -148,7 +149,7 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 		}
 		if (e.getSource() == getAction2Button()) {
 			Deconvolution deconvolution = new Deconvolution("Check Algorithm", Command.command());
-			DeconvolutionDialog d = new DeconvolutionDialog(DeconvolutionDialog.Module.ALGO, deconvolution, null, null);
+			DeconvolutionDialog d = new DeconvolutionDialog(DeconvolutionDialog.Module.ALGO, deconvolution);
 			Lab.setVisible(d, false);
 		}
 		setSynopsis((String) cmb.getSelectedItem());

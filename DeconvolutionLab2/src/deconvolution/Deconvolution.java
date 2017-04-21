@@ -70,6 +70,8 @@ public class Deconvolution implements Runnable {
 	private Finish								finish				= Finish.DIE;
 	private DeconvolutionDialog					dialog;
 	
+	private boolean embeddedStats 			=			false;
+	
 	public Deconvolution(String name, String command) {
 		this.name = name;
 		this.finish = Finish.DIE;
@@ -128,12 +130,8 @@ public class Deconvolution implements Runnable {
 	 * This method runs the deconvolution with a graphical user interface.
 	 */
 	public void launch() {
-		TableMonitor tableMonitor = null;
-		for(AbstractMonitor monitor : controller.getMonitors())
-			if (monitor instanceof TableMonitor)
-				tableMonitor = (TableMonitor)monitor;
-		
-		dialog = new DeconvolutionDialog(DeconvolutionDialog.Module.ALL, this, tableMonitor, controller.getStats());
+		embeddedStats = true;
+		dialog = new DeconvolutionDialog(DeconvolutionDialog.Module.ALL, this);
 		controller.getMonitors().add(new StatusMonitor(dialog.getProgressBar()));
 
 		Lab.setVisible(dialog, false);
@@ -180,6 +178,19 @@ public class Deconvolution implements Runnable {
 		report.add("FFT", controller.getFFT().getName());
 		report.add("Algorithm", algo.getName());
 
+		if (embeddedStats) {
+			TableMonitor tableMonitor = null;
+			for(AbstractMonitor monitor : controller.getMonitors())
+				if (monitor instanceof TableMonitor)
+					tableMonitor = (TableMonitor)monitor;
+			if (controller.getStats().getMode() == Stats.Mode.SHOW || controller.getStats().getMode() == Stats.Mode.SHOWSAVE) {
+				controller.getStats().setEmbeddedInFrame(embeddedStats);
+				dialog.addStats(controller.getStats());
+			}
+			if (tableMonitor != null) {
+				dialog.addMonitor(tableMonitor);
+			}
+		}
 		algo.setController(controller);
 		deconvolvedImage = algo.run(image, psf, controller.getStats());
 

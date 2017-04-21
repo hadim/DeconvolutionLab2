@@ -156,7 +156,6 @@ public class ControllerModule extends AbstractModule implements ActionListener, 
 		scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 		JPanel panel = new JPanel(new BorderLayout());
-		panel.setBorder(BorderFactory.createEtchedBorder());
 		panel.add(scroll, BorderLayout.CENTER);
 	
 		Config.register(getName(), "residu.enable", chkResidu, false);

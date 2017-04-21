@@ -279,7 +279,6 @@ public class Lab {
 	/**
 	 * Return the active image.
 	 * 
-	 * @param monitors
 	 * @return
 	 */
 	public static RealSignal getImage() {
@@ -289,7 +288,7 @@ public class Lab {
 	/**
 	 * Return an image from the platform with a specified name.
 	 * 
-	 * @param monitors
+	 * @param name
 	 * @return
 	 */
 	public static RealSignal getImage(String name) {
@@ -315,7 +314,6 @@ public class Lab {
 	/**
 	 * Open an image from the disk.
 	 * 
-	 * @param monitors
 	 * @param filename
 	 * @return
 	 */

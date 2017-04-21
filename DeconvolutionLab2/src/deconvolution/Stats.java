@@ -59,6 +59,8 @@ public class Stats {
 	private float[]				statsInput;
 	private Mode mode;
 	
+	private boolean embedded = false;
+	
 	public Stats(Mode mode) {
 		this.mode = mode;
 		ArrayList<CustomizedColumn> columns = new ArrayList<CustomizedColumn>();
@@ -77,7 +79,16 @@ public class Stats {
 		table = new CustomizedTable(columns, true);
 	}
 	
+	public void setEmbeddedInFrame(boolean embedded) {
+		this.embedded = embedded;
+	}
+	
+	/**
+	 * Show the stats table in a frame if it is not yet embedded in another frame.
+	 */
 	public void show() {
+		if (embedded)
+			return;
 		if (mode == Mode.SHOW || mode == Mode.SHOWSAVE) {
 			JFrame frame = new JFrame("Stats");
 			frame.getContentPane().add(getPanel());

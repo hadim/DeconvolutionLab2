@@ -116,6 +116,7 @@ public class BatchModule extends AbstractModule implements MouseListener, Action
 			for (int row : rows)
 				new Deconvolution("Batch " + table.getCell(row, 0), table.getCell(row, 1)).launch();
 		}
+		update();
 	}
 
 	private void update() {

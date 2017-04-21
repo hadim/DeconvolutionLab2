@@ -264,7 +264,7 @@ getAction2Button().setToolTipText("Click to have a preview, Shift-click or Ctrl-
 				Lab.show(Monitors.createDefaultMonitor(), x, table.getCell(row, 0));
 		} 
 		else {
-			DeconvolutionDialog d = new DeconvolutionDialog(DeconvolutionDialog.Module.PSF, deconvolution, null, null);
+			DeconvolutionDialog d = new DeconvolutionDialog(DeconvolutionDialog.Module.PSF, deconvolution);
 			Lab.setVisible(d, false);
 		}
 	}

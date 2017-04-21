@@ -65,7 +65,7 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 	private JButton			bnFigure;
 	
 	public OutputModule(boolean expanded) {
-		super("Output", "", "", "Default", expanded);
+		super("Output", "", "Clear", "", expanded);
 	}
 
 	@Override

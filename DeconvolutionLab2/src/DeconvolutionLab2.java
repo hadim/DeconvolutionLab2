@@ -45,10 +45,7 @@ public class DeconvolutionLab2 {
 	public static String ack = Constants.name + " " + Constants.version + " " + Constants.copyright;
 
 	public static void main(String arg[]) {
-
-		System.out.println(ack);
 		Lab.init(Platform.STANDALONE);
-
 		if (arg.length == 0) {
 			System.out.println("Starting lab");
 			lab(arg);

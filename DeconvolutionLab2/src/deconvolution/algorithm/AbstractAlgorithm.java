@@ -38,7 +38,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import signal.Constraint;
+import signal.RealSignal;
+import signal.SignalCollector;
+import signal.apodization.Apodization;
+import signal.padding.Padding;
 import bilib.tools.NumFormat;
+import deconvolution.DeconvolutionDialog;
 import deconvolution.Stats;
 import deconvolutionlab.Lab;
 import deconvolutionlab.Output;
@@ -47,11 +53,6 @@ import deconvolutionlab.monitor.Verbose;
 import deconvolutionlab.system.SystemInfo;
 import fft.AbstractFFT;
 import fft.FFT;
-import signal.Constraint;
-import signal.RealSignal;
-import signal.SignalCollector;
-import signal.apodization.Apodization;
-import signal.padding.Padding;
 
 /**
  * This class is the common part of every algorithm of deconvolution.
@@ -154,7 +155,7 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		
 		monitors.log(getShortnames()[0] + " is starting (" + iterations + ")");
 		controller.setMonitors(monitors);
-		
+	
 		controller.start(y, stats);
 		h.circular();
 

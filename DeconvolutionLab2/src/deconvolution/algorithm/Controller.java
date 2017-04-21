@@ -36,6 +36,12 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import signal.Assessment;
+import signal.ComplexSignal;
+import signal.Constraint;
+import signal.RealSignal;
+import signal.apodization.Apodization;
+import signal.padding.Padding;
 import bilib.tools.NumFormat;
 import deconvolution.Deconvolution;
 import deconvolution.Stats;
@@ -49,12 +55,6 @@ import deconvolutionlab.monitor.Verbose;
 import deconvolutionlab.system.SystemUsage;
 import fft.AbstractFFT;
 import fft.FFT;
-import signal.Assessment;
-import signal.ComplexSignal;
-import signal.Constraint;
-import signal.RealSignal;
-import signal.apodization.Apodization;
-import signal.padding.Padding;
 
 /**
  * This is an important class to manage all the common task of the algorithm.
@@ -588,17 +588,10 @@ public class Controller {
 		return s;
 	}
 
-	/**
-	 * @return the stats
-	 */
 	public Stats.Mode getStatsMode() {
 		return stats.getMode();
 	}
 
-	/**
-	 * @param stats
-	 *            the stats to set
-	 */
 	public void setStatsMode(Stats.Mode mode) {
 		this.stats = new Stats(mode);
 	}

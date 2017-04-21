@@ -263,10 +263,13 @@ public class Output {
 		case SERIES:
 			for (int k = 0; k < x.nz; k++) {
 				RealSignal slice = x.getSlice(k);
+				String z = "-z" + String.format("%06d", k) ;
 				if (show && !live)
-					Lab.show(monitors, slice, title, type);
-				if (save && !live)
-					Lab.save(monitors, slice, filename, type);
+					Lab.show(monitors, slice, title + z, type);
+				if (save && !live) {
+					String zfilename = controller.getPath() + File.separator + title + z + ".tif";
+					Lab.save(monitors, slice, zfilename, type);
+				}
 			}
 			break;
 		case ORTHO:

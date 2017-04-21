@@ -276,7 +276,7 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 				Lab.show(Monitors.createDefaultMonitor(), x, table.getCell(row, 0));
 		} 
 		else {
-			DeconvolutionDialog d = new DeconvolutionDialog(DeconvolutionDialog.Module.IMAGE, deconvolution, null, null);
+			DeconvolutionDialog d = new DeconvolutionDialog(DeconvolutionDialog.Module.IMAGE, deconvolution);
 			Lab.setVisible(d, false);
 		}
 	}
