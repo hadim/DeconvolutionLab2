@@ -47,7 +47,7 @@ public class CubeSphericalBeads extends SignalFactory {
 
 	@Override
 	public String getName() {
-		return "Cube of Spherical Beads";
+		return "CubeSphericalBeads";
 	}
 
 	@Override

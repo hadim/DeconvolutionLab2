@@ -34,7 +34,6 @@ import java.io.File;
 
 import javax.swing.filechooser.FileSystemView;
 
-import deconvolution.Deconvolution;
 import deconvolution.Stats;
 import deconvolution.algorithm.Controller;
 import deconvolution.algorithm.Convolution;
@@ -97,9 +96,13 @@ public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 		controller.setStatsMode(Stats.Mode.SHOW);
 		
 		Convolution convo = new Convolution();
-		convo.setController(controller);
+		convo.setSystem(true);
+		convo.setReference(res + "ref.tif");
+		
 		RealSignal y = convo.run(x, h);
 		Lab.show(y);
+		
+		
 		/*
 		algo  = " -algorithm NIF -out mip NIFp ";
 		new Deconvolution("nif", conv + psf + algo + param).deconvolve();

@@ -51,7 +51,7 @@ public class AxialDiffractionSimulation extends SignalFactory {
 
 	@Override
 	public String getName() {
-		return "Axial Diffraction Simulation";
+		return "AxialDiffractionSimulation";
 	}
 
 	@Override

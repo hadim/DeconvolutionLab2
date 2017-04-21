@@ -33,8 +33,6 @@ package course;
 
 import java.io.File;
 
-import javax.swing.filechooser.FileSystemView;
-
 import bilib.tools.Files;
 import deconvolution.Deconvolution;
 import ij.plugin.PlugIn;

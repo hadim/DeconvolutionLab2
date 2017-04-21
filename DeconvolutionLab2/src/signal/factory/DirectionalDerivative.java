@@ -51,7 +51,7 @@ public class DirectionalDerivative extends SignalFactory {
 
 	@Override
 	public String getName() {
-		return "Directional Derivative";
+		return "Directional-Derivative";
 	}
 	 
 	@Override

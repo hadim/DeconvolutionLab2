@@ -49,7 +49,6 @@ import deconvolutionlab.monitor.ConsoleMonitor;
 import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.monitor.TableMonitor;
 import deconvolutionlab.monitor.Verbose;
-import fft.AbstractFFT;
 import fft.FFT;
 import signal.Constraint;
 import signal.Operations;

@@ -40,9 +40,11 @@ import java.util.concurrent.Future;
 
 import bilib.tools.NumFormat;
 import deconvolution.Stats;
+import deconvolutionlab.Lab;
 import deconvolutionlab.Output;
 import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.monitor.Verbose;
+import deconvolutionlab.system.SystemInfo;
 import fft.AbstractFFT;
 import fft.FFT;
 import signal.Constraint;
@@ -112,6 +114,10 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 	}
 
 	public RealSignal run(RealSignal image, RealSignal psf, Stats stats) {
+
+		if (controller.isSystem())
+			SystemInfo.activate();
+
 		Padding pad = controller.getPadding();
 		Apodization apo = controller.getApodization();
 		double norm = controller.getNormalizationPSF();
@@ -200,6 +206,10 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		monitors.log(getName() + " is finished");
 
 		SignalCollector.free(x);
+		
+		if (controller.isDisplayFinal())
+			Lab.show(monitors, result, "Final Display of " + getShortnames()[0]);
+
 		result.setName("Output of " + this.getShortnames()[0]);
 		return result;
 	}

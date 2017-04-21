@@ -47,7 +47,7 @@ public class DoubleConeWave extends SignalFactory {
 
 	@Override
 	public String getName() {
-		return "Double Cone Wave";
+		return "DoubleConeWave";
 	}
 
 	@Override

@@ -46,7 +46,7 @@ public class DirectionalMotionBlur extends SignalFactory {
 
 	@Override
 	public String getName() {
-		return "Direction Motion Blur";
+		return "Direction-Motion-Blur";
 	}
 
 	@Override

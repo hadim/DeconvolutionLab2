@@ -165,6 +165,7 @@ public abstract class SignalFactory {
 	public static ArrayList<SignalFactory> getImages() {
 		ArrayList<SignalFactory> list = new ArrayList<SignalFactory>();
 		list.add(new Cube(10, 1));
+		list.add(new CubeSphericalBeads(3, 0.5, 8, 16));
 		list.add(new Sphere(10, 1));
 		list.add(new Constant());
 		list.add(new Cross(1, 1, 30));

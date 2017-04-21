@@ -42,7 +42,6 @@ import deconvolutionlab.monitor.AbstractMonitor;
 import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.monitor.StatusMonitor;
 import deconvolutionlab.monitor.TableMonitor;
-import deconvolutionlab.system.SystemInfo;
 import signal.RealSignal;
 import signal.SignalCollector;
 
@@ -145,9 +144,6 @@ public class Deconvolution implements Runnable {
 		double chrono = System.nanoTime();
 		Monitors monitors = controller.getMonitors();
 		
-		if (controller.isSystem())
-			SystemInfo.activate();
-
 		report.add("Path", controller.toStringPath());
 
 		if (image == null)
@@ -189,8 +185,6 @@ public class Deconvolution implements Runnable {
 
 		report.add("End", NumFormat.time(System.nanoTime() - chrono));
 
-		if (controller.isDisplayFinal())
-			Lab.show(monitors, deconvolvedImage, "Result of " + algo.getShortnames()[0]);
 
 		if (finish == Finish.KILL) {
 			System.out.println("End");
