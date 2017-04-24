@@ -135,7 +135,8 @@ public class IJImager extends Imager {
 	}
 
 	@Override
-	public void append(ContainerImage container, RealSignal signal, String title, Imager.Type type) {		ImagePlus cont = (ImagePlus) container.object;
+	public void append(ContainerImage container, RealSignal signal, String title, Imager.Type type) {		
+		ImagePlus cont = (ImagePlus) container.object;
 		if (container.object == null) {
 			ImageStack stack = new ImageStack(signal.nx, signal.ny);
 			stack.addSlice(build(signal, type).getProcessor());

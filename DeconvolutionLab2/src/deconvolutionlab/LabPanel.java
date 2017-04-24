@@ -62,6 +62,7 @@ import deconvolutionlab.module.ComputationModule;
 import deconvolutionlab.module.ConfigModule;
 import deconvolutionlab.module.ControllerModule;
 import deconvolutionlab.module.DirectoryModule;
+import deconvolutionlab.module.FFTModule;
 import deconvolutionlab.module.GroupedModulePanel;
 import deconvolutionlab.module.ImageModule;
 import deconvolutionlab.module.LanguageModule;
@@ -96,6 +97,7 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 	private CommandModule		command;
 	private RunningModule		running;
 	private DirectoryModule		directory;
+	private FFTModule			fft;
 
 	private ControllerModule	controller;
 
@@ -122,8 +124,9 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		command = new CommandModule();
 		running = new RunningModule(false);
 		directory = new DirectoryModule(false);
+		fft = new FFTModule(false);
 
-		modules = new AbstractModule[] { image, psf, algo, output, controller, border, computation, batch, directory };
+		modules = new AbstractModule[] { image, psf, algo, output, controller, border, computation, batch, directory, fft };
 		Command.active(modules, command);
 		Command.command();
 
@@ -226,6 +229,7 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		list.add(controller);
 		list.add(computation);
 		list.add(border);
+		list.add(fft);
 		return list;
 	}
 

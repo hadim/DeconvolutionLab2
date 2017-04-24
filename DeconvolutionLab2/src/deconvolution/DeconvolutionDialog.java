@@ -63,6 +63,8 @@ import deconvolution.capsule.ReportCapsule;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 import deconvolutionlab.Lab;
+import deconvolutionlab.monitor.AbstractMonitor;
+import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.monitor.StatusMonitor;
 import deconvolutionlab.monitor.TableMonitor;
 
@@ -204,17 +206,14 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		}
 		if (module == Module.IMAGE) {
 			toggle(bnImage);
-			deconvolution.getMonitors().add(new StatusMonitor(getProgressBar()));
-			image.update();
+				image.update();
 		}
 		if (module == Module.PSF) {
 			toggle(bnPSF);
-			deconvolution.getMonitors().add(new StatusMonitor(getProgressBar()));
 			psf.update();
 		}
 		if (module == Module.ALGO) {
 			toggle(bnAlgo);
-			deconvolution.getMonitors().add(new StatusMonitor(getProgressBar()));
 			algorithm.update();
 		}
 		if (module == Module.RECAP) {
@@ -278,31 +277,47 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 			toggle(bnMonitor);
 		else if (e.getSource() == bnStats)
 			toggle(bnStats);
+		
+		addProgress();
+
 	}
 
 	@Override
 	public void run() {
-		bnRecap.setEnabled(false);
-		bnImage.setEnabled(false);
-		bnPSF.setEnabled(false);
-		bnAlgo.setEnabled(false);
+		//bnRecap.setEnabled(false);
+		//bnImage.setEnabled(false);
+		//bnPSF.setEnabled(false);
+		//bnAlgo.setEnabled(false);
 		bnStart.setEnabled(false);
 		bnStop.setEnabled(true);
-
-		deconvolution.setCommand(recap.getCommand());
 		
+		deconvolution.setCommand(recap.getCommand());
+		addProgress();
 		deconvolution.run();
 		toggle(bnReport);
 		
 		bnStop.setEnabled(false);
 		report.update();
-		bnRecap.setEnabled(true);
-		bnAlgo.setEnabled(true);
-		bnPSF.setEnabled(true);
-		bnImage.setEnabled(true);
+		//bnRecap.setEnabled(true);
+		//bnAlgo.setEnabled(true);
+		//bnPSF.setEnabled(true);
+		//bnImage.setEnabled(true);
 		thread = null;
 	}
 
+	private void addProgress() {
+		Monitors monitors =  deconvolution.getController().getMonitors();
+		boolean found = false;
+		for(AbstractMonitor monitor : monitors) {
+			if (monitor instanceof StatusMonitor)
+				found = true;
+		}
+		if (!found) {
+			monitors.add(new StatusMonitor(progress));
+			deconvolution.getController().setMonitors(monitors);
+		}
+
+	}
 	public void addStats(Stats stats) {
 		if (stats != null) {
 			cards.add("Stats", stats.getPanel());
@@ -368,7 +383,4 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 	public void windowDeactivated(WindowEvent e) {
 	}
 
-	public JProgressBar getProgressBar() {
-		return progress;
-	}
 }

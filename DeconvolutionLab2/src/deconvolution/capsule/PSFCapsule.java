@@ -62,6 +62,7 @@ public class PSFCapsule extends AbstractCapsule implements Runnable {
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(300, 300), pnImage);
 	}
 
+	@Override
 	public void update() {
 		split.setDividerLocation(300);
 		if (pnImage == null)
@@ -111,7 +112,7 @@ public class PSFCapsule extends AbstractCapsule implements Runnable {
 			return;
 		}
 
-		startAsynchronousTimer("Preprocessing PSF", 200);
+		startAsynchronousTimer("Open PSF", 200);
 
 		float stati[] = deconvolution.psf.getStats();
 		int sizi = deconvolution.psf.nx * deconvolution.psf.ny * deconvolution.psf.nz;

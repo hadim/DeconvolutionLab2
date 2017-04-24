@@ -63,15 +63,18 @@ public class RecapCapsule extends AbstractCapsule implements KeyListener {
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(200, 200), pnCommand.getPane());
 	}
 	
+	@Override
 	public void update() {
 		if (table == null)
 			return;
+		startAsynchronousTimer("Recap", 200);
 		table.removeRows();
 		for (String[] feature : deconvolution.recap())
 			table.append(feature);
 
 		split.setDividerLocation(0.5);
 		split.repaint();
+		stopAsynchronousTimer();
 	}
 
 	public String getCommand() {

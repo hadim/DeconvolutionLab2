@@ -74,7 +74,7 @@ public class Academic extends AbstractFFT {
 	
 	@Override
 	public boolean isMultithreadable() {
-		return false;
+		return true;
 	}
 
 }

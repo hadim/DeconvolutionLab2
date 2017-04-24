@@ -128,7 +128,7 @@ public class Controller {
 
 		monitors = new Monitors();
 		monitors.add(new ConsoleMonitor());
-		monitors.add(new TableMonitor("Monitor", Constants.widthGUI, 240));
+		monitors.add(new TableMonitor(Constants.widthGUI, 240));
 
 		setVerbose(Verbose.Log);
 		setStats(new Stats(Stats.Mode.NO));
@@ -221,7 +221,7 @@ public class Controller {
 		boolean stopIter = (iterations >= iterationsMax);
 		boolean stopTime = doTime && (timeElapsed >= timeLimit);
 		boolean stopResd = doResidu && (residu <= residuMin);
-		monitors.log("@" + iterations + " Time: " + NumFormat.seconds(timeElapsed));
+		monitors.log("@" + iterations + " Time: " + NumFormat.seconds(timeElapsed*1e9));
 
 		addStats();
 		

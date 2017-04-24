@@ -64,6 +64,7 @@ public class ImageCapsule extends AbstractCapsule implements Runnable {
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(300, 300), pnImage);
 	}
 	
+	@Override
 	public void update() {
 		split.setDividerLocation(300);
 		if (pnImage == null)
@@ -108,7 +109,7 @@ public class ImageCapsule extends AbstractCapsule implements Runnable {
 			return;
 		}
 
-		startAsynchronousTimer("Preprocessing image", 200);
+		startAsynchronousTimer("Open image", 200);
 
 		float stati[] = deconvolution.image.getStats();
 		int sizi = deconvolution.image.nx * deconvolution.image.ny * deconvolution.image.nz;

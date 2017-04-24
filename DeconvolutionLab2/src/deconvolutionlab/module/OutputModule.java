@@ -135,14 +135,9 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 		pn.add(bnPlanar);
 		pn.add(bnFigure);
 		
-		JToolBar tool = new JToolBar("Path");
-		tool.setBorder(BorderFactory.createEmptyBorder());
-		tool.setLayout(new BorderLayout());
-		tool.setFloatable(false);
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		panel.setLayout(new BorderLayout());
-		panel.add(tool, BorderLayout.NORTH);
 		panel.add(pn, BorderLayout.SOUTH);
 		panel.add(table.getMinimumPane(100, 100), BorderLayout.CENTER);
 

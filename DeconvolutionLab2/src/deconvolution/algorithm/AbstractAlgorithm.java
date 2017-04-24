@@ -108,10 +108,12 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 	public abstract double getRegularizationFactor();
 	public abstract double getStepFactor();
 	public abstract double[] getParameters();
+
 	public abstract double[] getDefaultParameters();
 
 	public RealSignal run(RealSignal image, RealSignal psf) {
 
+		String sn = getShortnames()[0];
 		if (controller.isSystem())
 			SystemInfo.activate();
 
@@ -160,16 +162,8 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		controller.setFFT(fft);
 		
 		monitors.log(getShortnames()[0] + " data ready");
+		monitors.log(getShortnames()[0] + "" + getParametersToString());
 
-		double params[] = getParameters();
-		if (params != null) {
-			if (params.length > 0) {
-				String s = " ";
-				for (double param : params)
-					s += "" + param + " ";
-				monitors.log(getShortnames()[0] + s);
-			}
-		}
 		RealSignal x = null;
 
 		try {
@@ -205,9 +199,12 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		SignalCollector.free(x);
 		
 		if (controller.isDisplayFinal())
-			Lab.show(monitors, result, "Final Display of " + getShortnames()[0]);
+			Lab.show(monitors, result, "Final Display of " + sn);
 
-		result.setName("Output of " + this.getShortnames()[0]);
+		result.setName("Output of " + sn);
+		
+		monitors.log("End of " + sn + " in " + NumFormat.seconds(controller.getTimeNano()) + " and " + controller.getMemoryAsString());
+
 		return result;
 	}
 
@@ -460,5 +457,18 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 	public AbstractAlgorithm addOutput(Output out) {
 		controller.addOutput(out);
 		return this;
+	}
+	
+	public String getParametersToString() {
+		double params[] = getParameters();
+		if (params != null) {
+			if (params.length > 0) {
+				String s = " ";
+				for (double param : params)
+					s += NumFormat.nice(param) + " ";
+				return s;
+			}
+		}
+		return "parameter-free";
 	}
 }

@@ -395,15 +395,15 @@ public class Command {
 			if (p.equals("1") || p.startsWith("console")) 
 				monitors.add(new ConsoleMonitor());
 			if (p.equals("2"))
-				monitors.add(new TableMonitor("Monitor", Constants.widthGUI, 240));
+				monitors.add(new TableMonitor(Constants.widthGUI, 240));
 			if (p.equals("3")) {
 				monitors.add(new ConsoleMonitor());
-				monitors.add(new TableMonitor("Monitor", Constants.widthGUI, 240));
+				monitors.add(new TableMonitor(Constants.widthGUI, 240));
 			}
 			if (p.equals("console"))
 				monitors.add(new ConsoleMonitor());
 			if (p.equals("table"))
-				monitors.add(new TableMonitor("Monitor", Constants.widthGUI, 240));
+				monitors.add(new TableMonitor(Constants.widthGUI, 240));
 		}
 		return monitors;
 	}

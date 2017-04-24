@@ -79,7 +79,7 @@ public class StatusMonitor implements AbstractMonitor {
 	
 	@Override
 	public String getName() {
-		return "status";
+		return "progress";
 	}
 
 

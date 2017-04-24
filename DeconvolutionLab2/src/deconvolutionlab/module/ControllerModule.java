@@ -33,11 +33,19 @@ package deconvolutionlab.module;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -53,6 +61,7 @@ import bilib.component.GridPanel;
 import bilib.tools.Files;
 import deconvolution.Command;
 import deconvolutionlab.Config;
+import deconvolutionlab.module.ImageModule.LocalDropTarget;
 import signal.Constraint;
 
 public class ControllerModule extends AbstractModule implements ActionListener, ChangeListener, KeyListener {
@@ -157,7 +166,12 @@ public class ControllerModule extends AbstractModule implements ActionListener, 
 
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(scroll, BorderLayout.CENTER);
-	
+
+		// Add drop area
+		txtReference.setDropTarget(new LocalDropTarget());
+		getCollapsedPanel().setDropTarget(new LocalDropTarget());
+		bnBrowse.setDropTarget(new LocalDropTarget());
+
 		Config.register(getName(), "residu.enable", chkResidu, false);
 		Config.register(getName(), "reference.enable", chkReference, false);
 		Config.register(getName(), "time.enable", chkTime, false);
@@ -261,5 +275,36 @@ public class ControllerModule extends AbstractModule implements ActionListener, 
 		getAction1Button().removeChangeListener(this);
 	}
 
+	public class LocalDropTarget extends DropTarget {
 
+		@Override
+		public void drop(DropTargetDropEvent e) {
+			e.acceptDrop(DnDConstants.ACTION_COPY);
+			e.getTransferable().getTransferDataFlavors();
+			Transferable transferable = e.getTransferable();
+			DataFlavor[] flavors = transferable.getTransferDataFlavors();
+			for (DataFlavor flavor : flavors) {
+				if (flavor.isFlavorJavaFileListType()) {
+					try {
+						List<File> files = (List<File>) transferable.getTransferData(flavor);
+						for (File file : files) {
+							if (file.isFile()) {
+								txtReference.setText(file.getAbsolutePath());
+								chkReference.setSelected(true);
+								update();
+							}
+						}
+					}
+					catch (UnsupportedFlavorException ex) {
+						ex.printStackTrace();
+					}
+					catch (IOException ex) {
+						ex.printStackTrace();
+					}
+				}
+			}
+			e.dropComplete(true);
+			super.drop(e);
+		}
+	}
 }

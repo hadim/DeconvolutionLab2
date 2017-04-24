@@ -99,7 +99,7 @@ public class AcademicFFT_XY_Z extends AbstractFFT {
 	
 	@Override
 	public boolean isMultithreadable() {
-		return false;
+		return true;
 	}
 
 }

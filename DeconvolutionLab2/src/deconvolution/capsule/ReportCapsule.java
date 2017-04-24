@@ -59,6 +59,7 @@ public class ReportCapsule extends AbstractCapsule {
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(300, 300), pnImage);
 	}
 	
+	@Override
 	public void update() {
 		split.setDividerLocation(300);
 		if (pnImage == null)

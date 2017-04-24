@@ -33,6 +33,8 @@ package deconvolution.capsule;
 
 import javax.swing.JSplitPane;
 
+import com.esotericsoftware.minlog.Log;
+
 import bilib.component.HTMLPane;
 import bilib.table.CustomizedTable;
 import bilib.tools.NumFormat;
@@ -66,6 +68,7 @@ public class AlgorithmCapsule extends AbstractCapsule implements Runnable {
 		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(200, 200), doc.getPane());
 	}
 
+	@Override
 	public void update() {
 		if (doc == null)
 			return;
@@ -130,7 +133,7 @@ public class AlgorithmCapsule extends AbstractCapsule implements Runnable {
 			return;
 		}
 
-		startAsynchronousTimer("Run FFT", 200);
+		startAsynchronousTimer("Check Algorithm", 200);
 		
 		AbstractFFT f = FFT.getFastestFFT().getDefaultFFT();
 		double Q = Math.sqrt(2);
@@ -159,19 +162,18 @@ public class AlgorithmCapsule extends AbstractCapsule implements Runnable {
 			SignalCollector.free(c);
 			
 			chrono = (System.nanoTime() - chrono);
-			features.add("Tested on", mx + "x" + my + "x" + mz);
-			features.add("Estimated Time on small", NumFormat.time(chrono) );
+			features.add("Small dataset", mx + "x" + my + "x" + mz);
+			features.add("Elapsed time on small dataset", NumFormat.time(chrono) );
 			
 			chrono = chrono * ratio * algo.getComplexityNumberofFFT();
 			
-			int n = algo.isIterative() ? algo.getIterationsMax() : 1;
-			features.add("Estimated Time", NumFormat.time(chrono) );
-			features.add("Estimated Number of FFT / Transform", ""+algo.getComplexityNumberofFFT());
+			features.add("Estimated time for input dataset", NumFormat.time(chrono) );
+			features.add("Estimated number of FFTs", "" + algo.getComplexityNumberofFFT());
 		}
 		else 
-			features.add("Estimated Time", "Error" );
+			features.add("Estimated time", "Error" );
 		double mem = (algo.getMemoryFootprintRatio() * deconvolution.image.nx * deconvolution.image.ny * deconvolution.image.nz * 4);
-		features.add("Estimated Memory", NumFormat.bytes(mem));
+		features.add("Estimated required memory", NumFormat.bytes(mem));
 		features.add("Iterative", algo.isIterative()  ? "" + algo.getIterationsMax() : "Direct");
 		
 		table.removeRows();

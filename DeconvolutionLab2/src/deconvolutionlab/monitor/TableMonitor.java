@@ -57,10 +57,8 @@ public class TableMonitor implements AbstractMonitor, ActionListener {
 	private JButton					bnClear		= new JButton("Clear");
 	private HashMap<Long, Color>	colors		= new HashMap<Long, Color>();
 	private JPanel					panel;
-	private String 					name;
 	
-	public TableMonitor(String name, int width, int height) {
-		this.name = name;
+	public TableMonitor(int width, int height) {
 		ArrayList<CustomizedColumn> columns = new ArrayList<CustomizedColumn>();
 		columns.add(new CustomizedColumn("#", Long.class, 60, false));
 		columns.add(new CustomizedColumn("Time", String.class, 100, false));
@@ -129,7 +127,7 @@ public class TableMonitor implements AbstractMonitor, ActionListener {
 
 	@Override
 	public String getName() {
-		return name;
+		return "table";
 	}
 	
 	class RowRenderer extends DefaultTableCellRenderer {

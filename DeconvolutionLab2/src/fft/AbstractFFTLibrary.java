@@ -49,7 +49,6 @@ public abstract class AbstractFFTLibrary {
 		return installed;
 	}
 	
-	
 	public ArrayList<AbstractFFT> getFFTs() {
 		return ffts;
 	}

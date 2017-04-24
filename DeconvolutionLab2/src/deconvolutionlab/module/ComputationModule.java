@@ -52,10 +52,10 @@ import fft.FFT;
 
 public class ComputationModule extends AbstractModule implements ActionListener, ChangeListener {
 
-	private JComboBox<String>	cmbFFT;
 	private JComboBox<String>	cmbMultithreading;
 	private JComboBox<String>	cmbSystem;
 	private JComboBox<String>	cmbDisplayFinal;
+	private JComboBox<String>	cmbFFT;
 	private JComboBox<String>	cmbEpsilon;
 	private JComboBox<String>	cmbNormalization;
 	boolean init = false;
@@ -84,10 +84,10 @@ public class ComputationModule extends AbstractModule implements ActionListener,
 
 	@Override
 	public JPanel buildExpandedPanel() {
-		cmbFFT = new JComboBox<String>(FFT.getLibrariesAsArray());
 		cmbSystem = new JComboBox<String>(new String[] { "yes", "no" });
 		cmbMultithreading = new JComboBox<String>(new String[] { "yes", "no" });
 		cmbDisplayFinal = new JComboBox<String>(new String[] { "yes", "no" });
+		cmbFFT = new JComboBox<String>(FFT.getLibrariesAsArray());
 		cmbEpsilon = new JComboBox<String>(new String[] { "1E-0", "1E-1", "1E-2", "1E-3", "1E-4", "1E-5", "1E-6", "1E-7", "1E-8", "1E-9", "1E-10", "1E-11", "1E-12" });
 		cmbEpsilon.setSelectedItem("1E-6");
 		cmbNormalization = new JComboBox<String>(new String[] { "1", "10", "1000", "1E+6", "1E+9", "no" });
@@ -161,7 +161,6 @@ public class ComputationModule extends AbstractModule implements ActionListener,
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
-System.out.println("" + e);
 		if (e.getSource() == getAction1Button()) {
 			cmbFFT.setSelectedIndex(0);
 			cmbMultithreading.setSelectedIndex(0);

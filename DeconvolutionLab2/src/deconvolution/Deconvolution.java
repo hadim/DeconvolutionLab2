@@ -33,6 +33,8 @@ package deconvolution;
 
 import java.io.File;
 
+import com.esotericsoftware.minlog.Log;
+
 import bilib.tools.NumFormat;
 import deconvolution.algorithm.AbstractAlgorithm;
 import deconvolution.algorithm.Controller;
@@ -132,8 +134,6 @@ public class Deconvolution implements Runnable {
 	public void launch() {
 		embeddedStats = true;
 		dialog = new DeconvolutionDialog(DeconvolutionDialog.Module.ALL, this);
-		controller.getMonitors().add(new StatusMonitor(dialog.getProgressBar()));
-
 		Lab.setVisible(dialog, false);
 	}
 
@@ -254,13 +254,18 @@ public class Deconvolution implements Runnable {
 		}
 		features.add("Path", controller.getPath());
 
-		features.add("Monitor", controller.toStringMonitor());
+		String s = "[" + controller.getVerbose().name() + "] ";
+		for(AbstractMonitor monitor : controller.getMonitors())
+			s+= monitor.getName() + " ";
+		features.add("Monitor", s);
 		if (controller.getStats() != null)
 			features.add("Stats", controller.getStats().toStringStats());
 		features.add("Running", controller.toStringRunning());
 		
 		for (Output out : controller.getOuts())
 			features.add("Output " + out.getName(), out.toString());
+		
+		Log.info("Recap deconvolution parameters");
 		return features;
 	}
 
@@ -294,6 +299,8 @@ public class Deconvolution implements Runnable {
 		String arg = token.option.trim();
 		String cmd = token.parameters.substring(arg.length(), token.parameters.length()).trim();
 		image = createRealSignal(controller.getMonitors(), arg, cmd, controller.getPath());
+		Log.info("Open image " + arg + " " + cmd);
+
 		return image;
 	}
 
@@ -306,6 +313,7 @@ public class Deconvolution implements Runnable {
 		String arg = token.option.trim();
 		String cmd = token.parameters.substring(arg.length(), token.parameters.length()).trim();
 		psf = createRealSignal(controller.getMonitors(), arg, cmd, controller.getPath());
+		Log.info("Open PSF " + arg + " " + cmd);
 		return psf;
 	}
 

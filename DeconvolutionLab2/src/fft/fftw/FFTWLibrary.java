@@ -42,6 +42,7 @@ import jfftw.complex.nd.Plan;
 public class FFTWLibrary extends AbstractFFTLibrary {
 
 	private String location;
+	
 	public FFTWLibrary(Monitors monitors) {
 
 		String path = "";
