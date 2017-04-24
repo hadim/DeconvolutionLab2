@@ -49,9 +49,10 @@ import bilib.component.GridPanel;
 import bilib.component.HTMLPane;
 import bilib.component.SpinnerRangeInteger;
 import deconvolutionlab.Imager;
-import deconvolutionlab.Output;
-import deconvolutionlab.Output.Dynamic;
-import deconvolutionlab.Output.View;
+import deconvolutionlab.output.Output;
+import deconvolutionlab.output.Output.Action;
+import deconvolutionlab.output.Output.Dynamic;
+import deconvolutionlab.output.Output.View;
 
 public class OutputPanel extends JPanel implements ActionListener, ChangeListener {
 
@@ -114,16 +115,16 @@ public class OutputPanel extends JPanel implements ActionListener, ChangeListene
 
 		if (view == View.ORTHO || view == View.FIGURE) {
 			pn.place(9, 1, 3, 1, chkCenter);
-			pnOrtho = new GridPanel("Keypoint");
-			pnOrtho.place(4, 0, "Position in X");
+			pnOrtho = new GridPanel("Origin for orthoview");
+			pnOrtho.place(4, 0, "Origin in X");
 			pnOrtho.place(4, 1, spnX);
 			pnOrtho.place(4, 2, "[pixel]");
 
-			pnOrtho.place(5, 0, "Position in Y");
+			pnOrtho.place(5, 0, "Origin in Y");
 			pnOrtho.place(5, 1, spnY);
 			pnOrtho.place(5, 2, "[pixel]");
 
-			pnOrtho.place(6, 0, "Position in Z");
+			pnOrtho.place(6, 0, "Origin in Z");
 			pnOrtho.place(6, 1, spnZ);
 			pnOrtho.place(5, 2, "[pixel]");
 			main.place(2, 0, 2, 1, pnOrtho);
@@ -167,21 +168,29 @@ public class OutputPanel extends JPanel implements ActionListener, ChangeListene
 			return;
 		}
 		else if (e.getSource() == bnOK) {
-			int freq = snpSnapshot.get();
-			Dynamic dynamic = Output.Dynamic.values()[cmbDynamic.getSelectedIndex()];
-			Imager.Type type = Imager.Type.values()[cmbType.getSelectedIndex()];
-			boolean show = chkShow.isSelected();
-			boolean save = chkSave.isSelected();
+			Action action = Action.SHOW;
+			if (chkShow.isSelected() && chkSave.isSelected())
+				action = Action.SHOWSAVE;
+			if (!chkShow.isSelected() && chkSave.isSelected())
+				action = Action.SAVE;
 			String name = txtName.getText();
-			if (chkCenter.isSelected()) {
-				out = new Output(view, show, save, freq, name, dynamic, type, true);
-			}
-			else {
-				int px = spnX.get();
-				int py = spnY.get();
-				int pz = spnZ.get();
-				out = new Output(view, show, save, freq, name, dynamic, type, px, py, pz);
-			}
+			out = new Output(view, action, name).frequency(snpSnapshot.get());
+			Dynamic dynamic = Output.Dynamic.values()[cmbDynamic.getSelectedIndex()];
+			if (dynamic == Dynamic.RESCALED)
+				out.rescale();
+			if (dynamic == Dynamic.CLIPPED)
+				out.clip();
+			if (dynamic == Dynamic.NORMALIZED)
+				out.normalize();
+			Imager.Type type = Imager.Type.values()[cmbType.getSelectedIndex()];
+			if (type == Imager.Type.BYTE)
+				out.toByte();
+			if (type == Imager.Type.SHORT)
+				out.toShort();
+			if (type == Imager.Type.FLOAT)
+				out.toFloat();
+			if (!chkCenter.isSelected()) 
+				out.origin(spnX.get(), spnY.get(), spnZ.get());
 			cancel = false;
 		}
 	}

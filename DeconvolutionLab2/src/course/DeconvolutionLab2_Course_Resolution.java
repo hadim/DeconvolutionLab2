@@ -34,11 +34,14 @@ import java.io.File;
 
 import javax.swing.filechooser.FileSystemView;
 
-import deconvolution.Stats;
-import deconvolution.algorithm.Controller;
 import deconvolution.algorithm.Convolution;
+import deconvolution.algorithm.LandweberPositivity;
+import deconvolution.algorithm.NaiveInverseFilter;
+import deconvolution.algorithm.RichardsonLucyTV;
+import deconvolution.algorithm.Simulation;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
+import deconvolutionlab.output.ShowOrtho;
 import ij.plugin.PlugIn;
 import signal.RealSignal;
 import signal.factory.Airy;
@@ -67,81 +70,64 @@ public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 		int spacing = 12;
 		int border = 6;
 		
-		RealSignal x = new CubeSphericalBeads(4, 0.1, spacing, border).intensity(400).generate(nx, ny, nz);
+		RealSignal x = new CubeSphericalBeads(4, 0.1, spacing, border).intensity(100).generate(nx, ny, nz);
 		//RealSignal x = new Sphere(30, 1).generate(nx, ny, nz);
 		//RealSignal x = new Constant().intensity(0, 255).generate(nx, ny, nz);
 		//Lab.show(monitors, x, "reference");
 		//Lab.showOrthoview(x);
 		//Lab.showMIP(x);
-		//Lab.save(monitors, x, res + "ref.tif");
+		Lab.showOrthoview(monitors, x, "Ref", border, border, border);
 
 		//RealSignal h = new Gaussian(3, 3, 1).generate(nx, ny, nz);
 		RealSignal h = new Airy(100, 50, 0.5, 0.1).generate(nx, ny, nz);
 		Lab.show(monitors, h, "psf");
-		Lab.showOrthoview(h);
-		Lab.showMIP(h);
-		Lab.save(monitors, h, res + "psf.tif");
-		Lab.save(monitors, h.createOrthoview(), res + "psfo.tif");
-		Lab.save(monitors, h.createMIP(), res + "psfp.tif");
-
-		String algo  = " ";
-		String param = " -reference " + res + "ref.tif -stats show -display no -monitor no -system no";
-		String conv = " -image file " + res + "conv.tif ";
-		String ref = " -image file " + res + "ref.tif ";
-		String psf = " -psf file " + res + "psf.tif ";
-
-		Controller controller = new Controller();
-		controller.setSystem(true);
-		controller.setReference(res + "ref.tif");
-		controller.setStatsMode(Stats.Mode.SHOW);
+		//Lab.showOrthoview(h);
+		//Lab.showMIP(h);
+	
+		Convolution convolution = new Convolution();
+		convolution.disableDisplayFinal().disableSystem();
+		convolution.addOutput(new ShowOrtho("convolution"));
+		RealSignal y = convolution.run(x, h);
 		
-		Convolution convo = new Convolution();
-		convo.setSystem(true);
-		convo.setReference(res + "ref.tif");
+		Simulation simulation = new Simulation(0, 0.25, 0);
+		simulation.disableDisplayFinal().disableSystem();
+		simulation.addOutput(new ShowOrtho("simualtion").origin(border, border, border));
+		RealSignal ys = simulation.run(x, h);
+		Lab.showOrthoview(monitors, ys, "Simulation", border, border, border);
+		//Lab.show(y);
 		
-		RealSignal y = convo.run(x, h);
-		Lab.show(y);
-		
-		
-		/*
-		algo  = " -algorithm NIF -out mip NIFp ";
-		new Deconvolution("nif", conv + psf + algo + param).deconvolve();
-/*
-//		algo  = " -algorithm TRIF 10e-5 -pad NO NO 0 32 -out mip trifppad -out ortho trifopad ";
-//		new Deconvolution("trif", conv + psf + algo + param).deconvolve();
-
-		algo  = " -algorithm TRIF 10e-5 -out mip TRIFo ";
-		new Deconvolution("trif", conv + psf + algo + param).deconvolve();
-		
-		algo  = " -algorithm TRIF 10e-5 -pad NO NO 100 100 -out mip TRIFoapo ";
-		new Deconvolution("TRIF apo", conv + psf + algo + param).deconvolve();
-
-
-//		algo  = " -algorithm TRIF 10e-4  -pad NO NO 0 20 -out mip trif_ppad -out ortho trif_opad";
-//		new Deconvolution("trif", conv + psf + algo + param).deconvolve();
-
-		//algo  = " -algorithm TRIF 10e-6 -out mip trif_p -out ortho trif_o -stats show";
-		//new Deconvolution("trif", conv + psf + algo + param).deconvolve();
-		/*
-
-		for(int i=-8; i<=-2; i+=20) {
-			algo  = " -algorithm TRIF " + Math.pow(10, i) + " -out mip nifp" + i + " -out ortho nifo" + i + " -stats show";
-			new Deconvolution("trif", conv + psf + algo + param).deconvolve();
+		NaiveInverseFilter nif = new NaiveInverseFilter();
+		nif.addOutput(new ShowOrtho("nif").origin(border, border, border));
+		nif.disableDisplayFinal().disableSystem().setReference(res + "ref.tif").setStats();
+		nif.run(ys, h);
+		//Lab.show(nifo);
+/*		
+		TikhonovRegularizedInverseFilter rif = new TikhonovRegularizedInverseFilter(1e-8);
+		rif.disableDisplayFinal().disableSystem().setReference(res + "ref.tif");
+		rif.addOutput(new ShowOrtho("trif").origin(border, border, border));
+		for(int i=-8; i<=0; i+=1) {
+			rif.setParameters(new double[] {Math.pow(10, i)});
+			RealSignal t = rif.run(ys, h);
+			System.out.println("" + i + " " +Assessment.rmse(t, x));
 		}
+*/
+		
+		RichardsonLucyTV rl = new RichardsonLucyTV(100, 0.00001);
+		rl.disableDisplayFinal().disableSystem().setReference(res + "ref.tif").setStats();
+		rl.addOutput(new ShowOrtho("rltv").frequency(1).origin(border, border, border));
+		RealSignal fli = rl.run(ys, h);
 
-		algo  = " -algorithm SIM 0 1 0  -out ortho simo  -system no -monitor no";
-		new Deconvolution("run", ref + psf + algo).deconvolve();
+//RLTV 0.0001 100		Signals: 167.2 Mb	14.6724	0.9261	n/a
+//RL 		100		Signals: 138.6 Mb	14.6688	0.9224	n/a
+//RLTV 0.001	100		Signals: 167.2 Mb	14.6979	0.9515	n/a		
+//LW+		5000	Signals: 311.6 Mb	15.4276	1.6812	n/a
 
-		algo  = " -algorithm NIF -out ortho nifo  -system -monitor";
-		new Deconvolution("run", signal + psf + algo).deconvolve();
-		for(int i=0; i<=24; i++) {
-			double p = Math.pow(10, i-18);
-			algo  = " -algorithm RIF " + p + " -out ortho @5 RIF/RIF" + i + paramout;
-			new Deconvolution("run", signal + psf + algo).deconvolve();
-		}
-		algo  = " -algorithm LW+ 30 1 -out stats @3 LW+ nosave -out ortho @s5 LW+/LW+" + paramout;
-		new Deconvolution("run", signal + psf + algo).deconvolve();
-	*/	
+		LandweberPositivity lw = new LandweberPositivity(100, 1.95);
+		lw.disableDisplayFinal().disableSystem().setReference(res + "ref.tif").setStats();
+		lw.addOutput(new ShowOrtho("lw").frequency(20).origin(border, border, border));
+		RealSignal lwi = lw.run(ys, h);
+
+		Lab.show(lwi);
 	}
 	
 	public static void main(String arg[]) {

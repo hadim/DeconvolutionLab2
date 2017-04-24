@@ -153,13 +153,15 @@ public class FISTAPanel extends AbstractAlgorithmPanel implements KeyListener, A
 	@Override
 	public String getDocumentation() {
 		String s = "";
-		s += "<h1>" + getName() + " (FISTA)</h1>";
-		s += "<p>Iterative: " + algo.isIterative() + "</p>";
-		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
-		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
-		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		s += "<p></p>";
-		s += "<h3>Reference: Beck and Teboulle, SIAM <b>2</b> 2009</h3>";
+		s += "<h1>" + getName();
+		s += " [<span style=\"color:#FF3333;font-family:georgia\">FISTA</span>]</h1>";		
+		s += "<p>FISTA exploits the sparsity of the wavelet domain to better preserve ";
+		s += "image details and discontinuities. The associated cost function is: </p>";
+		s += "<p>C(<b>x</b>) = | <b>y</b> - <b>H</b><b>x</b> | + &lambda; |<b>W</b><b>x</b>|<sub>1</sub> </p>";
+		s += "<p>where <b>W</b> represents a wavelet transform. ";
+		s += "Due to the non-smoothness of the l<sub>1</sub> norm, ";
+		s += "the problem can be solved efficiently by fast iterative soft-thresholding </p>";
+		s += "<p>Reference: A. Beck, M. Teboulle, A fast iterative shrinkage-thresholding algorithm for linear inverse problems, SIAM J. Imag. Sci. 2, 2009. ";
 		return s;
 	}
 

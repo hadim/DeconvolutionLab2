@@ -257,6 +257,14 @@ public class Lab {
 		imaging.show(signal, title, type, z);
 	}
 
+	public static void save(Monitors monitors, RealSignal signal, String path, String name) {
+		save(monitors, signal, path + File.separator + name + ".tif", Imager.Type.FLOAT);
+	}
+
+	public static void save(Monitors monitors, RealSignal signal, String path, String name, Imager.Type type) {
+		save(monitors, signal, path + File.separator + name + ".tif", type);
+	}
+
 	public static void save(Monitors monitors, RealSignal signal, String filename) {
 		imaging.save(signal, filename, Imager.Type.FLOAT);
 		monitors.log("Save Real Signal " + filename);
@@ -452,7 +460,7 @@ public class Lab {
 		if (signal == null) {
 			return;
 		}
-		imaging.show(signal.createMontage(), signal.name, Imager.Type.FLOAT, 0);
+		imaging.show(signal.createPlanar(), signal.name, Imager.Type.FLOAT, 0);
 	}
 	
 	public static void showPlanar(Monitors monitors, RealSignal signal, String title) {
@@ -460,7 +468,7 @@ public class Lab {
 			monitors.error("Show Planar " + title + " this image does not exist.");
 			return;
 		}
-		imaging.show(signal.createMontage(), title, Imager.Type.FLOAT, 0);
+		imaging.show(signal.createPlanar(), title, Imager.Type.FLOAT, 0);
 	}
 /*
 	public static RealSignal create(Monitors monitors, String name) {

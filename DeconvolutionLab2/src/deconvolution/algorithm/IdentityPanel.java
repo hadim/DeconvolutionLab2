@@ -64,8 +64,9 @@ public class IdentityPanel extends AbstractAlgorithmPanel {
 	@Override
 	public String getDocumentation() {
 		String s = "";
-		s += "<h1>" + getName() + "</h1>";
-		s += "<p>This algorithm does nothing. It returns the input image.</p>";
+		s += "<h1>" + getName();
+		s += " [<span style=\"color:#FF3333;font-family:georgia\">I</span>]</h1>";
+		s += "<p>This algorithm does nothing. It returns a copy of the input image.</p>";
 		return s;
 	}
 

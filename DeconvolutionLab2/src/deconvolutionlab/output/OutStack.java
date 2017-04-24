@@ -29,48 +29,16 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package deconvolution.algorithm;
+package deconvolutionlab.output;
 
-import javax.swing.JPanel;
+public class OutStack extends Output {
 
-import bilib.component.GridPanel;
-
-public class NaiveInverseFilterPanel extends AbstractAlgorithmPanel {
-
-	private NaiveInverseFilter algo = new NaiveInverseFilter();
-
-	@Override
-	public JPanel getPanelParameters() {
-		GridPanel pn = new GridPanel(false);
-		pn.place(1, 0, "<html><span \"nowrap\">NIF is parameter-free</span></html>");
-		return pn;
+	public OutStack(String name) {
+		super(View.STACK, Action.SHOWSAVE, name);
 	}
-
-	@Override
-	public String getCommand() {
-		return "";
+	
+	public OutStack(String path, String name) {
+		super(View.STACK, Action.SHOWSAVE, name);
+		setPath(name);
 	}
-
-	@Override
-	public String getName() {
-		return algo.getName();
-	}
-
-	@Override
-	public String[] getShortnames() {
-		return algo.getShortnames();
-	}
-
-	@Override
-	public String getDocumentation() {
-		String s = "";
-		s += "<h1>" + getName();
-		s += " [<span style=\"color:#FF3333;font-family:georgia\">NIF</span> | ";
-		s += " <span style=\"color:#FF3333;font-family:georgia\">IF</span>] </h1>";
-		s += "<p>The simplest approach to deconvolution consists in minimizing a least-squares cost function. ";
-		s += "Unfortunately, the NIF tends to amplify measurement noise, resulting in spurious high-frequency oscillations. ";
-		s += "It corresponds to maximum-likelihood estimation in the presence of Gaussian noise. ";
-		return s;
-	}
-
 }

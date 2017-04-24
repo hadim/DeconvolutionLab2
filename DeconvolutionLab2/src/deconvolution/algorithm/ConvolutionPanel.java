@@ -64,7 +64,8 @@ public class ConvolutionPanel extends AbstractAlgorithmPanel {
 	@Override
 	public String getDocumentation() {
 		String s = "";
-		s += "<h1>" + getName() + "</h1>";
+		s += "<h1>" + getName();
+		s += " [<span style=\"color:#FF3333;font-family:georgia\">CONV</span>]</h1>";
 		s += "<p>This algorithm is only used for simulation. It make a pure convolution of the input image with the PSF in the Fourier domain.</p>";
 		return s;
 	}

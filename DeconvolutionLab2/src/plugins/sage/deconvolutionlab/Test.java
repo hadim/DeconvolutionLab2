@@ -4,8 +4,8 @@ import java.io.File;
 
 import deconvolutionlab.Imager;
 import deconvolutionlab.Lab;
-import deconvolutionlab.Output.View;
 import deconvolutionlab.dialog.OutputDialog;
+import deconvolutionlab.output.Output.View;
 import icy.gui.frame.IcyFrame;
 import icy.plugin.abstract_.PluginActionable;
 

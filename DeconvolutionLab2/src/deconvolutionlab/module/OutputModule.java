@@ -50,9 +50,9 @@ import deconvolution.Command;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 import deconvolutionlab.Lab;
-import deconvolutionlab.Output;
-import deconvolutionlab.Output.View;
 import deconvolutionlab.dialog.OutputDialog;
+import deconvolutionlab.output.Output;
+import deconvolutionlab.output.Output.View;
 
 public class OutputModule extends AbstractModule implements ActionListener, MouseListener {
 
@@ -104,7 +104,7 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 		columns.add(new CustomizedColumn("Name", String.class, Constants.widthGUI, true));
 		columns.add(new CustomizedColumn("Dynamic", String.class, 100, dynamics, "Select the dynamic range"));
 		columns.add(new CustomizedColumn("Type", String.class, 100, types, "Select the type"));
-		columns.add(new CustomizedColumn("Keypoint", String.class, 120, false));
+		columns.add(new CustomizedColumn("Origin", String.class, 120, false));
 		columns.add(new CustomizedColumn("Show", String.class, 50, false));
 		columns.add(new CustomizedColumn("Save", String.class, 50, false));
 		columns.add(new CustomizedColumn("Del", String.class, 30, "\u232B", "Delete this image source"));

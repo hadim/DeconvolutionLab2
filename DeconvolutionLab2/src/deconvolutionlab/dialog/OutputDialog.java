@@ -50,9 +50,10 @@ import bilib.component.GridPanel;
 import bilib.component.HTMLPane;
 import bilib.component.SpinnerRangeInteger;
 import deconvolutionlab.Imager;
-import deconvolutionlab.Output;
-import deconvolutionlab.Output.Dynamic;
-import deconvolutionlab.Output.View;
+import deconvolutionlab.output.Output;
+import deconvolutionlab.output.Output.Action;
+import deconvolutionlab.output.Output.Dynamic;
+import deconvolutionlab.output.Output.View;
 import ij.gui.GUI;
 
 public class OutputDialog extends JDialog implements ActionListener, ChangeListener {
@@ -173,23 +174,31 @@ public class OutputDialog extends JDialog implements ActionListener, ChangeListe
 			return;
 		}
 		else if (e.getSource() == bnOK) {
-			int freq = snpSnapshot.get();
-			Dynamic dynamic = Output.Dynamic.values()[cmbDynamic.getSelectedIndex()];
-			Imager.Type type = Imager.Type.values()[cmbType.getSelectedIndex()];
-			boolean show = chkShow.isSelected();
-			boolean save = chkSave.isSelected();
+			Action action = Action.SHOW;
+			if (chkShow.isSelected() && chkSave.isSelected())
+				action = Action.SHOWSAVE;
+			if (!chkShow.isSelected() && chkSave.isSelected())
+				action = Action.SAVE;
 			String name = txtName.getText();
-			if (chkCenter.isSelected()) {
-				out = new Output(view, show, save, freq, name, dynamic, type, true);
-			}
-			else {
-				int px = spnX.get();
-				int py = spnY.get();
-				int pz = spnZ.get();
-				out = new Output(view, show, save, freq, name, dynamic, type, px, py, pz);
-			}
-			dispose();
+			out = new Output(view, action, name).frequency(snpSnapshot.get());
+			Dynamic dynamic = Output.Dynamic.values()[cmbDynamic.getSelectedIndex()];
+			if (dynamic == Dynamic.RESCALED)
+				out.rescale();
+			if (dynamic == Dynamic.CLIPPED)
+				out.clip();
+			if (dynamic == Dynamic.NORMALIZED)
+				out.normalize();
+			Imager.Type type = Imager.Type.values()[cmbType.getSelectedIndex()];
+			if (type == Imager.Type.BYTE)
+				out.toByte();
+			if (type == Imager.Type.SHORT)
+				out.toShort();
+			if (type == Imager.Type.FLOAT)
+				out.toFloat();	
+			if (!chkCenter.isSelected()) 
+				out.origin(spnX.get(), spnY.get(), spnZ.get());
 			cancel = false;
+			dispose();
 		}
 	}
 
@@ -250,7 +259,7 @@ public class OutputDialog extends JDialog implements ActionListener, ChangeListe
 		}
 		if (view == View.ORTHO) {
 			info.append("h1", "ortho");
-			info.append("h2", "Create a view 3 orthogonal section centered on the keypoint.");
+			info.append("h2", "Create a view 3 orthogonal section centered on the origin.");
 		}
 		if (view == View.PLANAR) {
 			info.append("h1", "ortho");

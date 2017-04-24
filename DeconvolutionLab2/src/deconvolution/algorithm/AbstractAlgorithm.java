@@ -47,9 +47,9 @@ import bilib.tools.NumFormat;
 import deconvolution.DeconvolutionDialog;
 import deconvolution.Stats;
 import deconvolutionlab.Lab;
-import deconvolutionlab.Output;
 import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.monitor.Verbose;
+import deconvolutionlab.output.Output;
 import deconvolutionlab.system.SystemInfo;
 import fft.AbstractFFT;
 import fft.FFT;
@@ -111,10 +111,6 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 	public abstract double[] getDefaultParameters();
 
 	public RealSignal run(RealSignal image, RealSignal psf) {
-		return run(image, psf, new Stats(Stats.Mode.NO));
-	}
-
-	public RealSignal run(RealSignal image, RealSignal psf, Stats stats) {
 
 		if (controller.isSystem())
 			SystemInfo.activate();
@@ -156,7 +152,7 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		monitors.log(getShortnames()[0] + " is starting (" + iterations + ")");
 		controller.setMonitors(monitors);
 	
-		controller.start(y, stats);
+		controller.start(y);
 		h.circular();
 
 		// FFT
@@ -215,8 +211,9 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		return result;
 	}
 
-	public void setController(Controller controller) {
+	public AbstractAlgorithm setController(Controller controller) {
 		this.controller = controller;
+		return this;
 	}
 
 	public Controller getController() {
@@ -237,6 +234,18 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 
 	public double getMemory() {
 		return controller.getMemory();
+	}
+	
+	public double getResidu() {
+		return controller.getResidu();	
+	}
+	
+	public double getSNR() {
+		return controller.getSNR();	
+	}
+
+	public double getPSNR() {
+		return controller.getPSNR();	
 	}
 
 	public void setWavelets(String waveletsName) {
@@ -268,142 +277,188 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		return controller.getFFT();
 	}
 
-	public void setFFT(AbstractFFT fft) {
+	public AbstractAlgorithm setFFT(AbstractFFT fft) {
 		this.fft = fft;
 		controller.setFFT(fft);
+		return this;
 	}
 
 	public String getPath() {
 		return controller.getPath();
 	}
 
-	public void setPath(String path) {
+	public AbstractAlgorithm setPath(String path) {
 		controller.setPath(path);
+		return this;
 	}
 
 	public boolean isSystem() {
 		return controller.isSystem();
 	}
 
-	public void setSystem(boolean system) {
-		controller.setSystem(system);
+	public AbstractAlgorithm enableSystem() {
+		controller.setSystem(true);
+		return this;
+	}
+
+	public AbstractAlgorithm disableSystem() {
+		controller.setSystem(false);
+		return this;
 	}
 
 	public boolean isMultithreading() {
 		return controller.isMultithreading();
 	}
 
-	public void setMultithreading(boolean multithreading) {
-		controller.setMultithreading(multithreading);
+	public AbstractAlgorithm enableMultithreading() {
+		controller.setMultithreading(true);
+		return this;
+	}
+
+	public AbstractAlgorithm disableMultithreading() {
+		controller.setMultithreading(false);
+		return this;
 	}
 
 	public boolean isDisplayFinal() {
 		return controller.isDisplayFinal();
 	}
 
-	public void setDisplayFinal(boolean displayFinal) {
-		controller.setDisplayFinal(displayFinal);
+	public AbstractAlgorithm enableDisplayFinal() {
+		controller.setDisplayFinal(true);
+		return this;
+	}
+
+	public AbstractAlgorithm disableDisplayFinal() {
+		controller.setDisplayFinal(false);
+		return this;
 	}
 
 	public double getNormalizationPSF() {
 		return controller.getNormalizationPSF();
 	}
 
-	public void setNormalizationPSF(double normalizationPSF) {
+	public AbstractAlgorithm setNormalizationPSF(double normalizationPSF) {
 		controller.setNormalizationPSF(normalizationPSF);
+		return this;
 	}
 
 	public double getEpsilon() {
 		return controller.getEpsilon();
 	}
 
-	public void setEpsilon(double epsilon) {
+	public AbstractAlgorithm setEpsilon(double epsilon) {
 		controller.setEpsilon(epsilon);
+		return this;
 	}
 
 	public Padding getPadding() {
 		return controller.getPadding();
 	}
 
-	public void setPadding(Padding padding) {
+	public AbstractAlgorithm setPadding(Padding padding) {
 		controller.setPadding(padding);
+		return this;
 	}
 
 	public Apodization getApodization() {
 		return controller.getApodization();
 	}
 
-	public void setApodization(Apodization apodization) {
+	public AbstractAlgorithm setApodization(Apodization apodization) {
 		controller.setApodization(apodization);
+		return this;
 	}
 
 	public Monitors getMonitors() {
 		return controller.getMonitors();
 	}
 
-	public void setMonitors(Monitors monitors) {
+	public AbstractAlgorithm setMonitors(Monitors monitors) {
 		controller.setMonitors(monitors);
+		return this;
 	}
 
 	public Verbose getVerbose() {
 		return controller.getVerbose();
 	}
 
-	public void setVerbose(Verbose verbose) {
+	public AbstractAlgorithm setVerbose(Verbose verbose) {
 		controller.setVerbose(verbose);
+		return this;
 	}
 
 	public Constraint.Mode getConstraint() {
 		return controller.getConstraint();
 	}
 
-	public void setConstraint(Constraint.Mode constraint) {
+	public AbstractAlgorithm setConstraint(Constraint.Mode constraint) {
 		controller.setConstraint(constraint);
+		return this;
 	}
 
 	public Stats getStats() {
 		return controller.getStats();
 	}
 
-	public void setStats(Stats stats) {
+	public AbstractAlgorithm setStats(Stats stats) {
 		controller.setStats(stats);
+		return this;
 	}
-
+	
+	public AbstractAlgorithm showStats() {
+		controller.setStats(new Stats(Stats.Mode.SHOW));
+		return this;
+	}
+	
+	public AbstractAlgorithm saveStats(Stats stats) {
+		controller.setStats(new Stats(Stats.Mode.SAVE));
+		return this;
+	}
+	
+	public AbstractAlgorithm setStats() {
+		controller.setStats(new Stats(Stats.Mode.SHOWSAVE));
+		return this;
+	}
+	
 	public double getResiduMin() {
 		return controller.getResiduMin();
 	}
 
-	public void setResiduMin(double residuMin) {
+	public AbstractAlgorithm setResiduMin(double residuMin) {
 		controller.setResiduMin(residuMin);
+		return this;
 	}
 
 	public double getTimeLimit() {
 		return controller.getTimeLimit();
 	}
 
-	public void setTimeLimit(double timeLimit) {
+	public AbstractAlgorithm setTimeLimit(double timeLimit) {
 		controller.setTimeLimit(timeLimit);
+		return this;
 	}
 
 	public String getReference() {
 		return controller.getReference();
 	}
 
-	public void setReference(String reference) {
+	public AbstractAlgorithm setReference(String reference) {
 		controller.setReference(reference);
+		return this;
 	}
 
 	public ArrayList<Output> getOuts() {
 		return controller.getOuts();
 	}
 
-	public void setOuts(ArrayList<Output> outs) {
+	public AbstractAlgorithm setOuts(ArrayList<Output> outs) {
 		controller.setOuts(outs);
+		return this;
 	}
 
-	public void addOutput(Output out) {
+	public AbstractAlgorithm addOutput(Output out) {
 		controller.addOutput(out);
+		return this;
 	}
-
-
 }

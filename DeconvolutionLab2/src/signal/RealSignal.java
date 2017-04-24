@@ -570,7 +570,7 @@ public class RealSignal extends Signal implements SignalListener {
 		return view;
 	}
 
-	public RealSignal createMontage() {
+	public RealSignal createPlanar() {
 		String n = "planar(" + name + ")";
 		int nr = (int) Math.sqrt(nz);
 		int nc = (int) Math.ceil(nz / nr) + 1;

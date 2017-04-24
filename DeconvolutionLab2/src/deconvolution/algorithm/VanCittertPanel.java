@@ -95,15 +95,10 @@ public class VanCittertPanel extends AbstractAlgorithmPanel implements ChangeLis
 	@Override
 	public String getDocumentation() {
 		String s = "";
-		s += "<h1>" + getName() + "</h1>";
-		s += "<p>Iterative: " + algo.isIterative() + "</p>";
-		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
-		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
-		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		String shortname = "<p>Shortname: ";
-		for(String name : getShortnames())
-			shortname += name + " ";
-		s += shortname + "</p>";
+		s += "<h1>" + getName();
+		s += " [<span style=\"color:#FF3333;font-family:georgia\">VC</span>]</h1>";
+		s += "<p>The simplest iterative algorithm for image deconvolution is the Van Cittert algorithm (1930)</p>";
+		s += "<p>The algorithm is sensitive to the presence of noise and tends to increase the noise </p>";
 		return s;
 	}
 }

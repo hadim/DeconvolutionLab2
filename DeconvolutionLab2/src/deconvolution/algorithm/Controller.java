@@ -46,12 +46,12 @@ import bilib.tools.NumFormat;
 import deconvolution.Deconvolution;
 import deconvolution.Stats;
 import deconvolutionlab.Constants;
-import deconvolutionlab.Output;
 import deconvolutionlab.monitor.AbstractMonitor;
 import deconvolutionlab.monitor.ConsoleMonitor;
 import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.monitor.TableMonitor;
 import deconvolutionlab.monitor.Verbose;
+import deconvolutionlab.output.Output;
 import deconvolutionlab.system.SystemUsage;
 import fft.AbstractFFT;
 import fft.FFT;
@@ -161,9 +161,8 @@ public class Controller {
 	 * @param x
 	 *            the input signal
 	 */
-	public void start(RealSignal x, Stats stats) {
-		this.x = x;
-		this.stats = stats;
+	public void start(RealSignal x) {
+		this.x = x;	
 		
 		stats.show();
 		stats.addInput(x);
@@ -324,6 +323,18 @@ public class Controller {
 
 	public int getIterations() {
 		return iterations;
+	}
+	
+	public double getSNR() {
+		return snr;
+	}
+
+	public double getPSNR() {
+		return psnr;
+	}
+
+	public double getResidu() {
+		return residu;
 	}
 
 	private void update() {

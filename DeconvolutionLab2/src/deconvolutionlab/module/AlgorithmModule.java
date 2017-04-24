@@ -89,6 +89,8 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 		Border bl2 = BorderFactory.createEmptyBorder(0, 10, 0, 10);
 		shortname.setBorder(BorderFactory.createCompoundBorder(bl1, bl2));
 		cmb = new JComboBox<String>();
+		cmb.setBorder(BorderFactory.createEtchedBorder());
+		
 		JPanel pnc = new JPanel();
 		pnc.add(cmb);
 		doc = new HTMLPane(100, 1000);

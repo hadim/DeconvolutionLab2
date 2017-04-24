@@ -29,13 +29,15 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package deconvolutionlab;
+package deconvolutionlab.output;
 
 import java.io.File;
 
 import bilib.tools.NumFormat;
 import deconvolution.algorithm.Controller;
+import deconvolutionlab.Imager;
 import deconvolutionlab.Imager.ContainerImage;
+import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
 import signal.Constraint;
 import signal.RealSignal;
@@ -49,11 +51,15 @@ public class Output {
 	public enum Dynamic {
 		INTACT, RESCALED, NORMALIZED, CLIPPED
 	};
+	
+	public enum Action {
+		SHOW, SAVE, SHOWSAVE;
+	}
 
 	private ContainerImage	container	= null;
-	private int				px			= 0;
-	private int				py			= 0;
-	private int				pz			= 0;
+	private int				ox			= 0;
+	private int				oy			= 0;
+	private int				oz			= 0;
 	private boolean			center		= true;
 
 	private String			name		= "";
@@ -64,6 +70,8 @@ public class Output {
 	private Imager.Type		type		= Imager.Type.FLOAT;
 	private Dynamic			dynamic		= Dynamic.INTACT;
 
+	private String			customPath	= "$";
+	
 	private int				frequency	= 0;
 
 	public Output(View view, int frequency, String param) {
@@ -114,11 +122,11 @@ public class Output {
 			if (p.startsWith("(") && p.endsWith(")")) {
 				double pos[] = NumFormat.parseNumbers(p);
 				if (pos.length > 0)
-					px = (int) Math.round(pos[0]);
+					ox = (int) Math.round(pos[0]);
 				if (pos.length > 1)
-					py = (int) Math.round(pos[1]);
+					oy = (int) Math.round(pos[1]);
 				if (pos.length > 2)
-					pz = (int) Math.round(pos[2]);
+					oz = (int) Math.round(pos[2]);
 				found = true;
 				center = false;
 			}
@@ -128,31 +136,60 @@ public class Output {
 		}
 	}
 
-	public Output(View view, boolean show, boolean save, int frequency, String name, Dynamic dynamic, Imager.Type type, boolean center) {
+	public Output(View view, Action action, String name) {
 		this.name = name;
-		this.show = show;
-		this.save = save;
+		this.show = action == Action.SHOW || action == Action.SHOWSAVE;
+		this.save = action == Action.SAVE || action == Action.SHOWSAVE;
 		this.view = view;
-		this.type = type;
-		this.dynamic = dynamic;
-		this.center = center;
-		this.frequency = frequency;
+		this.type = Imager.Type.FLOAT;
+		this.dynamic = Dynamic.INTACT;
+		this.center = true;
+		this.frequency = 0;
 	}
 
-	public Output(View view, boolean show, boolean save, int frequency, String name, Dynamic dynamic, Imager.Type type, int px, int py, int pz) {
-		this.name = name;
-		this.show = show;
-		this.save = save;
-		this.view = view;
-		this.type = type;
-		this.dynamic = dynamic;
+	public Output rescale() {
+		this.dynamic = Dynamic.RESCALED;
+		return this;
+	}
+	
+	public Output clip() {
+		this.dynamic = Dynamic.CLIPPED;
+		return this;
+	}
+
+	public Output normalize() {
+		this.dynamic = Dynamic.NORMALIZED;
+		return this;
+	}
+
+	public Output toFloat() {
+		this.type = Imager.Type.FLOAT;
+		return this;
+	}
+	
+	public Output toShort() {
+		this.type = Imager.Type.SHORT;
+		return this;
+	}
+	
+	public Output toByte() {
+		this.type = Imager.Type.BYTE;
+		return this;
+	}
+	
+	public Output frequency(int frequency) {
+		this.frequency = frequency;
+		return this;
+	}
+
+	public Output origin(int ox, int oy, int oz) {
+		this.ox = ox;
+		this.oy = oy;
+		this.oz = oz;
 		this.center = false;
-		this.px = px;
-		this.py = py;
-		this.pz = pz;
-		this.frequency = frequency;
+		return this;
 	}
-
+	
 	public boolean is(int iterations) {
 		if (frequency == 0)
 			return false;
@@ -166,6 +203,11 @@ public class Output {
 	public String getName() {
 		return name;
 	}
+	
+	public void setPath(String customPath) {
+		this.customPath = customPath;
+	}
+
 
 	public int extractFrequency(String param) {
 		String line = param.trim();
@@ -178,25 +220,16 @@ public class Output {
 		return 0;
 	}
 
-	public void setKeypoint(int px, int py, int pz) {
-		this.px = px;
-		this.py = py;
-		this.pz = pz;
-		this.center = false;
-	}
-
 	public String[] getAsString() {
 		String t = (type == Imager.Type.FLOAT ? "" : type.name().toLowerCase());
 		String d = (dynamic == Dynamic.INTACT ? "" : dynamic.name().toLowerCase());
-		String k = "";
+		String o = "";
 		if (!center)
-			k = " (" + px + "," + py + "," + pz + ")";
-		else
-			k = "";
+			o = " (" + ox + "," + oy + "," + oz + ")";
 		String sa = save ? "\u2713" : "";
 		String sh = show ? "\u2713" : "";
 		String fr = frequency > 0 ? " @" + frequency : "";
-		return new String[] { view.name().toLowerCase() + fr, name, d, t, k, sh, sa, "\u232B" };
+		return new String[] { view.name().toLowerCase() + fr, name, d, t, o, sh, sa, "\u232B" };
 	}
 
 	public void executeStarting(Monitors monitors, RealSignal signal, Controller controller) {
@@ -251,12 +284,13 @@ public class Output {
 		default:
 			x = signal;
 		}
-		String filename = controller.getPath() + File.separator + title + ".tif";
+		String path = (customPath.equals("$") ? controller.getPath() : customPath) + File.separator;
+		String filename = path + title + ".tif";
 
 		switch (view) {
 		case STACK:
 			if (show && !live)
-				Lab.show(monitors, x, title, type, (center ? x.nz / 2 : pz));
+				Lab.show(monitors, x, title, type, (center ? x.nz / 2 : oz));
 			if (save && !live)
 				Lab.save(monitors, x, filename, type);
 			break;
@@ -267,7 +301,7 @@ public class Output {
 				if (show && !live)
 					Lab.show(monitors, slice, title + z, type);
 				if (save && !live) {
-					String zfilename = controller.getPath() + File.separator + title + z + ".tif";
+					String zfilename = path + title + z + ".tif";
 					Lab.save(monitors, slice, zfilename, type);
 				}
 			}
@@ -305,9 +339,9 @@ public class Output {
 	}
 
 	private void orthoview(Monitors monitors, RealSignal signal, String title, String filename, boolean live) {
-		int cx = px;
-		int cy = py;
-		int cz = pz;
+		int cx = ox;
+		int cy = oy;
+		int cz = oz;
 		if (center) {
 			cx = signal.nx / 2;
 			cy = signal.ny / 2;
@@ -326,9 +360,9 @@ public class Output {
 	}
 
 	private void figure(Monitors monitors, RealSignal signal, String title, String filename, boolean live) {
-		int cx = px;
-		int cy = py;
-		int cz = pz;
+		int cx = ox;
+		int cy = oy;
+		int cz = oz;
 		if (center) {
 			cx = signal.nx / 2;
 			cy = signal.ny / 2;
@@ -347,7 +381,7 @@ public class Output {
 	}
 
 	private void planar(Monitors monitors, RealSignal signal, String title, String filename, boolean live) {
-		RealSignal plane = signal.createMontage();
+		RealSignal plane = signal.createPlanar();
 		if (show && live) {
 			if (container == null)
 				container = Lab.createContainer(monitors, title);
@@ -365,7 +399,7 @@ public class Output {
 		String v = view.name().toLowerCase();
 		String d = dynamic.name().toLowerCase();
 		String f = frequency > 0 ? " every " + frequency + " iterations" : "";
-		String k = (center ? "" : " keypoint = (" + px + "," + py + "," + pz + ")");
+		String k = (center ? "" : " keypoint = (" + ox + "," + oy + "," + oz + ")");
 		return v + " " + name + " format = (" + d + ", " + t + ") " + k + f;
 	}
 }

@@ -81,14 +81,16 @@ public class RichardsonLucyPanel extends AbstractAlgorithmPanel implements Chang
 	@Override
 	public String getDocumentation() {
 		String s = "";
-		s += "<h1>" + getName() + "</h1>";
-		s += "<h2> Shortname: RL</h2>";
-
+		s += "<h1>" + getName() + "";
+		s += " [<span style=\"color:#FF3333;font-family:georgia\">RL</span>]</h1>";
 		s += "<p>This is the well-known Richardson-Lucy algorithm.</p>";
 		s += "<p>It is an iterative with a slow convergence, it has only one parameter to tune: the maximum number of iterations</p>";
-		s += "<p>RL is well appropiate for dominant Poison noise.</p>";
+		s += "<p>RL assumes that the noise follows a Poisson distribution.</p>";
 		s += "<p>It is a maximum likelihood estimator (MLE).</p>";
 		s += "<p>Warning: the input image should have only positive values</p>";
+		s += "<p>References:</p>";
+		s += "<p>W.H. Richardson, Bayesian-based iterative method of image restoration, J. Optical Soc. Am. 62, 1972.";
+		s += "<p>L.B. Lucy, An iterative technique for the rectification of observed distributions, Astrophys. J. 79 (6), 1974.";
 		return s;
 	}
 }

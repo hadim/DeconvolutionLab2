@@ -39,11 +39,11 @@ import signal.RealSignal;
 import signal.SignalCollector;
 import signal.factory.complex.ComplexSignalFactory;
 
-public class TikhonovRegularizationInverseFilter extends AbstractAlgorithm implements Callable<RealSignal> {
+public class TikhonovRegularizedInverseFilter extends AbstractAlgorithm implements Callable<RealSignal> {
 
 	private double lambda = 0.1;
 	
-	public TikhonovRegularizationInverseFilter(double lambda) {
+	public TikhonovRegularizedInverseFilter(double lambda) {
 		super();
 		this.lambda = lambda;
 	}
@@ -120,14 +120,13 @@ public class TikhonovRegularizationInverseFilter extends AbstractAlgorithm imple
 
 	@Override
 	public String getName() {
-		return "Tikhonov Regularization";
+		return "Tikhonov Regularization Inverse Filter";
 	}
 	
 	@Override
 	public String[] getShortnames() {
-		return new String[] {"TRIF"};
+		return new String[] {"TRIF", "TR"};
 	}
-
 
 	@Override
 	public double getMemoryFootprintRatio() {

@@ -98,13 +98,12 @@ public class StarkParkerPanel extends AbstractAlgorithmPanel implements ChangeLi
 	@Override
 	public String getDocumentation() {
 		String s = "";
-		s += "<h1>" + getName() + "</h1>";
-		s += "<h1>Stark-Parker Algorithm</p>";
-		s += "<h2>Shortname: BVLS or SP</p>";
-		s += "<p>This algorithm also known as Stark-Parker algorithm is a least squares variant with a bounded-variable constraint.</p>";
-		s += "<p>In this implementation, the bounds are the bounds of the input image.</p>";
-		s += "<p></p>";
-		s += "<p>Reference: Stark and Parker, Computational Statistics <b>10</b>, 1995.</p>";
+		s += "<h1>" + getName();
+		s += " [<span style=\"color:#FF3333;font-family:georgia\">BVLS</span> | ";
+		s += " <span style=\"color:#FF3333;font-family:georgia\">SP</span>]</h1>";
+		s += "<p>The Bounded-Variables Least-Square algorithm is known also as Spark-Parker (SP) algorithm. ";
+		s += "It minimizes a least-squares cost function with a clipped values constraint.</p>";
+		s += "<p>Reference: P. Stark, R. Parker, Bounded-variable least-squares: an algorithm and applications. Computational Statistics 10, 1995.";
 		return s;
 	}
 }

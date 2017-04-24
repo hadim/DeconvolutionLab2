@@ -37,11 +37,11 @@ import bilib.tools.NumFormat;
 import deconvolution.algorithm.AbstractAlgorithm;
 import deconvolution.algorithm.Controller;
 import deconvolutionlab.Lab;
-import deconvolutionlab.Output;
 import deconvolutionlab.monitor.AbstractMonitor;
 import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.monitor.StatusMonitor;
 import deconvolutionlab.monitor.TableMonitor;
+import deconvolutionlab.output.Output;
 import signal.RealSignal;
 import signal.SignalCollector;
 
@@ -192,7 +192,7 @@ public class Deconvolution implements Runnable {
 			}
 		}
 		algo.setController(controller);
-		deconvolvedImage = algo.run(image, psf, controller.getStats());
+		deconvolvedImage = algo.run(image, psf);
 
 		report.add("End", NumFormat.time(System.nanoTime() - chrono));
 

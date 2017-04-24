@@ -118,13 +118,13 @@ public class RichardsonLucyTVPanel extends AbstractAlgorithmPanel implements Key
 	@Override
 	public String getDocumentation() {
 		String s = "";
-		s += "<h1>" + getName() + "</h1>";
-		s += "<h2> Shortname: RLTV</h2>";
+		s += "<h1>" + getName();
+		s += " [<span style=\"color:#FF3333;font-family:georgia\">RLTV</span>]</h1>";
 		s += "<p>This algorithm is a combinaison of the Richardson–Lucy algorithm with a regularization constraint based on Total Variation, which tends to reduce unstable oscillations while preserving object edges.</p>";
-		s += "<p>It is a iterative algorithm, relative slow to compute the Total Variation at every iteration.s</p>";
-		s += "<p>It has a weighted parameter &lamdba; to control the effect of the total variation.</p>";
+		s += "<p>It is a iterative algorithm, relative slow to compute the Total Variation at every iteration.</p>";
+		s += "<p>It has a weighted parameter &lambda; to control the effect of the total variation.</p>";
 		s += "<p></p>";
-		s += "<h3>Reference: Dey et al., Microscopy Research and Technics, 2006.</p>";
+		s += "<h3>Reference: N. Dey et al., Richardson–Lucy algorithm with total variation regularization for 3D confocal microscope deconvolution, Microsc. Res. Tech. 69, 2006. </p>";
 		return s;
 	}
 }

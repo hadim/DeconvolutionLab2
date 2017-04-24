@@ -41,7 +41,7 @@ public class Algorithm {
 	static {
 		list = new ArrayList<AbstractAlgorithmPanel>();
 		list.add(new RegularizedInverseFilterPanel());
-		list.add(new TikhonovRegularizationInverseFilterPanel());
+		list.add(new TikhonovRegularizedInverseFilterPanel());
 		list.add(new NaiveInverseFilterPanel());
 		list.add(new FISTAPanel());
 		list.add(new ISTAPanel());
@@ -81,7 +81,7 @@ public class Algorithm {
 		if (list.get(i++).isNamed(n))
 			algo = new RegularizedInverseFilter(0.1);
 		else if (list.get(i++).isNamed(n))
-			algo =  new TikhonovRegularizationInverseFilter(1.0);
+			algo =  new TikhonovRegularizedInverseFilter(1.0);
 		else if (list.get(i++).isNamed(n))
 			algo =  new NaiveInverseFilter();
 		else if (list.get(i++).isNamed(n))

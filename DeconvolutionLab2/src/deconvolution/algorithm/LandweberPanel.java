@@ -98,15 +98,13 @@ public class LandweberPanel extends AbstractAlgorithmPanel implements ChangeList
 	@Override
 	public String getDocumentation() {
 		String s = "";
-		s += "<h1>" + getName() + "</h1>";
-		s += "<p>Iterative: " + algo.isIterative() + "</p>";
-		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
-		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
-		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		String shortname = "<p>Shortname: ";
-		for(String name : getShortnames())
-			shortname += name + " ";
-		s += shortname + "</p>";
+		s += "<h1>" + getName();
+		s += " [<span style=\"color:#FF3333;font-family:georgia\">LW</span> | ";
+		s += " <span style=\"color:#FF3333;font-family:georgia\">LLS</span>]</h1>";
+		s += "<p>The Landweber algorithm known as Linear Least-Square (LLS) minimizes the same least-squares cost function than NIF.</p>";
+		s += "<p>The Landweber algorithm proceeds by an iterative gradient-descent approach which allows ";
+		s += " to impose a nonnegativity constraint at each iteration (see LW+ or NLLS algorithm).</p>";
+		s += "<p>Reference: L. Landweber, An iteration formula for fredholm integral equations of the first kind, Am. J. Math. 73, 1951. ";
 		return s;
 	}
 }

@@ -40,7 +40,7 @@ import signal.SignalCollector;
 
 public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSignal> {
 
-	public RichardsonLucy(int iter) {
+	public RichardsonLucy(int iterMax) {
 		super();
 		this.iterMax = iterMax;
 	}

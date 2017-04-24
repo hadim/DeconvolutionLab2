@@ -46,10 +46,10 @@ import deconvolution.Command;
 import deconvolution.RegularizationPanel;
 import deconvolutionlab.Config;
 
-public class TikhonovRegularizationInverseFilterPanel extends AbstractAlgorithmPanel implements ActionListener, ChangeListener, KeyListener {
+public class TikhonovRegularizedInverseFilterPanel extends AbstractAlgorithmPanel implements ActionListener, ChangeListener, KeyListener {
 
 	private RegularizationPanel					reg;
-	private TikhonovRegularizationInverseFilter	algo	= new TikhonovRegularizationInverseFilter(0.1);
+	private TikhonovRegularizedInverseFilter	algo	= new TikhonovRegularizedInverseFilter(0.1);
 
 	@Override
 	public JPanel getPanelParameters() {
@@ -112,12 +112,20 @@ public class TikhonovRegularizationInverseFilterPanel extends AbstractAlgorithmP
 	@Override
 	public String getDocumentation() {
 		String s = "";
-		s += "<h1>" + getName() + "</h1>";
-		s += "<h2>Shortname TRIF</h2>";
-		s += "<p>Iterative: " + algo.isIterative() + "</p>";
-		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
-		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
-		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
+		s += "<h1>" + getName();
+		s += " [<span style=\"color:#FF3333;font-family:georgia\">TRIF</span> | ";
+		s += " <span style=\"color:#FF3333;font-family:georgia\">TR</span>] </h1>";
+		s += "<p>This algorithm is a direct inverse filter with a Tikhonov regularization following this formalization: ";
+		s += "<b>x</b> = (<b>H</b><sup>T</sup><b>H</b> + &lambda; <b>I</b>)<sup>-1</sup> <b>H</b><sup>T</sup><b>y</b>";
+		s += "<p> where <b>H</b> is the PSF and <b>I</b> is the identity operator. ";
+		s += "This regularization tends to reduce high frequencies noisy and in the same time ";
+		s += "it tends to blur the image. It is controlled by the regularization factor &lambda;. ";
+		s += "</p>";
+		s += "<p>TRIF or TR is very fast. It is non-iterative algorithm. </p>";
+		s += "<p>This formulation can also be interpreted as a maximum a posteriori model.";
+		s += "The regularization introduces prior information about the signal to guide the estimation.</p>";
+		
+		s += "<p>Reference: A. Tikhonov, Solution of incorrectly formulated problems and the regularization method, Soviet Mathematics Dokl., vol. 5, 1963.</p>";
 		return s;
 	}
 }

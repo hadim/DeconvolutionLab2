@@ -154,15 +154,13 @@ public class ISTAPanel extends AbstractAlgorithmPanel implements KeyListener, Ac
 	@Override
 	public String getDocumentation() {
 		String s = "";
-		s += "<h1>" + getName() + "</h1>";
-		s += "<p>Iterative: " + algo.isIterative() + "</p>";
-		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
-		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
-		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		String shortname = "<p>Shortname: ";
-		for(String name : getShortnames())
-			shortname += name + " ";
-		s += shortname + "</p>";
+		s += "<h1>" + getName();
+		s += " [<span style=\"color:#FF3333;font-family:georgia\">ISTA</span>]</h1>";
+		s += "<p>ISTA exploits the sparsity of the wavelet domain to better preserve ";
+		s += "image details and discontinuities. The associated cost function is: </p>";
+		s += "<p>C(<b>x</b>) = | <b>y</b> - <b>H</b><b>x</b> | + &lambda; |<b>W</b><b>x</b>|<sub>1</sub> </p>";
+		s += "<p>where <b>W</b> represents a wavelet transform. ";
+		s += "<p>Reference: An EM algorithm for wavelet-based image restoration, MAT Figueiredo, RD Nowak, Image Processing, IEEE Transactions on 12 (8), 2003. ";
 		return s;
 	}
 }

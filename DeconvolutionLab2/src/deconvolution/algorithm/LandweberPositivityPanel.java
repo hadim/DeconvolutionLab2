@@ -98,15 +98,11 @@ public class LandweberPositivityPanel extends AbstractAlgorithmPanel implements 
 	@Override
 	public String getDocumentation() {
 		String s = "";
-		s += "<h1>" + getName() + "</h1>";
-		s += "<p>Iterative: " + algo.isIterative() + "</p>";
-		s += "<p>Step controllable: " + algo.isStepControllable() + "</p>";
-		s += "<p>Regularization: " + algo.isRegularized() + "</p>";
-		s += "<p>Wavelet-base: " + algo.isWaveletsBased() + "</p>";
-		String shortname = "<p>Shortname: ";
-		for(String name : getShortnames())
-			shortname += name + " ";
-		s += shortname + "</p>";
+		s += "<h1>" + getName();
+		s += " [<span style=\"color:#FF3333;font-family:georgia\">LW+</span> | ";
+		s += " <span style=\"color:#FF3333;font-family:georgia\">NNLS</span>]</h1>";
+		s += "<p>The Landweber+ algorithm known as Non-Negative Least-Square (NLLS) minimizes a least-squares cost function with a non-negative constraint.</p>";
+		s += "<p>Reference: L. Landweber, An iteration formula for fredholm integral equations of the first kind, Am. J. Math. 73, 1951. ";
 		return s;
 	}
 }

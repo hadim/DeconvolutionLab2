@@ -103,12 +103,21 @@ public class RegularizedInverseFilterPanel extends AbstractAlgorithmPanel implem
 	@Override
 	public String getDocumentation() {
 		String s = "";
-		s += "<h1>" + getName() + "</h1>";
-		s += "<h2>Shortname RIF or LRIF</h2>";
-		s += "<p>Laplacian Regularized Inverse Filter</p>";
-		s += "<p>This is a inverse filter with a Laplacian regularization that tends to have an effect on high frequency</p>";
-		s += "<p>It is very fast, non-iterative algorithm</p>";
-		s += "<p>The regularization blurs the noise and the image. It is controlled by &lambda;</p>";
+		s += "<h1>" + getName();
+		s += " [<span style=\"color:#FF3333;font-family:georgia\">RIF</span> | ";
+		s += " <span style=\"color:#FF3333;font-family:georgia\">LRIF</span>] </h1>";
+		s += "<p><i>Laplacian Regularized Inverse Filter</i></p>";
+		s += "<p>This algorithm is a direct inverse filter with a Laplacian regularization following this formalization: ";
+		s += "<b>x</b> = (<b>H</b><sup>T</sup><b>H</b> + &lambda; <b>L</b><sup>T</sup><b>L</b>)<sup>-1</sup> <b>H</b><sup>T</sup><b>y</b>";
+		s += "<p> where <b>H</b> is the PSF and <b>L</b> is the discretization of the Laplacian operator. ";
+		s += "This regularization tends to reduce high frequencies noisy and in the same time ";
+		s += "it tends to blur the image. It is controlled by the regularization factor &lambda;. ";
+		s += "</p>";
+		s += "<p>RIF or LRIF is very fast. It is non-iterative algorithm</p>";
+		s += "<p>When the filtering by <b>L</b><sup>T</sup><b>L</b> has a whitening effect on <b>x</b> ";
+		s += "and &lambda; is defined as the inverse of the noise variance, RIF amounts to Wiener filtering.</p>";
+		
+		s += "<p>Reference: N. Wiener, Extrapolation, Interpolation, and Smoothing of Stationary Time Series, vol. 2, MIT press Cambridge, 1949.</p>";
 		return s;
 	}
 
