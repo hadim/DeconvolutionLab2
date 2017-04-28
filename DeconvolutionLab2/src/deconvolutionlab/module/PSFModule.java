@@ -77,8 +77,8 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 	private JButton			bnSynthetic;
 	private JButton			bnPlatform;
 
-	public PSFModule(boolean expanded) {
-		super("PSF", "-psf", "", "Check", expanded);
+	public PSFModule() {
+		super("PSF", "-psf", "", "Check");
 	}
 
 	@Override

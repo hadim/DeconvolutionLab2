@@ -61,8 +61,8 @@ public class RunningModule extends AbstractModule implements MouseListener {
 	private JTextField		txtPath;
 	private JTextField		txtDirectory;
 
-	public RunningModule(boolean expanded) {
-		super("Running", "", "Default", "Browse", expanded);
+	public RunningModule() {
+		super("Running", "", "Default", "Browse");
 	}
 
 	@Override

@@ -47,7 +47,7 @@ public class CommandModule extends AbstractModule {
 	private HTMLPane window;
 	
 	public CommandModule() {
-		super("Command", "", "", "Check", true);
+		super("Command", "", "", "Check");
 	}
 
 	public HTMLPane getPane() {

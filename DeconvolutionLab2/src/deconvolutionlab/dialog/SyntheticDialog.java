@@ -58,9 +58,9 @@ public class SyntheticDialog extends JDialog implements ActionListener, WindowLi
 
 	private SpinnerRangeDouble	spnIntensity	= new SpinnerRangeDouble(255, -999999, 999999, 1);
 
-	private SpinnerRangeInteger	spnWidth		= new SpinnerRangeInteger(128, 1, 9999, 1);
-	private SpinnerRangeInteger	spnHeight		= new SpinnerRangeInteger(128, 1, 9999, 1);
-	private SpinnerRangeInteger	spnSlices		= new SpinnerRangeInteger(32, 1, 9999, 1);
+	private SpinnerRangeInteger	spnWidth		= new SpinnerRangeInteger(200, 1, 9999, 1);
+	private SpinnerRangeInteger	spnHeight		= new SpinnerRangeInteger(100, 1, 9999, 1);
+	private SpinnerRangeInteger	spnSlices		= new SpinnerRangeInteger(100, 1, 9999, 1);
 
 	private SpinnerRangeDouble	spnCenterX		= new SpinnerRangeDouble(0.5, -10, 10, 0.05);
 	private SpinnerRangeDouble	spnCenterY		= new SpinnerRangeDouble(0.5, -10, 10, 0.05);

@@ -36,6 +36,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -43,13 +44,6 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import bilib.component.GridPanel;
-import bilib.component.SpinnerRangeInteger;
-import bilib.tools.NumFormat;
-import deconvolution.Command;
-import deconvolution.Deconvolution;
-import deconvolutionlab.Config;
-import deconvolutionlab.monitor.Monitors;
 import signal.RealSignal;
 import signal.apodization.AbstractApodization;
 import signal.apodization.Apodization;
@@ -57,8 +51,15 @@ import signal.apodization.UniformApodization;
 import signal.padding.AbstractPadding;
 import signal.padding.NoPadding;
 import signal.padding.Padding;
+import bilib.component.GridPanel;
+import bilib.component.SpinnerRangeInteger;
+import bilib.tools.NumFormat;
+import deconvolution.Command;
+import deconvolution.Deconvolution;
+import deconvolutionlab.Config;
+import deconvolutionlab.monitor.Monitors;
 
-public class BorderModule extends AbstractModule implements ActionListener, ChangeListener {
+public class PreprocessingModule extends AbstractModule implements ActionListener, ChangeListener {
 
 	private JComboBox<String>	cmbPadXY;
 	private JComboBox<String>	cmbPadZ;
@@ -68,9 +69,11 @@ public class BorderModule extends AbstractModule implements ActionListener, Chan
 	private SpinnerRangeInteger	spnExtensionZ;
 	private JLabel		        lblPad;
 	private JLabel		        lblApo;
+	private JComboBox<String>	cmbNormalization;
+	private JButton		        bnTest;
 	
-	public BorderModule(boolean expanded) {
-		super("Border", "", "Test", "Default", expanded);
+	public PreprocessingModule() {
+		super("Preprocessing", "", "Default", "");
 	}
 
 	@Override
@@ -87,11 +90,15 @@ public class BorderModule extends AbstractModule implements ActionListener, Chan
 			cmd += " -pad " + pxy.getShortname() + " " + paz.getShortname() + " " + extXY + extZ;
 		if (!(axy instanceof UniformApodization) || !(apz instanceof UniformApodization))
 			cmd += " -apo " + axy.getShortname() + " " + apz.getShortname() + " ";
+		if (cmbNormalization.getSelectedIndex() != 0)
+			cmd += " -norm  " + NumFormat.parseNumber((String)cmbNormalization.getSelectedItem(), 1);
 		return cmd;
 	}
 
 	@Override
 	public JPanel buildExpandedPanel() {
+		bnTest = new JButton("Test");
+		
 		lblPad = new JLabel("Information on padding size");
 		lblPad.setBorder(BorderFactory.createEtchedBorder());
 		lblApo = new JLabel("Information on apodization energy");
@@ -102,24 +109,36 @@ public class BorderModule extends AbstractModule implements ActionListener, Chan
 		cmbApoZ = new JComboBox<String>(Apodization.getApodizationsAsArray());
 		spnExtensionXY = new SpinnerRangeInteger(0, 0, 99999, 1);
 		spnExtensionZ = new SpinnerRangeInteger(0, 0, 99999, 1);
+		cmbNormalization = new JComboBox<String>(new String[] { "1", "10", "1000", "1E+6", "1E+9", "no" });
+		
+		cmbNormalization.addActionListener(this);
+		cmbNormalization.setSelectedIndex(0);
+		cmbNormalization.removeActionListener(this);
 	
 		GridPanel pnBorder = new GridPanel(false, 2);
+		pnBorder.place(0, 0, "<html><b>Image</b>");
 		pnBorder.place(0, 1, "Lateral (XY)");
 		pnBorder.place(0, 2, "Axial (Z)");
-		pnBorder.place(2, 0, "Apodization");
-		pnBorder.place(2, 1, cmbApoXY);
-		pnBorder.place(2, 2, cmbApoZ);
+		pnBorder.place(1, 0, "Apodization");
+		pnBorder.place(1, 1, cmbApoXY);
+		pnBorder.place(1, 2, cmbApoZ);
 
-		pnBorder.place(3, 0, "Padding Extension");
-		pnBorder.place(3, 1, spnExtensionXY);
-		pnBorder.place(3, 2, spnExtensionZ);
+		pnBorder.place(2, 0, "Padding Extension");
+		pnBorder.place(2, 1, spnExtensionXY);
+		pnBorder.place(2, 2, spnExtensionZ);
 
-		pnBorder.place(4, 0, "Padding Constraint");
-		pnBorder.place(4, 1, cmbPadXY);
-		pnBorder.place(4, 2, cmbPadZ);
-		pnBorder.place(5, 0, 3, 1, lblPad);
-		pnBorder.place(6, 0, 3, 1, lblApo);
-			
+		pnBorder.place(3, 0, "Padding Constraint");
+		pnBorder.place(3, 1, cmbPadXY);
+		pnBorder.place(3, 2, cmbPadZ);
+		pnBorder.place(4, 0, 3, 1, lblPad);
+		pnBorder.place(5, 0, 3, 1, lblApo);
+		pnBorder.place(6, 2, 3, 1, bnTest);
+		pnBorder.place(7, 0, "  ");
+		pnBorder.place(8, 0, "<html><b>PSF</b>");
+		pnBorder.place(9, 0, "Normalization");
+		pnBorder.place(9, 1, cmbNormalization);
+		pnBorder.place(9, 2, "recommended: 1");
+
 		JScrollPane scroll = new JScrollPane(pnBorder);
 		scroll.setBorder(BorderFactory.createEmptyBorder());
 		scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -135,15 +154,18 @@ public class BorderModule extends AbstractModule implements ActionListener, Chan
 		Config.register(getName(), "apoz", cmbApoZ, Apodization.getDefault().getName());
 		Config.register(getName(), "extxy", spnExtensionXY, "0");
 		Config.register(getName(), "extz", spnExtensionZ, "0");
+		Config.register(getName(), "normalization", cmbNormalization, cmbNormalization.getItemAt(0));
+		
+		cmbNormalization.addActionListener(this);
 		spnExtensionXY.addChangeListener(this);
 		spnExtensionZ.addChangeListener(this);
 		cmbPadXY.addActionListener(this);
 		cmbPadZ.addActionListener(this);
 		cmbApoXY.addActionListener(this);
 		cmbApoZ.addActionListener(this);
+		bnTest.addActionListener(this);
 
 		getAction1Button().addActionListener(this);
-		getAction2Button().addActionListener(this);
 		return panel;
 	}
 
@@ -170,7 +192,7 @@ public class BorderModule extends AbstractModule implements ActionListener, Chan
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
-		if (e.getSource() == getAction2Button()) {
+		if (e.getSource() == getAction1Button()) {
 			cmbPadXY.removeActionListener(this);
 			cmbPadZ.removeActionListener(this);
 			cmbApoXY.removeActionListener(this);
@@ -181,6 +203,7 @@ public class BorderModule extends AbstractModule implements ActionListener, Chan
 			cmbApoZ.setSelectedIndex(0);
 			spnExtensionXY.set(0);
 			spnExtensionZ.set(0);
+			cmbNormalization.setSelectedIndex(0);
 			cmbPadXY.addActionListener(this);
 			cmbPadZ.addActionListener(this);
 			cmbApoXY.addActionListener(this);
@@ -188,7 +211,7 @@ public class BorderModule extends AbstractModule implements ActionListener, Chan
 			update();
 			return;
 		}
-		if (e.getSource() == getAction1Button()) {
+		if (e.getSource() == bnTest) {
 			Thread thread = new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -234,9 +257,10 @@ public class BorderModule extends AbstractModule implements ActionListener, Chan
 		cmbApoXY.removeActionListener(this);
 		cmbApoZ.removeActionListener(this);
 		getAction1Button().removeActionListener(this);
-		getAction2Button().removeActionListener(this);
 		spnExtensionXY.removeChangeListener(this);
 		spnExtensionZ.removeChangeListener(this);
+		cmbNormalization.removeActionListener(this);
+		bnTest.removeActionListener(this);
 	}
 
 

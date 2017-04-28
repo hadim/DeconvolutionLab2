@@ -56,8 +56,8 @@ public class LanguageModule extends AbstractModule implements ActionListener {
 	private JComboBox<String>	gui;
 	private JTextField			txt;
 
-	public LanguageModule(boolean expanded) {
-		super("Language", "", "", "", expanded);
+	public LanguageModule() {
+		super("Language", "", "", "");
 	}
 
 	public String getJobName() {

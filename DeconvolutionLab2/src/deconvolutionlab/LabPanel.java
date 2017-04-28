@@ -56,9 +56,7 @@ import deconvolutionlab.module.AboutModule;
 import deconvolutionlab.module.AbstractModule;
 import deconvolutionlab.module.AlgorithmModule;
 import deconvolutionlab.module.BatchModule;
-import deconvolutionlab.module.BorderModule;
 import deconvolutionlab.module.CommandModule;
-import deconvolutionlab.module.ComputationModule;
 import deconvolutionlab.module.ConfigModule;
 import deconvolutionlab.module.ControllerModule;
 import deconvolutionlab.module.DirectoryModule;
@@ -69,35 +67,43 @@ import deconvolutionlab.module.LanguageModule;
 import deconvolutionlab.module.LicenceModule;
 import deconvolutionlab.module.OutputModule;
 import deconvolutionlab.module.PSFModule;
+import deconvolutionlab.module.PreprocessingModule;
 import deconvolutionlab.module.RunningModule;
 import deconvolutionlab.system.SystemInfo;
 
+/**
+ * This class build the main panel for DeconvolutionLab2. It consists to a
+ * series of collapse/expanded modules that are placed in different tabs. The size
+ * of the panel is dynamically computed,
+ * 
+ * @author Daniel Sage
+ * 
+ */
 public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 
-	private JTabbedPane			tab			= new JTabbedPane();
-	private JButton				bnHelp		= new JButton("Help");
-	private JButton				bnQuit		= new JButton("Quit");
-	private JButton				bnSystem	= new JButton("System");
-	private JButton				bnBatch		= new JButton("Batch");
-	private JButton				bnRun		= new JButton("Run");
-	private JButton				bnLaunch	= new JButton("Launch");
-	private JButton				bnClose;
+	private JTabbedPane	        tab	     = new JTabbedPane();
+	private JButton	            bnHelp	 = new JButton("Help");
+	private JButton	            bnQuit	 = new JButton("Quit");
+	private JButton	            bnSystem	= new JButton("System");
+	private JButton	            bnBatch	 = new JButton("Batch");
+	private JButton	            bnRun	 = new JButton("Run");
+	private JButton	            bnLaunch	= new JButton("Launch");
+	private JButton	            bnClose;
 
-	private ImageModule			image;
-	private PSFModule			psf;
-	private AlgorithmModule		algo;
-	private AboutModule			about;
-	private LicenceModule		licence;
-	private OutputModule		output;
-	private ComputationModule	computation;
-	private BorderModule		border;
-	private ConfigModule		config;
-	private BatchModule			batch;
-	private LanguageModule		language;
-	private CommandModule		command;
-	private RunningModule		running;
-	private DirectoryModule		directory;
-	private FFTModule			fft;
+	private ImageModule	        image;
+	private PSFModule	        psf;
+	private AlgorithmModule	    algo;
+	private AboutModule	        about;
+	private LicenceModule	    licence;
+	private OutputModule	    output;
+	private PreprocessingModule	preprocessing;
+	private ConfigModule	    config;
+	private BatchModule	        batch;
+	private LanguageModule	    language;
+	private CommandModule	    command;
+	private RunningModule	    running;
+	private DirectoryModule	    directory;
+	private FFTModule	        fft;
 
 	private ControllerModule	controller;
 
@@ -105,28 +111,27 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 	private GroupedModulePanel	panelAdvanc;
 	private GroupedModulePanel	panelScript;
 	private GroupedModulePanel	panelAbout;
-	private AbstractModule		modules[];
-	
+	private AbstractModule	    modules[];
+
 	public LabPanel(JButton bnClose) {
 		this.bnClose = bnClose;
-		image = new ImageModule(false);
-		psf = new PSFModule(false);
-		algo = new AlgorithmModule(true);
-		output = new OutputModule(true);
-		computation = new ComputationModule(false);
-		border = new BorderModule(false);
-		controller = new ControllerModule(false);
-		batch = new BatchModule(false);
-		language = new LanguageModule(false);
-		about = new AboutModule(true);
-		licence = new LicenceModule(false);
-		config = new ConfigModule(false);
+		image = new ImageModule();
+		psf = new PSFModule();
+		algo = new AlgorithmModule();
+		output = new OutputModule();
+		preprocessing = new PreprocessingModule();
+		controller = new ControllerModule();
+		batch = new BatchModule();
+		language = new LanguageModule();
+		about = new AboutModule();
+		licence = new LicenceModule();
+		config = new ConfigModule();
 		command = new CommandModule();
-		running = new RunningModule(false);
-		directory = new DirectoryModule(false);
-		fft = new FFTModule(false);
+		running = new RunningModule();
+		directory = new DirectoryModule();
+		fft = new FFTModule();
 
-		modules = new AbstractModule[] { image, psf, algo, output, controller, border, computation, batch, directory, fft };
+		modules = new AbstractModule[] { image, psf, algo, output, controller, preprocessing, batch, directory, fft };
 		Command.active(modules, command);
 		Command.command();
 
@@ -171,7 +176,12 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 
 		Config.load();
 		running.init();
-		//sizeModule();
+		algo.open();
+		controller.open();
+		about.open();
+		command.open();
+
+		// sizeModule();
 		Command.command();
 		running.update();
 		image.update();
@@ -195,7 +205,7 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 			BatchDialog dlg = new BatchDialog(batch);
 			Lab.setVisible(dlg, true);
 		}
-		
+
 		else if (e.getSource() == bnLaunch) {
 			String job = language.getJobName() + " " + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
 			Deconvolution d = new Deconvolution(job, Command.command(), Deconvolution.Finish.ALIVE);
@@ -227,8 +237,7 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		ArrayList<AbstractModule> list = new ArrayList<AbstractModule>();
 		list.add(output);
 		list.add(controller);
-		list.add(computation);
-		list.add(border);
+		list.add(preprocessing);
 		list.add(fft);
 		return list;
 	}
@@ -257,7 +266,7 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		bnBatch.removeActionListener(this);
 		bnClose.removeActionListener(this);
 		bnHelp.removeActionListener(this);
-		
+
 		Lab.close();
 	}
 
@@ -278,7 +287,7 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		int npc = hpc * panel.getModules().size();
 		Dimension small = new Dimension(dim.width, hpc);
 		Dimension large = new Dimension(dim.width, dim.height - npc);
-		setMinimumSize(new Dimension(Constants.widthGUI, 4*hpc));
+		setMinimumSize(new Dimension(Constants.widthGUI, 4 * hpc));
 		for (AbstractModule module : panel.getModules()) {
 			if (module.isExpanded()) {
 				module.setPreferredSize(large);

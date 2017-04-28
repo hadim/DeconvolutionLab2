@@ -56,8 +56,8 @@ public class ConfigModule extends AbstractModule implements ActionListener {
 	private CustomizedTable table;
 	private JLabel	 lblDefault;
 
-	public ConfigModule(boolean expanded) {
-		super("Config", "", "", "", expanded);
+	public ConfigModule() {
+		super("Config", "", "", "");
 	}
 
 	@Override

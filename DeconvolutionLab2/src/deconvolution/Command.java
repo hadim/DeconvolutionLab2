@@ -31,6 +31,8 @@
 
 package deconvolution;
 
+import ij.IJ;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.regex.Matcher;
@@ -76,13 +78,11 @@ public class Command {
 		if (modules == null)
 			return "";
 		String cmd = "";
-
 		for (AbstractModule m : modules)
 			cmd += m.getCommand() + " ";
 
 		if (command != null)
 			command.setCommand(cmd);
-
 		return cmd;
 	}
 

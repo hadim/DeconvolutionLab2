@@ -31,6 +31,8 @@
 
 package deconvolutionlab.module;
 
+import ij.IJ;
+
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.datatransfer.DataFlavor;
@@ -53,6 +55,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
+import signal.RealSignal;
+import signal.factory.SignalFactory;
 import bilib.table.CustomizedColumn;
 import bilib.table.CustomizedTable;
 import bilib.tools.Files;
@@ -66,8 +70,6 @@ import deconvolutionlab.Lab;
 import deconvolutionlab.dialog.PatternDialog;
 import deconvolutionlab.dialog.SyntheticDialog;
 import deconvolutionlab.monitor.Monitors;
-import signal.RealSignal;
-import signal.factory.SignalFactory;
 
 public class ImageModule extends AbstractModule implements ActionListener, MouseListener {
 
@@ -77,8 +79,8 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 	private JButton			bnSynthetic;
 	private JButton			bnPlatform;
 
-	public ImageModule(boolean expanded) {
-		super("Image", "-image", (Lab.getPlatform() == Imager.Platform.IMAGEJ ? "Active" : ""), "Check", expanded);
+	public ImageModule() {
+		super("Image", "-image", (Lab.getPlatform() == Imager.Platform.IMAGEJ ? "Active" : ""), "Check");
 	}
 
 	@Override
@@ -166,6 +168,8 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
+IJ.log("ImageModule, line 170 " + e);
 		super.actionPerformed(e);
 		if (e.getSource() == bnFile)
 			file(Command.getPath());
@@ -247,8 +251,6 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 			return;
 		String name = table.getCell(row, 0).trim();
 		for (SignalFactory factory : SignalFactory.getAll()) {
-			System.out.println(">>edit>> " + name + " == " + factory.getName().trim());
-
 			if (name.equals(factory.getName().trim())) {
 				synthetic(true);
 				return;
@@ -268,10 +270,18 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 		int row = table.getSelectedRow();
 		if (row < 0)
 			return;
+		
+IJ.log(">>>>>>>>>>>>>>> ImageModule, line 273 " + Command.command());
 		Deconvolution deconvolution = new Deconvolution("Check Image", Command.command());
+		
+IJ.log("ImageModule, line 276 " + Command.command());
+		
 		deconvolution.openImage();
+IJ.log("ImageModule, line 279 " + stack);
+
 		if (stack) {
 			RealSignal x = deconvolution.getImage();
+IJ.log("ImageModule, line 283 " + (x == null));
 			if (x != null)
 				Lab.show(Monitors.createDefaultMonitor(), x, table.getCell(row, 0));
 		} 

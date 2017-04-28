@@ -56,8 +56,8 @@ public class BatchModule extends AbstractModule implements MouseListener, Action
 	private JButton			bnRun;
 	private JButton			bnLaunch;
 
-	public BatchModule(boolean expanded) {
-		super("Batch", "", "", "", expanded);
+	public BatchModule() {
+		super("Batch", "", "", "");
 	}
 
 	@Override

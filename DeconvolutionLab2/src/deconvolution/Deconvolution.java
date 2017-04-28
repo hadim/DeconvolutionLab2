@@ -31,6 +31,8 @@
 
 package deconvolution;
 
+import ij.IJ;
+
 import java.io.File;
 
 import com.esotericsoftware.minlog.Log;
@@ -77,7 +79,11 @@ public class Deconvolution implements Runnable {
 	public Deconvolution(String name, String command) {
 		this.name = name;
 		this.finish = Finish.DIE;
+IJ.log("Deconvolution, line 82 " + command);
+
 		setCommand(command);
+IJ.log("Deconvolution, line 84 " + command);
+
 	}
 
 	public Deconvolution(String name, String command, Finish finish) {
@@ -292,14 +298,20 @@ public class Deconvolution implements Runnable {
 
 	public RealSignal openImage() {
 		Token token = Command.extract(command, "-image");
+
 		if (token == null)
 			return null;
+
 		if (token.parameters.startsWith(">>>"))
 			return null;
 		String arg = token.option.trim();
+
 		String cmd = token.parameters.substring(arg.length(), token.parameters.length()).trim();
+
 		image = createRealSignal(controller.getMonitors(), arg, cmd, controller.getPath());
+IJ.log("Deconvolution, line 312 " + (image==null));
 		Log.info("Open image " + arg + " " + cmd);
+IJ.log("Deconvolution, line 314 " + (image==null));
 
 		return image;
 	}
@@ -319,7 +331,9 @@ public class Deconvolution implements Runnable {
 
 	private static RealSignal createRealSignal(Monitors monitors, String arg, String cmd, String path) {
 		RealSignal signal = null;
+IJ.log("Deconvolution, line 337 " + arg);
 		if (arg.equalsIgnoreCase("synthetic")) {
+IJ.log("Deconvolution, synthetic 337 " + arg);
 			signal = Lab.createSynthetic(monitors, cmd);
 		}
 

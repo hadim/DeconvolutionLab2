@@ -32,18 +32,16 @@
 package deconvolutionlab.module;
 
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
 
 import javax.swing.JPanel;
 
 import bilib.component.HTMLPane;
 import deconvolutionlab.Constants;
-import deconvolutionlab.Lab;
 
 public class AboutModule extends AbstractModule {
 
-	public AboutModule(boolean expanded) {
-		super("About", "", "", "", expanded);
+	public AboutModule() {
+		super("About", "", "", "");
 	}
 
 	@Override

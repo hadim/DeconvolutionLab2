@@ -47,7 +47,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -57,12 +56,11 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import signal.Constraint;
 import bilib.component.GridPanel;
 import bilib.tools.Files;
 import deconvolution.Command;
 import deconvolutionlab.Config;
-import deconvolutionlab.module.ImageModule.LocalDropTarget;
-import signal.Constraint;
 
 public class ControllerModule extends AbstractModule implements ActionListener, ChangeListener, KeyListener {
 
@@ -82,8 +80,8 @@ public class ControllerModule extends AbstractModule implements ActionListener, 
 	private JCheckBox			chkReference;
 	private JCheckBox			chkTime;
 
-	public ControllerModule(boolean expanded) {
-		super("Controller", "", "Default", "", expanded);
+	public ControllerModule() {
+		super("Controller", "", "Default", "");
 	}
 
 	@Override

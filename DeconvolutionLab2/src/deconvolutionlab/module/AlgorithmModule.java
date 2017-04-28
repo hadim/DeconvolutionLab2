@@ -63,8 +63,8 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 	private JPanel				cards;
 	private JLabel				shortname;
 	
-	public AlgorithmModule(boolean expanded) {
-		super("Algorithm", "-algorithm", "", "Check", expanded);
+	public AlgorithmModule() {
+		super("Algorithm", "-algorithm", "", "Check");
 		ArrayList<AbstractAlgorithmPanel> deconv = Algorithm.getAvailableAlgorithms();
 		for (AbstractAlgorithmPanel panel : deconv)
 			cmb.addItem(panel.getName());

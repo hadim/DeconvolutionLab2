@@ -46,6 +46,7 @@ import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 import fft.FFT;
+import ij.IJ;
 import imagej.IJImager;
 import plugins.sage.deconvolutionlab.IcyImager;
 import signal.ComplexComponent;
@@ -276,6 +277,7 @@ public class Lab {
 	}
 
 	public static RealSignal createSynthetic(Monitors monitors, String cmd) {
+IJ.log("Lab, synthetic 337 " + cmd);
 		RealSignal signal = SignalFactory.createFromCommand(cmd);
 		if (signal == null)
 			monitors.error("Unable to create " + cmd);

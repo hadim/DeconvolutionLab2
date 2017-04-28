@@ -43,8 +43,8 @@ public class PreferencesModule extends AbstractModule {
 
 	private SpinnerRangeInteger spnMaxItems;
 	
-	public PreferencesModule(boolean expanded) {
-		super("Preferences", "", "", "", expanded);
+	public PreferencesModule() {
+		super("Preferences", "", "", "");
 	}
 
 	@Override

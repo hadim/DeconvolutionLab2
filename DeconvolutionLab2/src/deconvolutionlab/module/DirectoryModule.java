@@ -47,7 +47,9 @@ import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -55,16 +57,18 @@ import bilib.component.GridPanel;
 import bilib.tools.Files;
 import deconvolution.Command;
 import deconvolutionlab.Config;
-import deconvolutionlab.module.ImageModule.LocalDropTarget;
 
 public class DirectoryModule extends AbstractModule implements ActionListener, KeyListener {
 
 	private JComboBox<String>	cmbPath;
 	private JTextField			txtPath;
 	private JButton				bnBrowse;
+	
+	private JCheckBox			chkSystem;
+	private JCheckBox			chkDisplayFinal;
 
-	public DirectoryModule(boolean expanded) {
-		super("Path", "", "Default", "", expanded);
+	public DirectoryModule() {
+		super("Path", "", "Default", "");
 	}
 
 	@Override
@@ -72,6 +76,10 @@ public class DirectoryModule extends AbstractModule implements ActionListener, K
 		String cmd = "";
 		if (cmbPath.getSelectedIndex() != 0)
 			cmd += " -path " + txtPath.getText();
+		if (!chkSystem.isSelected())
+			cmd += " -system no";
+		if (!chkDisplayFinal.isSelected())
+			cmd += " -display no";
 		return cmd;
 	}
 
@@ -81,6 +89,9 @@ public class DirectoryModule extends AbstractModule implements ActionListener, K
 		cmbPath = new JComboBox<String>(new String[] { "Current", "Specify"});
 		txtPath = new JTextField("", 35);
 		bnBrowse = new JButton("Browse");
+		chkSystem = new JCheckBox("Show the system panel");
+		chkDisplayFinal = new JCheckBox("Display the final output");
+		
 		
 		GridPanel pn1 = new GridPanel(true, 3);
 		pn1.place(0, 0, 3, 1, "Working directory");
@@ -88,12 +99,19 @@ public class DirectoryModule extends AbstractModule implements ActionListener, K
 		pn1.place(1, 1, bnBrowse);
 		pn1.place(2, 0, 3, 1, txtPath);
 
+		pn1.place(5, 0, 3, 1, "  ");
+		pn1.place(6, 0, 3, 1, chkSystem);
+		pn1.place(7, 0, 3, 1, chkDisplayFinal);
+
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 		panel.add(pn1);
 		String dir = System.getProperty("user.dir");
 		Config.register(getName(), "current", cmbPath, cmbPath.getItemAt(0));
 		Config.register(getName(), "path", txtPath, dir);
+		Config.register(getName(), "system", chkSystem, true);
+		Config.register(getName(), "display", chkDisplayFinal, true);
+
 	
 		// Add drop area
 		pn1.setDropTarget(new LocalDropTarget());
@@ -103,6 +121,8 @@ public class DirectoryModule extends AbstractModule implements ActionListener, K
 		bnSynopsis.setDropTarget(new LocalDropTarget());
 		bnExpand.setDropTarget(new LocalDropTarget());
 
+		chkSystem.addActionListener(this);
+		chkDisplayFinal.addActionListener(this);
 		cmbPath.addActionListener(this);
 		txtPath.addKeyListener(this);
 		bnBrowse.addActionListener(this);
@@ -144,12 +164,16 @@ public class DirectoryModule extends AbstractModule implements ActionListener, K
 			txtPath.setText(System.getProperty("user.dir"));
 			txtPath.setEnabled(false);
 			bnBrowse.setEnabled(false);
+			chkDisplayFinal.setSelected(true);
+			chkSystem.setSelected(true);
 		}
 		update();
 	}
 
 	@Override
 	public void close() {
+		chkDisplayFinal.removeActionListener(this);
+		chkSystem.removeActionListener(this);
 		cmbPath.removeActionListener(this);
 		txtPath.removeKeyListener(this);
 		bnBrowse.removeActionListener(this);

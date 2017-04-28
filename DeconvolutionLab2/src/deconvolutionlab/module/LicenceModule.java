@@ -42,8 +42,8 @@ import deconvolutionlab.Lab;
 
 public class LicenceModule extends AbstractModule {
 
-	public LicenceModule(boolean expanded) {
-		super("Licence", "", "", "", expanded);
+	public LicenceModule() {
+		super("Licence", "", "", "");
 	}
 
 	@Override

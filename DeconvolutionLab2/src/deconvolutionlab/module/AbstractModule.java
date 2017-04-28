@@ -63,13 +63,12 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 
 	private int					heightButton	= 22;
 
-	public AbstractModule(String name, String key, String action1, String action2, boolean expanded) {
+	public AbstractModule(String name, String key, String action1, String action2) {
 		this.name = name;
 		this.key = key;
 		pnCollapsed = buildCollapsedPanel();
 		pnExpanded = buildExpandedPanel();
 		setLayout(new BorderLayout());
-		this.expanded = expanded;
 		
 		bnTitle.setText("<html><b>" + name + "</b></html>");
 		bnTitle.setHorizontalAlignment(SwingConstants.LEFT);
@@ -214,6 +213,13 @@ public abstract class AbstractModule extends JPanel implements ActionListener {
 		bnExpand.setText("\u25BC");
 	}
 
+	public void open() {
+		for (AbstractModule module : mpns.getModules())
+			module.collapse();
+		expand();
+		mpns.organize();	
+	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == bnTitle || e.getSource() == bnExpand || e.getSource() == bnSynopsis) {
