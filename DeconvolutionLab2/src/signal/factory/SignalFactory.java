@@ -141,6 +141,7 @@ public abstract class SignalFactory {
 		list.add(new Airy(5, 1, 0.5, 3));	
 		list.add(new Astigmatism(5, 1));	
 		list.add(new AxialDiffractionSimulation(10, 10, 2));	
+		list.add(new BesselJ0(2, 5, 0.2, 0.2));	
 		list.add(new Constant());
 		list.add(new Cross(1, 1, 30));
 		list.add(new Cube(10 ,1));
@@ -149,7 +150,6 @@ public abstract class SignalFactory {
 		list.add(new DirectionalDerivative(1, 1, 0));	
 		list.add(new DirectionalMotionBlur(3, 30, 3));
 		list.add(new DoG(3, 4));
-		list.add(new DoubleConeWave(60, 5, 15, 10));
 		list.add(new DoubleHelix(3, 30, 10));
 		list.add(new Gaussian(3, 3, 3));
 		list.add(new Impulse());
@@ -182,13 +182,13 @@ public abstract class SignalFactory {
 		list.add(new Airy(5, 1, 0.5, 3));	
 		list.add(new Astigmatism(5, 1));	
 		list.add(new AxialDiffractionSimulation(10, 10, 2));	
+		list.add(new BesselJ0(2, 5, 0.2, 0.2));	
 		list.add(new Cross(1, 1, 30));
 		list.add(new CubeSphericalBeads(3, 0.5, 8, 16));
 		list.add(new Defocus(3, 10, 10));
 		list.add(new DirectionalDerivative(1, 1, 0));	
 		list.add(new DirectionalMotionBlur(3, 30, 3));
 		list.add(new DoG(3, 4));
-		list.add(new DoubleConeWave(60, 5, 15, 10));
 		list.add(new DoubleHelix(3, 30, 10));
 		list.add(new Gaussian(3, 3, 3));
 		list.add(new Impulse());

@@ -31,64 +31,68 @@
 
 package signal.factory;
 
+import bilib.tools.Bessel;
 import signal.RealSignal;
 
-public class DoubleConeWave extends SignalFactory {
+public class BesselJ0 extends SignalFactory {
 
-	private double aperture = 60;
-	private double periodTopZ = 5;
-	private double periodCenterZ = 15;
-	private double attenuation = 10;
+	private double sizeCenter = 2;
+	private double sizeTop = 5;
+	private double attenuationAxial = 0.2;
+	private double attenuationLateral = 0.2;
 
-	public DoubleConeWave(double aperture, double periodTopZ, double periodCenterZ, double attenuation) {
-		super(new double[] {aperture, periodTopZ, periodCenterZ, attenuation});
-		setParameters(new double[] {aperture, periodTopZ, periodCenterZ, attenuation});
+	public BesselJ0(double sizeCenter, double sizeTop, double attenuationLateral, double attenuationAxial) {
+		super(new double[] {sizeCenter, sizeTop, attenuationLateral, attenuationAxial});
+		setParameters(new double[] {sizeCenter, sizeTop, attenuationLateral, attenuationAxial});
 	}
 
 	@Override
 	public String getName() {
-		return "DoubleConeWave";
+		return "BesselJ0";
 	}
 
 	@Override
 	public String[] getParametersName() {
-		return new String[] { "Aperture", "Period TopZ", "Period CenterZ", "Attenuation" };
+		return new String[] { "Size Center", "Size Top/Bottom", "Attenuation Lateral (<1)", "Attenuation Axial (<1)" };
 	}
 
 	@Override
 	public void setParameters(double[] parameters) {
 		if (parameters.length >= 1)
-			this.aperture = parameters[0];
+			this.sizeCenter = parameters[0];
 		if (parameters.length >= 2)
-			this.periodTopZ = parameters[1];
+			this.sizeTop = parameters[1];
 		if (parameters.length >= 3)
-			this.periodCenterZ = parameters[2];
+			this.attenuationLateral = parameters[2];
 		if (parameters.length >= 4)
-			this.attenuation = parameters[3];
+			this.attenuationAxial = parameters[3];
 	}
 
 	@Override
 	public double[] getParameters() {
-		return new double[]  {aperture, periodTopZ, periodCenterZ, attenuation};
+		return new double[]  {sizeCenter, sizeTop, attenuationLateral, attenuationAxial};
 	}
 
 	@Override
 	public void fill(RealSignal signal) {
-		double apernorm = (2.0*aperture)/(nx+ny);
-		double diag = Math.sqrt(nx*nx+ny*ny+nz*nz);
-		double step = (periodCenterZ-periodTopZ)/nz; 
+		double axial[] = new double[nz];
+		double s[] = new double[nz];
+		double tauAxial = - Math.log(attenuationAxial);
+		double tauLateral = - Math.log(attenuationLateral);
+		double diag = Math.sqrt(nx*nx+ny*ny) * 0.5;
+		double A = amplitude;
+		for(int k=0; k<nz; k++) {
+			double dz = Math.abs(k-zc)/(0.5*nz);
+			s[k] =  1.0 / (sizeCenter + dz*(sizeTop-sizeCenter));
+			axial[k] =  A*Math.exp(-tauAxial*dz);
+		}
 		for(int i=0; i<nx; i++)
 		for(int j=0; j<ny; j++) {
 			double r = Math.sqrt((i-xc)*(i-xc)+(j-yc)*(j-yc));
+			double att = A*Math.exp(-tauLateral*r/diag);
 			for(int k=0; k<nz; k++) {
-				double z = Math.abs(k-zc);
-				double p = Math.sqrt(r*r + z*z)/diag;
-				double period = Math.max(1, periodCenterZ-step*z);
-				double sz = apernorm*z + period*0.25;
-				double s = 1.0 / (1.0+Math.exp(-(r+sz))) - 1.0 / (1.0+Math.exp(-(r-sz)));
-				double q = Math.cos(2.0*Math.PI*(r-apernorm*z)/period);
-				double g = (attenuation*p+1);
-				signal.data[k][i+j*nx] = (float)(amplitude * s * q * q / g);
+				double jc = Bessel.J0(r * s[k]);
+				signal.data[k][i+j*nx] = (float)(jc*jc*axial[k]*att);
 			}
 		}
 	}

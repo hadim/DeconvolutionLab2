@@ -462,6 +462,63 @@ public class RealSignal extends Signal implements SignalListener {
 				data[k][j] = constant;
 	}
 
+	/**
+	 * Get a interpolated pixel value at specific position without specific
+	 * boundary conditions.
+	 * 
+	 * If the positions is not on the pixel grid, the method return a
+	 * interpolated value of the pixel (linear interpolation). If the positions
+	 * is outside of this signal, the method return 0.0.
+	 * 
+	 * @param x
+	 *            position in the X axis
+	 * @param y
+	 *            position in the Y axis
+	 * @param z
+	 *            position in the Z axis
+	 * @return an interpolated value
+	 */
+	public float getInterpolatedPixel(double x, double y, double z) {
+		if (x > nx - 1)
+			return 0.0f;
+		if (y > ny - 1)
+			return 0.0f;
+		if (z > nz - 1)
+			return 0.0f;
+		if (x < 0)
+			return 0.0f;
+		if (y < 0)
+			return 0.0f;
+		if (z < 0)
+			return 0.0f;
+		int i = (x >= 0.0 ? ((int) x) : ((int) x - 1));
+		int j = (y >= 0.0 ? ((int) y) : ((int) y - 1));
+		int k = (z >= 0.0 ? ((int) z) : ((int) z - 1));
+		boolean fi = (i == nx - 1);
+		boolean fj = (j == ny - 1);
+		boolean fk = (k == nz - 1);
+		int index = i + j * nx;
+		try {
+		double v3_000 = data[k][index];
+		double v3_100 = fi ? v3_000 : data[k][index + 1];
+		double v3_010 = fj ? v3_000 : data[k][index + nx];
+		double v3_110 = fi ? (fj ? v3_000 : v3_010) : data[k][index + 1 + nx];
+		double v3_001 = fk ? v3_000 : data[k + 1][index];
+		double v3_011 = fk ? (fj ? v3_000 : v3_010) : data[k + 1][index + 1];
+		double v3_101 = fk ? (fi ? v3_000 : v3_100) : data[k + 1][index + nx];
+		double v3_111 = fk ? (fj ? (fi ? v3_000 : v3_100) : v3_110) : data[k + 1][index + 1 + nx];
+		double dx3 = x - (double) i;
+		double dy3 = y - (double) j;
+		double dz3 = z - (double) k;
+		double z1 = (dx3 * (v3_110 * dy3 - v3_100 * (dy3 - 1.0)) - (dx3 - 1.0) * (v3_010 * dy3 - v3_000 * (dy3 - 1.0)));
+		double z2 = (dx3 * (v3_111 * dy3 - v3_101 * (dy3 - 1.0)) - (dx3 - 1.0) * (v3_011 * dy3 - v3_001 * (dy3 - 1.0)));
+		return (float)(z2 * dz3 - z1 * (dz3 - 1.0));
+		}
+		catch(Exception ex) {
+			return 0f;
+		}
+	}
+
 	public RealSignal changeSizeAs(RealSignal model) {
 		return size(model.nx, model.ny, model.nz);
 	}
@@ -589,6 +646,7 @@ public class RealSignal extends Signal implements SignalListener {
 		return view;
 	}
 
+	
 	public RealSignal circular() {
 		for (int i = 0; i < nx; i++)
 			for (int j = 0; j < ny; j++)

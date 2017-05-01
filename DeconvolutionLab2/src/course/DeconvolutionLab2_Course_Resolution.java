@@ -35,99 +35,154 @@ import java.io.File;
 import javax.swing.filechooser.FileSystemView;
 
 import deconvolution.algorithm.Convolution;
-import deconvolution.algorithm.LandweberPositivity;
 import deconvolution.algorithm.NaiveInverseFilter;
-import deconvolution.algorithm.RichardsonLucyTV;
 import deconvolution.algorithm.Simulation;
+import deconvolution.algorithm.TikhonovRegularizedInverseFilter;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.output.ShowOrtho;
+import ij.gui.Plot;
 import ij.plugin.PlugIn;
+import signal.Assessment;
 import signal.RealSignal;
-import signal.factory.Airy;
+import signal.factory.BesselJ0;
 import signal.factory.CubeSphericalBeads;
 
 public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 
 	private String desktop = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "Desktop";
 	private String root = desktop + File.separator + "Deconvolution" + File.separator;
-	private String res = root + "results" + File.separator + "resolution" + File.separator;
+	private String path = root + "results" + File.separator + "resolution" + File.separator;
 	
 	public DeconvolutionLab2_Course_Resolution() {
 
 		Monitors monitors = Monitors.createDefaultMonitor();
-		new File(res).mkdir();
-		System.setProperty("user.dir", res);
+		new File(path).mkdir();
+		System.setProperty("user.dir", path);
 					
-		new File(res + "RIF").mkdir();
-		new File(res + "LW").mkdir();
-		new File(res + "LW+").mkdir();
-		new File(res + "RL").mkdir();
+		new File(path + "RIF").mkdir();
+		new File(path + "LW").mkdir();
+		new File(path + "LW+").mkdir();
+		new File(path + "RL").mkdir();
 	
 		int nx = 128;
-		int ny = 120;
-		int nz = 122;
-		int spacing = 12;
-		int border = 6;
+		int ny = 128;
+		int nz = 128;
+		int spacing = 11;
+		int b = 11;
 		
-		RealSignal x = new CubeSphericalBeads(4, 0.1, spacing, border).intensity(100).generate(nx, ny, nz);
-		//RealSignal x = new Sphere(30, 1).generate(nx, ny, nz);
-		//RealSignal x = new Constant().intensity(0, 255).generate(nx, ny, nz);
-		//Lab.show(monitors, x, "reference");
-		//Lab.showOrthoview(x);
-		//Lab.showMIP(x);
-		Lab.showOrthoview(monitors, x, "Ref", border, border, border);
+		RealSignal x = new CubeSphericalBeads(4, 0.1, spacing, b).intensity(100).generate(nx, ny, nz);
+		Lab.save(monitors, x.createOrthoview(b, b, b), path + "ref.tif");
 
-		//RealSignal h = new Gaussian(3, 3, 1).generate(nx, ny, nz);
-		RealSignal h = new Airy(100, 50, 0.5, 0.1).generate(nx, ny, nz);
+		RealSignal h = new BesselJ0(3, 6, 0.01, 0.01).generate(nx, ny, nz);
+		Lab.save(monitors, h, path + "psf.tif");
 		Lab.show(monitors, h, "psf");
-		//Lab.showOrthoview(h);
-		//Lab.showMIP(h);
+		Lab.showOrthoview(h);
+		Lab.showMIP(h);
+		Lab.showPlanar(h);
 	
 		Convolution convolution = new Convolution();
 		convolution.disableDisplayFinal().disableSystem();
 		convolution.addOutput(new ShowOrtho("convolution"));
 		RealSignal y = convolution.run(x, h);
-		
-		Simulation simulation = new Simulation(0, 0.25, 0);
+		Lab.save(monitors, y.createOrthoview(b, b, b), path + "conv.tif");
+		Lab.showPlanar(y);
+	
+		Simulation simulation = new Simulation(0, 1, 1);
 		simulation.disableDisplayFinal().disableSystem();
-		simulation.addOutput(new ShowOrtho("simualtion").origin(border, border, border));
+		simulation.addOutput(new ShowOrtho("simualtion").origin(b, b, b));
 		RealSignal ys = simulation.run(x, h);
-		Lab.showOrthoview(monitors, ys, "Simulation", border, border, border);
-		//Lab.show(y);
+		Lab.save(monitors, ys.createOrthoview(b, b, b), path + "simu.tif");		
+		Lab.showPlanar(ys);
+		Lab.showMIP(ys);
+		Lab.showPlanar(ys);
 		
+		
+		plotProfile(x, "refY", b, 0, b, b, ny-1, b);
+		plotProfile(x, "refX", 0, b, b, nx-1, b, b);
+		plotProfile(x, "refZ", b, b, 0, b, b, nz-1);
+		
+		plotProfile(y, "convY", b, 0, b, b, ny-1, b);
+		plotProfile(y, "convX", 0, b, b, nx-1, b, b);
+		plotProfile(y, "convZ", b, b, 0, b, b, nz-1);
+		plotProfile(ys, "simuY", b, 0, b, b, ny-1, b);
+		plotProfile(ys, "simuX", 0, b, b, nx-1, b, b);
+		plotProfile(ys, "simuZ", b, b, 0, b, b, nz-1);
+	
 		NaiveInverseFilter nif = new NaiveInverseFilter();
-		nif.addOutput(new ShowOrtho("nif").origin(border, border, border));
-		nif.disableDisplayFinal().disableSystem().setReference(res + "ref.tif").setStats();
-		nif.run(ys, h);
-		//Lab.show(nifo);
-/*		
-		TikhonovRegularizedInverseFilter rif = new TikhonovRegularizedInverseFilter(1e-8);
-		rif.disableDisplayFinal().disableSystem().setReference(res + "ref.tif");
-		rif.addOutput(new ShowOrtho("trif").origin(border, border, border));
-		for(int i=-8; i<=0; i+=1) {
-			rif.setParameters(new double[] {Math.pow(10, i)});
-			RealSignal t = rif.run(ys, h);
-			System.out.println("" + i + " " +Assessment.rmse(t, x));
-		}
-*/
+		nif.addOutput(new ShowOrtho("nif").origin(b, b, b));
+		nif.disableDisplayFinal().disableSystem().setReference(path + "ref.tif").setStats();
+		RealSignal nic = nif.run(y, h);
+		Lab.save(monitors, nic.createOrthoview(b, b, b), path + "nif_conv.tif");
+		Lab.showPlanar(monitors, nic, nic + "NIF_CONV //"+Assessment.rmse(nic, x));
+		RealSignal nis = nif.run(ys, h);
+		Lab.save(monitors, nis.createOrthoview(b, b, b), path + "nif_simu.tif");
+		Lab.showPlanar(monitors, nis, nis + "NIF_SIMU //"+Assessment.rmse(nis, x));
 		
+		plotProfile(nic, "nicY", b, 0, b, b, ny-1, b);
+		plotProfile(nic, "nicX", 0, b, b, nx-1, b, b);
+		plotProfile(nic, "nicZ", b, b, 0, b, b, nz-1);
+
+		plotProfile(nis, "nisY", b, 0, b, b, ny-1, b);
+		plotProfile(nis, "nisX", 0, b, b, nx-1, b, b);
+		plotProfile(nis, "nisZ", b, b, 0, b, b, nz-1);
+
+		TikhonovRegularizedInverseFilter trif = new TikhonovRegularizedInverseFilter(1e-3);
+		trif.disableDisplayFinal().disableSystem().setReference(path + "ref.tif");
+		for(int i=-5; i<-1; i++) {
+			trif.setParameters(new double[] {Math.pow(10, i)});
+			RealSignal t = trif.run(ys, h);
+			Lab.save(monitors, t.createOrthoview(b, b, b), path + "trif" + i + ".tif");
+			Lab.showPlanar(monitors, t, "TRIF" + i + " //"+Assessment.rmse(t, x));
+			Lab.showOrthoview(monitors, t, "TRIF"+ i + " //"+Assessment.rmse(t, x), b, b, b);
+			plotProfile(t, "tirfY" + i, b, 0, b, b, ny-1, b);
+			plotProfile(t, "tirfX" + i, 0, b, b, nx-1, b, b);
+			plotProfile(t, "tirfZ" + i, b, b, 0, b, b, nz-1);
+		}
+		//plotProfile(t, "trifY", b, 0, b, b, ny-1, b);
+		//plotProfile(t, "trifX", 0, b, b, nx-1, b, b);
+		//plotProfile(t, "trifZ", b, b, 0, b, b, nz-1);
+		/*
 		RichardsonLucyTV rl = new RichardsonLucyTV(100, 0.00001);
 		rl.disableDisplayFinal().disableSystem().setReference(res + "ref.tif").setStats();
-		rl.addOutput(new ShowOrtho("rltv").frequency(1).origin(border, border, border));
+		rl.addOutput(new ShowOrtho("rltv").frequency(1).origin(b, b, b));
 		RealSignal fli = rl.run(ys, h);
 
 //RLTV 0.0001 100		Signals: 167.2 Mb	14.6724	0.9261	n/a
 //RL 		100		Signals: 138.6 Mb	14.6688	0.9224	n/a
 //RLTV 0.001	100		Signals: 167.2 Mb	14.6979	0.9515	n/a		
 //LW+		5000	Signals: 311.6 Mb	15.4276	1.6812	n/a
-
+/*
 		LandweberPositivity lw = new LandweberPositivity(100, 1.95);
 		lw.disableDisplayFinal().disableSystem().setReference(res + "ref.tif").setStats();
 		lw.addOutput(new ShowOrtho("lw").frequency(20).origin(border, border, border));
 		RealSignal lwi = lw.run(ys, h);
 
 		Lab.show(lwi);
+		*/
+	}
+	
+	private static void plotProfile(RealSignal signal, String name, int x1, int y1, int z1, int x2, int y2, int z2) {
+		double dx = x2 - x1;
+		double dy = y2 - y1;
+		double dz = z2 - z1;
+		double len = Math.sqrt(dx*dx + dy*dy + dz*dz);
+		int n = (int)Math.round(len * 2);
+		double ds = len / n;
+		dx = (double)(x2 - x1) / n;
+		dy = (double)(y2 - y1) / n;
+		dz = (double)(z2 - z1) / n;
+		double value[] = new double[n];
+		double dist[] = new double[n];
+		for(int s=0; s<n; s++) {
+			double x = x1 + s*dx;
+			double y = y1 + s*dy;
+			double z = z1 + s*dz;
+			dist[s] = s*ds;
+			value[s] = signal.getInterpolatedPixel(x, y, z);
+		}
+		Plot plot = new Plot(name, "distance", "intensity", dist, value);
+		plot.show();
 	}
 	
 	public static void main(String arg[]) {

@@ -86,10 +86,10 @@ public class Airy extends SignalFactory {
 		for(int j=0; j<ny; j++) {
 			double r = Math.max(epsilon, Math.sqrt((i-xc)*(i-xc)+(j-yc)*(j-yc)) / diag);
 			for(int k=0; k<nz; k++) {
-				double dz = Math.abs(k-zc)/nz;
+				double dz = 1 - Math.abs(k-zc)/nz;
 				double z1 =  d + dz;
 				double jc = Bessel.J1(r * b / z1) / r;
-				signal.data[k][i+j*nx] = (float)(jc*jc* Math.exp(-dz*attenuationFactor));
+				signal.data[k][i+j*nx] = (float)(jc*jc*Math.exp(-dz*attenuationFactor));
 			}
 		}
 	}
