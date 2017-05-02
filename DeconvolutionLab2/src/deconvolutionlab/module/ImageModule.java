@@ -31,8 +31,6 @@
 
 package deconvolutionlab.module;
 
-import ij.IJ;
-
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.datatransfer.DataFlavor;
@@ -168,8 +166,6 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
-IJ.log("ImageModule, line 170 " + e);
 		super.actionPerformed(e);
 		if (e.getSource() == bnFile)
 			file(Command.getPath());
@@ -270,18 +266,10 @@ IJ.log("ImageModule, line 170 " + e);
 		int row = table.getSelectedRow();
 		if (row < 0)
 			return;
-		
-IJ.log(">>>>>>>>>>>>>>> ImageModule, line 273 " + Command.command());
 		Deconvolution deconvolution = new Deconvolution("Check Image", Command.command());
-		
-IJ.log("ImageModule, line 276 " + Command.command());
-		
 		deconvolution.openImage();
-IJ.log("ImageModule, line 279 " + stack);
-
 		if (stack) {
 			RealSignal x = deconvolution.getImage();
-IJ.log("ImageModule, line 283 " + (x == null));
 			if (x != null)
 				Lab.show(Monitors.createDefaultMonitor(), x, table.getCell(row, 0));
 		} 

@@ -42,6 +42,7 @@ import signal.Constraint;
 import signal.RealSignal;
 import signal.apodization.Apodization;
 import signal.padding.Padding;
+import bilib.tools.Files;
 import bilib.tools.NumFormat;
 import deconvolution.Deconvolution;
 import deconvolution.Stats;
@@ -116,7 +117,7 @@ public class Controller {
 		doConstraint = false;
 		timeStarting = System.nanoTime();
 		
-		setPath(System.getProperty("user.dir"));
+		setPath(Files.getWorkingDirectory());
 		setSystem(true);
 		setMultithreading(true);
 		setDisplayFinal(true);
@@ -469,6 +470,8 @@ public class Controller {
 	 * @return the monitors
 	 */
 	public Monitors getMonitors() {
+		if (monitors == null)
+			return Monitors.createDefaultMonitor();
 		return monitors;
 	}
 

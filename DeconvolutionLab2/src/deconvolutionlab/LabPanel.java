@@ -68,7 +68,6 @@ import deconvolutionlab.module.LicenceModule;
 import deconvolutionlab.module.OutputModule;
 import deconvolutionlab.module.PSFModule;
 import deconvolutionlab.module.PreprocessingModule;
-import deconvolutionlab.module.RunningModule;
 import deconvolutionlab.system.SystemInfo;
 
 /**
@@ -101,7 +100,6 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 	private BatchModule	        batch;
 	private LanguageModule	    language;
 	private CommandModule	    command;
-	private RunningModule	    running;
 	private DirectoryModule	    directory;
 	private FFTModule	        fft;
 
@@ -127,7 +125,6 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		licence = new LicenceModule();
 		config = new ConfigModule();
 		command = new CommandModule();
-		running = new RunningModule();
 		directory = new DirectoryModule();
 		fft = new FFTModule();
 
@@ -175,7 +172,6 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		setMinimumSize(new Dimension(500, 500));
 
 		Config.load();
-		running.init();
 		algo.open();
 		controller.open();
 		about.open();
@@ -183,7 +179,6 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 
 		// sizeModule();
 		Command.command();
-		running.update();
 		image.update();
 		psf.update();
 		output.update();
@@ -191,7 +186,6 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
 		if (e.getSource() == bnHelp)
 			Lab.help();
 		else if (e.getSource() == bnClose)
@@ -205,7 +199,6 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 			BatchDialog dlg = new BatchDialog(batch);
 			Lab.setVisible(dlg, true);
 		}
-
 		else if (e.getSource() == bnLaunch) {
 			String job = language.getJobName() + " " + new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
 			Deconvolution d = new Deconvolution(job, Command.command(), Deconvolution.Finish.ALIVE);

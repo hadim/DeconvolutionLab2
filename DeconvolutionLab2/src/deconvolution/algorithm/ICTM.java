@@ -120,15 +120,16 @@ public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
 	}
 
 	@Override
-	public void setParameters(double[] params) {
+	public AbstractAlgorithm setParameters(double... params) {
 		if (params == null)
-			return;
+			return this;
 		if (params.length > 0)
 			iterMax = (int) Math.round(params[0]);
 		if (params.length > 1)
 			gamma = (float) params[1];
 		if (params.length > 2)
 			lambda = (float) params[2];
+		return this;
 	}
 
 	@Override

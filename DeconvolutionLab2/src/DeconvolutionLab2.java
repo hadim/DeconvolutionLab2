@@ -31,6 +31,7 @@
 
 import java.io.File;
 
+import bilib.tools.Files;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolutionlab.Constants;
@@ -90,7 +91,7 @@ public class DeconvolutionLab2 {
 	}
 
 	private static void lab(String arg[]) {
-		String config = System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config";
+		String config = Files.getWorkingDirectory() + "DeconvolutionLab2.config";
 		if (arg.length >= 2) {
 			String filename = arg[1].trim();
 			File file = new File(filename);
@@ -121,7 +122,7 @@ public class DeconvolutionLab2 {
 
 	public DeconvolutionLab2(String cmd) {
 		System.out.println("cmd: " + cmd);
-		Lab.init(Imager.Platform.STANDALONE, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
+		Lab.init(Imager.Platform.STANDALONE, Files.getWorkingDirectory() + "DeconvolutionLab2.config");
 		new Deconvolution("CommandLine", cmd).deconvolve();
 	}
 }

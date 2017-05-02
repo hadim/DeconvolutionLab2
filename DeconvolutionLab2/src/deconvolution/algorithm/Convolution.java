@@ -97,7 +97,8 @@ public class Convolution extends AbstractAlgorithm implements Callable<RealSigna
 	}
 
 	@Override
-	public void setParameters(double[] params) {
+	public AbstractAlgorithm setParameters(double... params) {
+		return this;
 	}
 
 	@Override

@@ -97,7 +97,8 @@ public class NaiveInverseFilter extends AbstractAlgorithm implements Callable<Re
 	}
 
 	@Override
-	public void setParameters(double[] params) {
+	public AbstractAlgorithm setParameters(double... params) {
+		return this;
 	}
 
 	@Override

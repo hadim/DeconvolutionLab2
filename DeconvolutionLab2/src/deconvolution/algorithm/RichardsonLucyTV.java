@@ -204,13 +204,14 @@ public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<Real
 	}
 	
 	@Override
-	public void setParameters(double[] params) {
+	public AbstractAlgorithm setParameters(double... params) {
 		if (params == null)
-			return;
+			return this;
 		if (params.length > 0)
 			iterMax = (int) Math.round(params[0]);
 		if (params.length > 1)
 			lambda = (float)params[1];
+		return this;
 	}
 	
 	@Override

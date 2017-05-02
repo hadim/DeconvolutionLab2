@@ -17,7 +17,7 @@ import signal.factory.complex.ComplexSignalFactory;
 
 public class Display_FactorySignals implements PlugIn {
 
-	private String path = Files.getDesktop() + File.separator + "Deconvolution" + File.separator + "Signals" + File.separator;
+	private String path = Files.getDesktopDirectory() + File.separator + "Deconvolution" + File.separator + "Signals" + File.separator;
 	
 	@Override
     public void run(String arg0) {

@@ -2,7 +2,7 @@
 <project name="DeconvolutionLab2" default="build" basedir=".">
 
 	<property name="imagej" location="${user.home}/Desktop/ImageJ/plugins" />
-	<property name="fiji" location="${user.home}/Desktop/Fiji.app/plugins" />
+	<property name="fiji" location="${user.home}/Desktop/Fiji-deconv.app/plugins" />
 	<property name="matlab" location="/Applications/MATLAB_R2014b.app/java/" />
 	<property name="doc" location="${user.home}/Desktop/doc/" />
 

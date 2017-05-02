@@ -34,6 +34,7 @@ import java.io.File;
 
 import javax.swing.filechooser.FileSystemView;
 
+import bilib.tools.Files;
 import deconvolution.Deconvolution;
 import deconvolutionlab.Imager;
 import deconvolutionlab.Lab;
@@ -50,8 +51,7 @@ import signal.factory.complex.ComplexSignalFactory;
 
 public class DeconvolutionLab2_Course_SpectralAnaylsis implements PlugIn {
 
-	private String desktop = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "Desktop";
-	private String root = desktop + File.separator + "Deconvolution" + File.separator;
+	private String root = Files.getDesktopDirectory() + "Deconvolution" + File.separator;
 	private String res = root + "results" + File.separator + "star" + File.separator;
 	private String data = root + "data" + File.separator + "star" + File.separator;
 	

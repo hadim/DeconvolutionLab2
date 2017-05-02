@@ -97,7 +97,8 @@ public class NonStabilizedDivision extends AbstractAlgorithm implements Callable
 	}
 
 	@Override
-	public void setParameters(double[] params) {
+	public AbstractAlgorithm setParameters(double... params) {
+		return this;
 	}
 
 	@Override

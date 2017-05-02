@@ -87,7 +87,8 @@ public class Identity extends AbstractAlgorithm implements Callable<RealSignal> 
 	}
 
 	@Override
-	public void setParameters(double[] params) {
+	public AbstractAlgorithm setParameters(double... params) {
+		return this;
 	}
 	
 	@Override

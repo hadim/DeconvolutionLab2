@@ -36,13 +36,16 @@ import javax.swing.filechooser.FileSystemView;
 
 public class Files {
 
-	public static String getHome() {
-		return FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath();
-		
+	public static String getWorkingDirectory() {
+		return System.getProperty("user.dir");
+	}
+
+	public static String getHomeDirectory() {
+		return FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator;	
 	}
 	
-	public static String getDesktop() {
-		return getHome() + File.separator + "Desktop";
+	public static String getDesktopDirectory() {
+		return getHomeDirectory() + "Desktop" + File.separator;
 	}
 	
 	public static File browseFile(String path) {

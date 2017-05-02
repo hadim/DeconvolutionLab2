@@ -44,7 +44,6 @@ import signal.SignalCollector;
 import signal.apodization.Apodization;
 import signal.padding.Padding;
 import bilib.tools.NumFormat;
-import deconvolution.DeconvolutionDialog;
 import deconvolution.Stats;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
@@ -104,7 +103,7 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 	public abstract boolean isStepControllable();
 	public abstract boolean isIterative();
 	public abstract boolean isWaveletsBased();
-	public abstract void setParameters(double[] params);
+	public abstract AbstractAlgorithm setParameters(double... params);
 	public abstract double getRegularizationFactor();
 	public abstract double getStepFactor();
 	public abstract double[] getParameters();
@@ -208,6 +207,10 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		return result;
 	}
 
+	public AbstractAlgorithm noPopup() {
+		return this.disableDisplayFinal().disableSystem();
+	}
+	
 	public AbstractAlgorithm setController(Controller controller) {
 		this.controller = controller;
 		return this;

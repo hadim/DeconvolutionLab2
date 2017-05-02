@@ -33,6 +33,7 @@ package deconvolution.algorithm;
 
 import java.util.concurrent.Callable;
 
+import deconvolutionlab.Lab;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;
@@ -89,19 +90,18 @@ public class RegularizedInverseFilter extends AbstractAlgorithm implements Calla
 	}
 
 	public ComplexSignal filter(ComplexSignal Y, ComplexSignal H) {
-		ComplexSignal X = ComplexSignalFactory.laplacian(Y.nx, Y.ny, Y.nz);
-		X.setName("X");
-		int nx = X.nx;
-		int ny = X.ny;
-		int nz = X.nz;
+		ComplexSignal L = ComplexSignalFactory.laplacian(Y.nx, Y.ny, Y.nz);
+		L.setName("Laplacian");
+System.out.println(" >>>>>>>>>>>>>>>>>> " + L.getEnergy());
+Lab.show(controller.getMonitors(), L, "L");
 		float la, lb, ha, hb, fa, fb, ta, tb, ya, yb;
-		int nxy = nx * ny * 2;
+		int nxy = Y.nx * Y.ny * 2;
 		float w = (float) lambda;
 		float epsilon = (float) Operations.epsilon;
-		for (int k = 0; k < nz; k++)
+		for (int k = 0; k < Y.nz; k++)
 			for (int i = 0; i < nxy; i += 2) {
-				la = X.data[k][i];
-				lb = X.data[k][i + 1];
+				la = L.data[k][i];
+				lb = L.data[k][i + 1];
 				ha = H.data[k][i];
 				hb = H.data[k][i + 1];
 				fa = w * (la * la - lb * lb) + (ha * ha - hb * hb);
@@ -111,11 +111,11 @@ public class RegularizedInverseFilter extends AbstractAlgorithm implements Calla
 				tb = (hb * fa - ha * fb) / mag;
 				ya = Y.data[k][i];
 				yb = Y.data[k][i + 1];
-				X.data[k][i] = ya * ta - yb * tb;
-				X.data[k][i + 1] = ya * tb + ta * yb;
+				L.data[k][i] = ya * ta - yb * tb;
+				L.data[k][i + 1] = ya * tb + ta * yb;
 			}
 		// SignalCollector.free(L);
-		return X;
+		return L;
 	}
 
 	@Override
@@ -159,11 +159,12 @@ public class RegularizedInverseFilter extends AbstractAlgorithm implements Calla
 	}
 
 	@Override
-	public void setParameters(double[] params) {
+	public AbstractAlgorithm setParameters(double... params) {
 		if (params == null)
-			return;
+			return this;
 		if (params.length > 0)
 			lambda = (float) params[0];
+		return this;
 	}
 
 	@Override

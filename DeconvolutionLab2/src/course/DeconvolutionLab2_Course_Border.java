@@ -35,19 +35,17 @@ import ij.plugin.PlugIn;
 
 import java.io.File;
 
-import javax.swing.filechooser.FileSystemView;
-
 import signal.RealSignal;
 import signal.factory.Cube;
 import signal.factory.Gaussian;
+import bilib.tools.Files;
 import deconvolution.Deconvolution;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
 
 public class DeconvolutionLab2_Course_Border implements PlugIn {
 
-	private String desktop = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "Desktop";
-	private String root = desktop + File.separator + "Deconvolution" + File.separator;
+	private String root = Files.getDesktopDirectory() + "Deconvolution" + File.separator;
 	private String res = root + "results" + File.separator + "border" + File.separator;
 
 	public DeconvolutionLab2_Course_Border() {

@@ -39,6 +39,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import bilib.tools.Files;
 import bilib.tools.NumFormat;
 import bilib.tools.WebBrowser;
 import deconvolutionlab.Imager.ContainerImage;
@@ -77,7 +78,7 @@ public class Lab {
 		frames = new ArrayList<JFrame>();
 		dialogs = new ArrayList<JDialog>();
 		imaging = new IJImager();
-		Config.init(System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
+		Config.init(Files.getWorkingDirectory() + "DeconvolutionLab2.config");
 	}
 
 	/**
@@ -87,7 +88,7 @@ public class Lab {
 	 *            The platform is ImageJ, ICY, or Matlab.
 	 */
 	public static void init(Imager.Platform platform) {
-		init(platform, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
+		init(platform, Files.getWorkingDirectory() + "DeconvolutionLab2.config");
 	}
 
 	/**
@@ -277,7 +278,6 @@ public class Lab {
 	}
 
 	public static RealSignal createSynthetic(Monitors monitors, String cmd) {
-IJ.log("Lab, synthetic 337 " + cmd);
 		RealSignal signal = SignalFactory.createFromCommand(cmd);
 		if (signal == null)
 			monitors.error("Unable to create " + cmd);

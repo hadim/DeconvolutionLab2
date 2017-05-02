@@ -145,9 +145,9 @@ public class ISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 	}
 
 	@Override
-	public void setParameters(double[] params) {
+	public AbstractAlgorithm setParameters(double... params) {
 		if (params == null)
-			return;
+			return this;
 		if (params.length > 0)
 			iterMax = (int) Math.round(params[0]);
 		if (params.length > 1)
@@ -156,6 +156,7 @@ public class ISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 			lambda = (float)params[2];
 		if (params.length > 3)
 			scale = (int)params[3];
+		return this;
 	}
 	
 	@Override

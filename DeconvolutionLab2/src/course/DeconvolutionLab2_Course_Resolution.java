@@ -34,6 +34,7 @@ import java.io.File;
 
 import javax.swing.filechooser.FileSystemView;
 
+import bilib.tools.Files;
 import deconvolution.algorithm.Convolution;
 import deconvolution.algorithm.NaiveInverseFilter;
 import deconvolution.algorithm.Simulation;
@@ -50,8 +51,7 @@ import signal.factory.CubeSphericalBeads;
 
 public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 
-	private String desktop = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "Desktop";
-	private String root = desktop + File.separator + "Deconvolution" + File.separator;
+	private String root = Files.getDesktopDirectory() + "Deconvolution" + File.separator;
 	private String path = root + "results" + File.separator + "resolution" + File.separator;
 	
 	public DeconvolutionLab2_Course_Resolution() {
@@ -65,21 +65,21 @@ public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 		new File(path + "LW+").mkdir();
 		new File(path + "RL").mkdir();
 	
-		int nx = 128;
-		int ny = 128;
-		int nz = 128;
-		int spacing = 11;
-		int b = 11;
+		int nx = 160;
+		int ny = 160;
+		int nz = 160;
+		int spacing = 8;
+		int b = 8;
 		
-		RealSignal x = new CubeSphericalBeads(4, 0.1, spacing, b).intensity(100).generate(nx, ny, nz);
+		RealSignal x = new CubeSphericalBeads(2, 0.5, spacing, b).intensity(100).generate(nx, ny, nz);
+		x.plus(10);
 		Lab.save(monitors, x.createOrthoview(b, b, b), path + "ref.tif");
-
-		RealSignal h = new BesselJ0(3, 6, 0.01, 0.01).generate(nx, ny, nz);
+System.out.println("mean x " + x.getStats()[0]);
+		RealSignal h = new BesselJ0(1, 10, 0.001, 0.00000001).generate(nx, ny, nz);
 		Lab.save(monitors, h, path + "psf.tif");
 		Lab.show(monitors, h, "psf");
 		Lab.showOrthoview(h);
 		Lab.showMIP(h);
-		Lab.showPlanar(h);
 	
 		Convolution convolution = new Convolution();
 		convolution.disableDisplayFinal().disableSystem();
@@ -87,17 +87,18 @@ public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 		RealSignal y = convolution.run(x, h);
 		Lab.save(monitors, y.createOrthoview(b, b, b), path + "conv.tif");
 		Lab.showPlanar(y);
-	
-		Simulation simulation = new Simulation(0, 1, 1);
+System.out.println("mean y " + y.getStats()[0]);	
+
+		Simulation simulation = new Simulation(0, 0.25, 0.25);
 		simulation.disableDisplayFinal().disableSystem();
 		simulation.addOutput(new ShowOrtho("simualtion").origin(b, b, b));
 		RealSignal ys = simulation.run(x, h);
 		Lab.save(monitors, ys.createOrthoview(b, b, b), path + "simu.tif");		
 		Lab.showPlanar(ys);
 		Lab.showMIP(ys);
-		Lab.showPlanar(ys);
+System.out.println("mean ys " + ys.getStats()[0]);	
 		
-		
+	
 		plotProfile(x, "refY", b, 0, b, b, ny-1, b);
 		plotProfile(x, "refX", 0, b, b, nx-1, b, b);
 		plotProfile(x, "refZ", b, b, 0, b, b, nz-1);
@@ -138,11 +139,12 @@ public class DeconvolutionLab2_Course_Resolution implements PlugIn {
 			plotProfile(t, "tirfY" + i, b, 0, b, b, ny-1, b);
 			plotProfile(t, "tirfX" + i, 0, b, b, nx-1, b, b);
 			plotProfile(t, "tirfZ" + i, b, b, 0, b, b, nz-1);
+			System.out.println("mean trif " + i + " "  + t.getStats()[0]);	
 		}
 		//plotProfile(t, "trifY", b, 0, b, b, ny-1, b);
 		//plotProfile(t, "trifX", 0, b, b, nx-1, b, b);
 		//plotProfile(t, "trifZ", b, b, 0, b, b, nz-1);
-		/*
+	/*
 		RichardsonLucyTV rl = new RichardsonLucyTV(100, 0.00001);
 		rl.disableDisplayFinal().disableSystem().setReference(res + "ref.tif").setStats();
 		rl.addOutput(new ShowOrtho("rltv").frequency(1).origin(b, b, b));

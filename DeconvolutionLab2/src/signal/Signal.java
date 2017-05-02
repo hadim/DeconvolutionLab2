@@ -48,8 +48,9 @@ public class Signal {
 		this.nz = nz;
 	}
 
-	public void setName(String name) {
+	public Signal setName(String name) {
 		this.name = name;
+		return this;
 	}
 	
 	public String dimAsString() {

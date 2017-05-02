@@ -131,15 +131,16 @@ public class Simulation extends AbstractAlgorithm implements Callable<RealSignal
 	}
 	
 	@Override
-	public void setParameters(double[] params) {
+	public AbstractAlgorithm setParameters(double... params) {
 		if (params == null)
-			return;
+			return this;
 		if (params.length > 0)
 			mean = params[0];
 		if (params.length > 1)
 			stdev = params[1];
 		if (params.length > 2)
 			poisson = params[2];
+		return this;
 	}
 	
 	@Override

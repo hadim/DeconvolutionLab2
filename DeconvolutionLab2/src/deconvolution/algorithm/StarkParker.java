@@ -117,13 +117,14 @@ public class StarkParker extends AbstractAlgorithm implements Callable<RealSigna
 	}
 
 	@Override
-	public void setParameters(double[] params) {
+	public AbstractAlgorithm setParameters(double... params) {
 		if (params == null)
-			return;
+			return this;
 		if (params.length > 0)
 			iterMax = (int) Math.round(params[0]);
 		if (params.length > 1)
 			gamma = (float) params[1];
+		return this;
 	}
 
 	@Override

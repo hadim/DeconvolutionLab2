@@ -39,7 +39,7 @@ import ij.plugin.PlugIn;
 
 public class DeconvolutionLab2_Course_Bigradient implements PlugIn {
 
-	private String root = Files.getDesktop() + File.separator + "Deconvolution" + File.separator;
+	private String root = Files.getDesktopDirectory() + "Deconvolution" + File.separator;
 	private String res = root + "results" + File.separator + "bigradient" + File.separator;
 	private String data = root + "data" + File.separator + "bigradient" + File.separator;
 	

@@ -41,12 +41,12 @@ import java.io.File;
 
 import javax.swing.filechooser.FileSystemView;
 
+import bilib.tools.Files;
 import deconvolution.Deconvolution;
 
 public class DeconvolutionLab2_Course_Celegans implements PlugIn {
 
-	private String	desktop	= FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "Desktop";
-	private String	root	= desktop + File.separator + "DeconvolutionLab2-Course" + File.separator;
+	private String	root	= Files.getDesktopDirectory() + "DeconvolutionLab2-Course" + File.separator;
 	private String	res	    = root + "Results" + File.separator + "c-elegans" + File.separator;
 	private String	data	= root + "Data" + File.separator + "c-elegans" + File.separator;
 

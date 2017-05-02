@@ -31,6 +31,8 @@
 
 package deconvolutionlab.module;
 
+import ij.IJ;
+
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -49,7 +51,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -74,7 +75,11 @@ public class DirectoryModule extends AbstractModule implements ActionListener, K
 	@Override
 	public String getCommand() {
 		String cmd = "";
-		if (cmbPath.getSelectedIndex() != 0)
+		if (cmbPath.getSelectedIndex() == 1)
+			cmd += "-path home ";
+		if (cmbPath.getSelectedIndex() == 2)
+			cmd += "-path desktop ";
+		if (cmbPath.getSelectedIndex() == 3)
 			cmd += " -path " + txtPath.getText();
 		if (!chkSystem.isSelected())
 			cmd += " -system no";
@@ -85,34 +90,28 @@ public class DirectoryModule extends AbstractModule implements ActionListener, K
 
 	@Override
 	public JPanel buildExpandedPanel() {
-
-		cmbPath = new JComboBox<String>(new String[] { "Current", "Specify"});
+		cmbPath = new JComboBox<String>(new String[] { "current", "home", "desktop", "specify ..."});
 		txtPath = new JTextField("", 35);
 		bnBrowse = new JButton("Browse");
 		chkSystem = new JCheckBox("Show the system panel");
 		chkDisplayFinal = new JCheckBox("Display the final output");
-		
-		
 		GridPanel pn1 = new GridPanel(true, 3);
 		pn1.place(0, 0, 3, 1, "Working directory");
 		pn1.place(1, 0, cmbPath);
 		pn1.place(1, 1, bnBrowse);
 		pn1.place(2, 0, 3, 1, txtPath);
-
 		pn1.place(5, 0, 3, 1, "  ");
 		pn1.place(6, 0, 3, 1, chkSystem);
 		pn1.place(7, 0, 3, 1, chkDisplayFinal);
-
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 		panel.add(pn1);
-		String dir = System.getProperty("user.dir");
+		String dir = Files.getWorkingDirectory();
 		Config.register(getName(), "current", cmbPath, cmbPath.getItemAt(0));
 		Config.register(getName(), "path", txtPath, dir);
 		Config.register(getName(), "system", chkSystem, true);
 		Config.register(getName(), "display", chkDisplayFinal, true);
 
-	
 		// Add drop area
 		pn1.setDropTarget(new LocalDropTarget());
 		txtPath.setDropTarget(new LocalDropTarget());
@@ -133,11 +132,21 @@ public class DirectoryModule extends AbstractModule implements ActionListener, K
 	private void update() {
 		setCommand(getCommand());
 		if (cmbPath.getSelectedIndex() == 0) {
-			txtPath.setText(System.getProperty("user.dir"));
+			txtPath.setText(Files.getWorkingDirectory());
 			txtPath.setEnabled(false);
 			bnBrowse.setEnabled(false);
 		}
-		else {
+		if (cmbPath.getSelectedIndex() == 1) {
+			txtPath.setText(Files.getHomeDirectory());
+			txtPath.setEnabled(false);
+			bnBrowse.setEnabled(false);
+		}
+		if (cmbPath.getSelectedIndex() == 2) {
+			txtPath.setText(Files.getDesktopDirectory());
+			txtPath.setEnabled(false);
+			bnBrowse.setEnabled(false);
+		}
+		if (cmbPath.getSelectedIndex() == 3) {
 			txtPath.setEnabled(true);
 			bnBrowse.setEnabled(true);
 		}
@@ -155,13 +164,22 @@ public class DirectoryModule extends AbstractModule implements ActionListener, K
 			}
 		}
 		else if (e.getSource() == cmbPath) {
-			if (cmbPath.getSelectedIndex() == 0) {
-				File f = new File(System.getProperty("user.dir"));
+			if (cmbPath.getSelectedIndex() == 1) {
+				File f = new File(Files.getWorkingDirectory());
+				txtPath.setText(f.getAbsolutePath());
+			}
+			if (cmbPath.getSelectedIndex() == 2) {
+				File f = new File(Files.getHomeDirectory());
+				txtPath.setText(f.getAbsolutePath());
+			}
+			if (cmbPath.getSelectedIndex() == 3) {
+				File f = new File(Files.getDesktopDirectory());
 				txtPath.setText(f.getAbsolutePath());
 			}
 		}
 		else if (e.getSource() == getAction1Button()) {
-			txtPath.setText(System.getProperty("user.dir"));
+			cmbPath.setSelectedIndex(0);
+			txtPath.setText(Files.getWorkingDirectory());
 			txtPath.setEnabled(false);
 			bnBrowse.setEnabled(false);
 			chkDisplayFinal.setSelected(true);
@@ -179,7 +197,6 @@ public class DirectoryModule extends AbstractModule implements ActionListener, K
 		bnBrowse.removeActionListener(this);
 	}
 	
-
 	@Override
 	public void keyTyped(KeyEvent e) {
 	}

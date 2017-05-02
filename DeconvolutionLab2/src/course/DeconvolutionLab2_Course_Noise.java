@@ -34,6 +34,7 @@ import java.io.File;
 
 import javax.swing.filechooser.FileSystemView;
 
+import bilib.tools.Files;
 import deconvolution.Deconvolution;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.Monitors;
@@ -43,8 +44,7 @@ import signal.factory.Cube;
 
 public class DeconvolutionLab2_Course_Noise implements PlugIn {
 
-	private String desktop = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath() + File.separator + "Desktop";
-	private String root = desktop + File.separator + "Deconvolution" + File.separator;
+	private String root = Files.getDesktopDirectory() + "Deconvolution" + File.separator;
 	private String res = root + "results" + File.separator + "noise" + File.separator;
 	
 	public DeconvolutionLab2_Course_Noise() {

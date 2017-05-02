@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import bilib.tools.Files;
 import bilib.tools.NumFormat;
 import deconvolution.algorithm.AbstractAlgorithm;
 import deconvolution.algorithm.Algorithm;
@@ -92,9 +93,16 @@ public class Command {
 		
 		ArrayList<Token> tokens = parse(command);
 		for (Token token : tokens) {
-			if (token.keyword.equalsIgnoreCase("-path") && !token.parameters.equalsIgnoreCase("current"))
-				controller.setPath(token.parameters);
-
+			if (token.keyword.equalsIgnoreCase("-path")) {
+				if (token.parameters.trim().equals("current"))
+					controller.setPath(Files.getWorkingDirectory());
+				else if (token.parameters.trim().equals("home"))
+					controller.setPath(Files.getHomeDirectory());
+				else if (token.parameters.trim().equals("desktop"))
+					controller.setPath(Files.getDesktopDirectory());
+				else 
+					controller.setPath(token.parameters);
+			}
 			if (token.keyword.equalsIgnoreCase("-monitor"))
 				controller.setMonitors(decodeMonitors(token.parameters));
 	

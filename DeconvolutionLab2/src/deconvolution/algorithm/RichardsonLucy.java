@@ -111,11 +111,12 @@ public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSi
 	}
 
 	@Override
-	public void setParameters(double[] params) {
+	public AbstractAlgorithm setParameters(double... params) {
 		if (params == null)
-			return;
+			return this;
 		if (params.length > 0)
 			iterMax = (int) Math.round(params[0]);
+		return this;
 	}
 
 	@Override

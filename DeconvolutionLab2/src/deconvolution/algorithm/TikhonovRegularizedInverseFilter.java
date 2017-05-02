@@ -154,11 +154,12 @@ public class TikhonovRegularizedInverseFilter extends AbstractAlgorithm implemen
 	}
 	
 	@Override
-	public void setParameters(double[] params) {
+	public AbstractAlgorithm setParameters(double... params ) {
 		if (params == null)
-			return;
+			return this;
 		if (params.length > 0)
 			lambda = (float)params[0];
+		return this;
 	}
 	
 	@Override
