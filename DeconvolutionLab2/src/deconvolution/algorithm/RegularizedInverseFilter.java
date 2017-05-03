@@ -33,7 +33,6 @@ package deconvolution.algorithm;
 
 import java.util.concurrent.Callable;
 
-import deconvolutionlab.Lab;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;
@@ -92,8 +91,6 @@ public class RegularizedInverseFilter extends AbstractAlgorithm implements Calla
 	public ComplexSignal filter(ComplexSignal Y, ComplexSignal H) {
 		ComplexSignal L = ComplexSignalFactory.laplacian(Y.nx, Y.ny, Y.nz);
 		L.setName("Laplacian");
-System.out.println(" >>>>>>>>>>>>>>>>>> " + L.getEnergy());
-Lab.show(controller.getMonitors(), L, "L");
 		float la, lb, ha, hb, fa, fb, ta, tb, ya, yb;
 		int nxy = Y.nx * Y.ny * 2;
 		float w = (float) lambda;
@@ -114,7 +111,6 @@ Lab.show(controller.getMonitors(), L, "L");
 				L.data[k][i] = ya * ta - yb * tb;
 				L.data[k][i + 1] = ya * tb + ta * yb;
 			}
-		// SignalCollector.free(L);
 		return L;
 	}
 

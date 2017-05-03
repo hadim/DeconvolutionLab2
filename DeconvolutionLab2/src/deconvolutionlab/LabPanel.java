@@ -60,7 +60,7 @@ import deconvolutionlab.module.CommandModule;
 import deconvolutionlab.module.ConfigModule;
 import deconvolutionlab.module.ControllerModule;
 import deconvolutionlab.module.DirectoryModule;
-import deconvolutionlab.module.FFTModule;
+import deconvolutionlab.module.ResourcesModule;
 import deconvolutionlab.module.GroupedModulePanel;
 import deconvolutionlab.module.ImageModule;
 import deconvolutionlab.module.LanguageModule;
@@ -83,7 +83,6 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 	private JTabbedPane	        tab	     = new JTabbedPane();
 	private JButton	            bnHelp	 = new JButton("Help");
 	private JButton	            bnQuit	 = new JButton("Quit");
-	private JButton	            bnSystem	= new JButton("System");
 	private JButton	            bnBatch	 = new JButton("Batch");
 	private JButton	            bnRun	 = new JButton("Run");
 	private JButton	            bnLaunch	= new JButton("Launch");
@@ -101,7 +100,7 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 	private LanguageModule	    language;
 	private CommandModule	    command;
 	private DirectoryModule	    directory;
-	private FFTModule	        fft;
+	private ResourcesModule	    resources;
 
 	private ControllerModule	controller;
 
@@ -126,9 +125,9 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		config = new ConfigModule();
 		command = new CommandModule();
 		directory = new DirectoryModule();
-		fft = new FFTModule();
+		resources = new ResourcesModule();
 
-		modules = new AbstractModule[] { image, psf, algo, output, controller, preprocessing, batch, directory, fft };
+		modules = new AbstractModule[] { image, psf, algo, output, controller, preprocessing, batch, directory, resources };
 		Command.active(modules, command);
 		Command.command();
 
@@ -144,7 +143,6 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		bottom.setBorder(border);
 
 		bottom.add(bnHelp);
-		bottom.add(bnSystem);
 		bottom.add(bnClose);
 		bottom.add(bnBatch);
 		bottom.add(bnRun);
@@ -166,7 +164,6 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		bnClose.addActionListener(this);
 		bnQuit.addActionListener(this);
 		bnHelp.addActionListener(this);
-		bnSystem.addActionListener(this);
 
 		((GroupedModulePanel) tab.getSelectedComponent()).organize();
 		setMinimumSize(new Dimension(500, 500));
@@ -190,8 +187,6 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 			Lab.help();
 		else if (e.getSource() == bnClose)
 			Config.store();
-		else if (e.getSource() == bnSystem)
-			SystemInfo.activate();
 		else if (e.getSource() == bnBatch) {
 			tab.setSelectedIndex(2);
 			batch.expand();
@@ -231,7 +226,7 @@ public class LabPanel extends JPanel implements ActionListener, ChangeListener {
 		list.add(output);
 		list.add(controller);
 		list.add(preprocessing);
-		list.add(fft);
+		list.add(resources);
 		return list;
 	}
 

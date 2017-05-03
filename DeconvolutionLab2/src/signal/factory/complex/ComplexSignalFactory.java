@@ -45,9 +45,9 @@ public class ComplexSignalFactory {
 		for (int z = 0; z <= zsize; z++)
 			for (int y = 0; y <= ysize; y++)
 				for (int x = 0; x <= xsize; x++) {
-					wx = Math.PI * x / xsize;
-					wy = Math.PI * y / ysize;
-					wz = Math.PI * z / ysize;
+					wx = (xsize > 0 ? Math.PI * x / xsize : 0);
+					wy = (ysize > 0 ? Math.PI * y / ysize : 0);
+					wz = (zsize > 0 ? Math.PI * z / zsize : 0);
 					wr = Math.sqrt(wx * wx + wy * wy + wz * wz);
 					function[x][y][z] = (float) Math.exp(-wr * wr * K);
 				}
@@ -75,9 +75,9 @@ public class ComplexSignalFactory {
 		for (int z = 0; z <= zsize; z++)
 			for (int y = 0; y <= ysize; y++)
 				for (int x = 0; x <= xsize; x++) {
-					wx = Math.PI * x / xsize;
-					wy = Math.PI * y / ysize;
-					wz = Math.PI * z / zsize;
+					wx = (xsize > 0 ? Math.PI * x / xsize : 0);
+					wy = (ysize > 0 ? Math.PI * y / ysize : 0);
+					wz = (zsize > 0 ? Math.PI * z / zsize : 0);
 					function[x][y][z] = (float) ((wx * wx + wy * wy + wz * wz));
 				}
 		return createHermitian("Laplacian", nx, ny, nz, function);
@@ -92,9 +92,9 @@ public class ComplexSignalFactory {
 		for (int z = 0; z <= zsize; z++)
 			for (int y = 0; y <= ysize; y++)
 				for (int x = 0; x <= xsize; x++) {
-					wx = Math.PI * x / xsize;
-					wy = Math.PI * y / ysize;
-					wz = Math.PI * z / zsize;
+					wx = (xsize > 0 ? Math.PI * x / xsize : 0);
+					wy = (ysize > 0 ? Math.PI * y / ysize : 0);
+					wz = (zsize > 0 ? Math.PI * z / zsize : 0);
 					function[x][y][z] = (float) ((wx * vx + vy * wy + vz * wz));
 				}
 		return createHermitian("Directional Derivative", nx, ny, nz, function);
@@ -110,9 +110,9 @@ public class ComplexSignalFactory {
 		for (int z = 0; z <= zsize; z++)
 			for (int y = 0; y <= ysize; y++)
 				for (int x = 0; x <= xsize; x++) {
-					wx = Math.PI * x / xsize;
-					wy = Math.PI * y / ysize;
-					wz = Math.PI * z / ysize;
+					wx = (xsize > 0 ? Math.PI * x / xsize : 0);
+					wy = (ysize > 0 ? Math.PI * y / ysize : 0);
+					wz = (zsize > 0 ? Math.PI * z / zsize : 0);
 					wr = Math.sqrt(wx * wx + wy * wy + wz*wz);
 					function[x][y][z] = 
 							(float) (1.0 - 1.0 / (1.0 + Math.exp(-K * (wr - mu)))

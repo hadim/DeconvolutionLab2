@@ -142,8 +142,7 @@ public class PSFModule extends AbstractModule implements ActionListener, MouseLi
 		bnDirectory.setToolTipText("Add a new source read from the 2D images from a directory");
 		bnSynthetic.setToolTipText("Add a new source artificially created");
 		bnPlatform.setToolTipText("Add a new source from a list of images of the platform");
-getAction2Button().setToolTipText("Click to have a preview, Shift-click or Ctrl-click to show the complete stack");
-		getAction1Button().setToolTipText("Select the active window");
+		getAction2Button().setToolTipText("Click to have a preview, Shift-click or Ctrl-click to show the complete stack");
 
 		Config.registerTable(getName(), "psf", table);
 	
@@ -174,8 +173,6 @@ getAction2Button().setToolTipText("Click to have a preview, Shift-click or Ctrl-
 		else if (e.getSource() == bnSynthetic)
 			synthetic(false);
 		else if (e.getSource() == bnPlatform)
-			platform();
-		else if (e.getSource() == getAction1Button())
 			platform();
 		else if (e.getSource() == getAction2Button()) {
 			boolean s = (e.getModifiers() & ActionEvent.SHIFT_MASK) == ActionEvent.SHIFT_MASK;
@@ -227,29 +224,32 @@ getAction2Button().setToolTipText("Click to have a preview, Shift-click or Ctrl-
 			if (row <= 0)
 				table.removeRow(row);
 		}
-		table.insert(new String[] { dlg.getShapeName(), "synthetic", dlg.getCommand(), "" });
+		table.insert(new String[] { dlg.getShapeName(), "synthetic", dlg.getCommand(), "\u232B" });
 	}
 
 	private void edit() {
-		int row = table.getSelectedRow();
-		
+		int row = table.getSelectedRow();	
 		if (row < 0)
 			return;
-		String name = table.getCell(row, 0).trim();
-		for(SignalFactory factory : SignalFactory.getAll()) {
-			if (name.equals(factory.getName().trim())) {
-				synthetic(true);
-				return;
+		String source = table.getCell(row, 1).trim().toLowerCase();
+		if (source.equals("synthetic")) {
+			String name = table.getCell(row, 0).trim();
+			for(SignalFactory factory : SignalFactory.getAll()) {
+				if (name.equals(factory.getName().trim())) {
+					synthetic(true);
+					return;
+				}
 			}
 		}
-		String filename = table.getCell(row, 1).trim();
-		File file = new File(filename);
-		if (!file.exists())
-			return;
-		if (file.isFile())
-			file(table.getCell(row, 21));
-		else
-			dir(table.getCell(row, 1));
+		else if (source.equals("directory")) {
+			dir(table.getCell(row, 2));
+		}
+		else if (source.equals("file")) {
+			file(table.getCell(row, 2));
+		}
+		else if (source.equals("platform")) {
+			platform();
+		}
 	}
 
 	private void display(boolean stack) {

@@ -113,6 +113,7 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 	public RealSignal run(RealSignal image, RealSignal psf) {
 
 		String sn = getShortnames()[0];
+		String algoParam = sn + "(" + getParametersAsString() + ")";
 		if (controller.isSystem())
 			SystemInfo.activate();
 
@@ -120,6 +121,7 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		Apodization apo = controller.getApodization();
 		double norm = controller.getNormalizationPSF();
 		
+		controller.setAlgoName(algoParam);
 		fft = controller.getFFT();
 		controller.setIterationsMax(iterMax);
 
@@ -150,7 +152,7 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 
 		controller.setIterationsMax(iterMax);
 		
-		monitors.log(getShortnames()[0] + " is starting (" + iterations + ")");
+		monitors.log(sn + " is starting (" + iterations + ")");
 		controller.setMonitors(monitors);
 	
 		controller.start(y);
@@ -160,8 +162,8 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		fft.init(monitors, y.nx, y.ny, y.nz);
 		controller.setFFT(fft);
 		
-		monitors.log(getShortnames()[0] + " data ready");
-		monitors.log(getShortnames()[0] + "" + getParametersToString());
+		monitors.log(sn + " data ready");
+		monitors.log(algoParam);
 
 		RealSignal x = null;
 
@@ -200,7 +202,7 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		if (controller.isDisplayFinal())
 			Lab.show(monitors, result, "Final Display of " + sn);
 
-		result.setName("Output of " + sn);
+		result.setName("Out of " + algoParam);
 		
 		monitors.log("End of " + sn + " in " + NumFormat.seconds(controller.getTimeNano()) + " and " + controller.getMemoryAsString());
 
@@ -266,9 +268,9 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		String param = "";
 		for (int i = 0; i < p.length; i++)
 			if (i == p.length - 1)
-				param += p[i];
+				param += NumFormat.nice(p[i]);
 			else
-				param += p[i] + ", ";
+				param += NumFormat.nice(p[i]) + ", ";
 		return param;
 	}
 	

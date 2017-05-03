@@ -48,6 +48,7 @@ import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 import fft.FFT;
 import ij.IJ;
+import ij.gui.Plot;
 import imagej.IJImager;
 import plugins.sage.deconvolutionlab.IcyImager;
 import signal.ComplexComponent;
@@ -266,15 +267,31 @@ public class Lab {
 	public static void save(Monitors monitors, RealSignal signal, String path, String name, Imager.Type type) {
 		save(monitors, signal, path + File.separator + name + ".tif", type);
 	}
+	
+	public static void save(Monitors monitors, RealSignal signal, String filename, Imager.Type type) {
+		imaging.save(signal, filename, type);
+		monitors.log("Save Real Signal " + filename);
+	}
 
 	public static void save(Monitors monitors, RealSignal signal, String filename) {
 		imaging.save(signal, filename, Imager.Type.FLOAT);
 		monitors.log("Save Real Signal " + filename);
 	}
 
-	public static void save(Monitors monitors, RealSignal signal, String filename, Imager.Type type) {
+	public static void save(RealSignal signal, String path, String name) {
+		save(signal, path + File.separator + name + ".tif", Imager.Type.FLOAT);
+	}
+
+	public static void save(RealSignal signal, String path, String name, Imager.Type type) {
+		save(signal, path + File.separator + name + ".tif", type);
+	}
+
+	public static void save(RealSignal signal, String filename) {
+		imaging.save(signal, filename, Imager.Type.FLOAT);
+	}
+
+	public static void save(RealSignal signal, String filename, Imager.Type type) {
 		imaging.save(signal, filename, type);
-		monitors.log("Save Real Signal " + filename);
 	}
 
 	public static RealSignal createSynthetic(Monitors monitors, String cmd) {
@@ -407,6 +424,10 @@ public class Lab {
 		return signal;
 	}
 
+	public static void showOrthoview(RealSignal signal, int hx, int hy, int hz) {
+		showOrthoview(signal, signal.name, hx, hy, hz);
+	}
+
 	public static void showOrthoview(RealSignal signal, String title, int hx, int hy, int hz) {
 		if (signal == null) {
 			return;
@@ -423,15 +444,19 @@ public class Lab {
 	}
 
 	public static void showOrthoview(RealSignal signal) {
+		showOrthoview(signal, signal.name);
+	}
+	
+	public static void showOrthoview(RealSignal signal, String title) {
 		if (signal == null) {
 			return;
 		}
 		int hx = signal.nx / 2;
 		int hy = signal.ny / 2;
 		int hz = signal.nz / 2;
-		imaging.show(signal.createOrthoview(hx, hy, hz), signal.name, Imager.Type.FLOAT, 0);
+		imaging.show(signal.createOrthoview(hx, hy, hz), title, Imager.Type.FLOAT, 0);
 	}
-	
+
 	public static void showOrthoview(Monitors monitors, RealSignal signal, String title) {
 		if (signal == null) {
 			monitors.error("Show Orthoview " + title + " this image does not exist.");
@@ -444,12 +469,16 @@ public class Lab {
 	}
 
 	public static void showMIP(RealSignal signal) {
+		showMIP(signal, signal.name);
+	}
+
+	public static void showMIP(RealSignal signal, String title) {
 		if (signal == null) {
 			return;
 		}
-		imaging.show(signal.createMIP(), signal.name, Imager.Type.FLOAT, 0);
+		imaging.show(signal.createMIP(), title, Imager.Type.FLOAT, 0);
 	}
-	
+
 	public static void showMIP(Monitors monitors, RealSignal signal, String title) {
 		if (signal == null) {
 			monitors.error("Show MIP " + title + " this image does not exist.");
@@ -459,12 +488,16 @@ public class Lab {
 	}
 
 	public static void showPlanar(RealSignal signal) {
+		showPlanar(signal, signal.name);
+	}
+
+	public static void showPlanar(RealSignal signal, String title) {
 		if (signal == null) {
 			return;
 		}
-		imaging.show(signal.createPlanar(), signal.name, Imager.Type.FLOAT, 0);
+		imaging.show(signal.createPlanar(), title, Imager.Type.FLOAT, 0);
 	}
-	
+
 	public static void showPlanar(Monitors monitors, RealSignal signal, String title) {
 		if (signal == null) {
 			monitors.error("Show Planar " + title + " this image does not exist.");
@@ -472,25 +505,34 @@ public class Lab {
 		}
 		imaging.show(signal.createPlanar(), title, Imager.Type.FLOAT, 0);
 	}
-/*
-	public static RealSignal create(Monitors monitors, String name) {
-		RealSignal signal = imaging.create(name);
-		if (signal != null)
-			monitors.log("Created the real signal " + name + " " + signal.toString());
-		else
-			monitors.error("Impossible to create the real signal " + name);
-		return signal;
+	
+	
+	public static void plotProfile(RealSignal signal, String name, int x1, int y1, int z1, int x2, int y2, int z2) {
+		if (signal == null) {
+			return;
+		}
+		double dx = x2 - x1;
+		double dy = y2 - y1;
+		double dz = z2 - z1;
+		double len = Math.sqrt(dx*dx + dy*dy + dz*dz);
+		int n = (int)Math.round(len * 2);
+		double ds = len / n;
+		dx = (double)(x2 - x1) / n;
+		dy = (double)(y2 - y1) / n;
+		dz = (double)(z2 - z1) / n;
+		double value[] = new double[n];
+		double dist[] = new double[n];
+		for(int s=0; s<n; s++) {
+			double x = x1 + s*dx;
+			double y = y1 + s*dy;
+			double z = z1 + s*dz;
+			dist[s] = s*ds;
+			value[s] = signal.getInterpolatedPixel(x, y, z);
+		}
+		Plot plot = new Plot(name, "distance", "intensity", dist, value);
+		plot.show();
 	}
 
-	public static RealSignal create(Monitors monitors) {
-		RealSignal signal = imaging.create();
-		if (signal != null)
-			monitors.log("Created the real signal from the active window " + signal.toString());
-		else
-			monitors.error("Impossible to create the real signal from the active window");
-		return signal;
-	}
-*/
 	public static Imager getImager() {
 		return imaging;
 	}

@@ -38,30 +38,30 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
-import bilib.component.HTMLPane;
+import bilib.component.GridPanel;
 import bilib.table.CustomizedColumn;
-import bilib.table.CustomizedTable;
 import deconvolution.algorithm.Algorithm;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
+import deconvolutionlab.system.SystemInfo;
 import fft.AbstractFFTLibrary;
 import fft.FFT;
 
-public class FFTModule extends AbstractModule implements ActionListener {
+public class ResourcesModule extends AbstractModule implements ActionListener {
 
-	private CustomizedTable	table;
 	private JComboBox<String>	cmbFFT;
 	private JComboBox<String>	cmbEpsilon;
-	private HTMLPane			doc;
 	private JComboBox<String>	cmbMultithreading;
+	private JComboBox<String>	cmbSystem;
 	
-	public FFTModule() {
-		super("FFT", "", "Default", "");
+	public ResourcesModule() {
+		super("Resources", "", "System", "Default");
 	}
 
 	@Override
@@ -73,6 +73,8 @@ public class FFTModule extends AbstractModule implements ActionListener {
 			cmd += " -epsilon " + (String) cmbEpsilon.getSelectedItem();
 		if (cmbMultithreading.getSelectedIndex() != 0)
 			cmd += " -multithreading no";
+		if (cmbSystem.getSelectedIndex() != 0)
+			cmd += " -system no";
 		return cmd;
 	}
 
@@ -80,72 +82,55 @@ public class FFTModule extends AbstractModule implements ActionListener {
 		AbstractFFTLibrary library = FFT.getLibraryByName((String) cmbFFT.getSelectedItem());
 		setCommand(getCommand());
 		setSynopsis(library.getLibraryName());
-		doc.clear();
-		doc.append(library.getCredit());
-		doc.append("<hr>");
-		doc.append(library.getLicence());
 	}
 
 	@Override
 	public JPanel buildExpandedPanel() {
 		
-		doc = new HTMLPane(100, 1000);
 		cmbFFT = new JComboBox<String>(FFT.getLibrariesAsArray());
 		cmbEpsilon = new JComboBox<String>(new String[] { "1E-0", "1E-1", "1E-2", "1E-3", "1E-4", "1E-5", "1E-6", "1E-7", "1E-8", "1E-9", "1E-10", "1E-11", "1E-12" });
 		cmbEpsilon.setSelectedItem("1E-6");
 		cmbMultithreading = new JComboBox<String>(new String[] { "yes", "no" });
-
+		cmbSystem = new JComboBox<String>(new String[] { "yes", "no" });
+	
 		ArrayList<CustomizedColumn> columns = new ArrayList<CustomizedColumn>();
 		columns.add(new CustomizedColumn("FFT Library", String.class, 100, false));
 		columns.add(new CustomizedColumn("Installed", String.class, 40, false));
 		columns.add(new CustomizedColumn("Installation", String.class, Constants.widthGUI, false));
-		table = new CustomizedTable(columns, true);	
-		table.setRowSelectionAllowed(false);
 			
-		JToolBar tool = new JToolBar("Path");
-		tool.setBorder(BorderFactory.createEmptyBorder());
-		tool.setLayout(new GridLayout(3, 3));
-		tool.setFloatable(false);
-		tool.add(new JLabel("fft"));
-		tool.add(cmbFFT);
-		tool.add(new JLabel("FFT Library"));
+		GridPanel pn = new GridPanel(false, 2);
+		pn.place(0, 0, new JLabel("fft"));
+		pn.place(0, 1, cmbFFT);
+		pn.place(0, 2, new JLabel("FFT Library"));
 		
-		tool.add(new JLabel("espilon"));
-		tool.add(cmbEpsilon);
-		tool.add(new JLabel("Machine epsilon"));
+		pn.place(1, 0, new JLabel("espilon"));
+		pn.place(1, 1, cmbEpsilon);
+		pn.place(1, 2, new JLabel("Machine epsilon"));
 		
-		tool.add(new JLabel("multithreading"));
-		tool.add(cmbMultithreading);
-		tool.add(new JLabel("Activate multithreading"));
+		pn.place(2, 0, new JLabel("multithreading"));
+		pn.place(2, 1, cmbMultithreading);
+		pn.place(2, 2, new JLabel("Activate multithreading"));
 		
+		pn.place(3, 0, new JLabel("system"));
+		pn.place(3, 1, cmbSystem);
+		pn.place(3, 2, new JLabel("Open system panel at each run"));		
 		
-		JPanel pn = new JPanel();
-		pn.setLayout(new BorderLayout());
-		pn.add(tool, BorderLayout.NORTH);
-		pn.add(table.getMinimumPane(100, 100), BorderLayout.CENTER);
-
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		panel.setLayout(new BorderLayout());
-		panel.add(pn, BorderLayout.NORTH);
-		panel.add(doc.getPane(), BorderLayout.CENTER);
-		getAction1Button().addActionListener(this);
+		panel.add(pn, BorderLayout.CENTER);
 
 		Config.register(getName(), "fft", cmbFFT, Algorithm.getDefaultAlgorithm());
 		Config.register(getName(), "epsilon", cmbEpsilon, "1E-6");
 		Config.register(getName(), "multithreading", cmbMultithreading, cmbMultithreading.getItemAt(0));
+		Config.register(getName(), "system", cmbSystem, cmbSystem.getItemAt(0));
 
 		cmbMultithreading.addActionListener(this);
 		cmbFFT.addActionListener(this);
 		cmbEpsilon.addActionListener(this);
-
-		for(AbstractFFTLibrary lib : FFT.getInstalledLibraries()) {
-			String name = lib.getLibraryName();
-				String i = lib.isInstalled() ? "yes" : "no";
-			String loc = lib.getLocation();
-			table.append(new String[]{name, i, loc});	
-		}
-		
+		cmbSystem.addActionListener(this);
+		getAction1Button().addActionListener(this);
+		getAction2Button().addActionListener(this);
 		update();
 		return panel;
 	}
@@ -153,19 +138,26 @@ public class FFTModule extends AbstractModule implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		super.actionPerformed(e);
-		if (e.getSource() == getAction1Button()) {
+		if (e.getSource() == getAction2Button()) {
 			cmbFFT.setSelectedIndex(0);;
 			cmbEpsilon.setSelectedItem("1E-6");
 			cmbMultithreading.setSelectedIndex(0);
+			cmbSystem.setSelectedIndex(0);
 		}
+		else if (e.getSource() == getAction1Button()) {
+			SystemInfo.activate();
+		}
+
 		update();
 	}
 
 	@Override
 	public void close() {
+		cmbSystem.removeActionListener(this);
 		cmbFFT.removeActionListener(this);
 		cmbEpsilon.removeActionListener(this);
 		cmbMultithreading.removeActionListener(this);
 		getAction1Button().removeActionListener(this);
+		getAction2Button().removeActionListener(this);
 	}
 }

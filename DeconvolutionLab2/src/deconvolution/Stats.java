@@ -108,23 +108,27 @@ public class Stats {
 	
 	public void addInput(RealSignal x) {
 		statsInput = x.getStats();
-		table.append(compute(x, 0, "", "", "", ""));	
+		table.append(compute(x, "In: " + x.name, "", "", "", ""));	
 	}
 
 	public void add(RealSignal x, int iterations) {
-		table.append(compute(x, iterations, "", "", "", ""));	
+		table.append(compute(x, ""+iterations, "", "", "", ""));	
 	}
 
 	public void add(RealSignal x, int iterations, String time, String psnr, String snr, String residu) {
-		table.append(compute(x, iterations, time, psnr, snr, residu));	
+		table.append(compute(x, ""+iterations, time, psnr, snr, residu));	
+	}
+
+	public void addOutput(RealSignal x, String algo, String time, String psnr, String snr, String residu) {
+		table.append(compute(x, "Out: " + algo, time, psnr, snr, residu));	
 	}
 	
-	public String[] compute(RealSignal x, int iterations, String time, String psnr, String snr, String residu) {
+	public String[] compute(RealSignal x, String iterations, String time, String psnr, String snr, String residu) {
 		float params[] = null;
 		if (x != null)
 			params = x.getStats();
 		String[] row = new String[12];
-		row[0] = "" + iterations;
+		row[0] = iterations;
 		row[1] = (params == null ? "-" : "" + params[0]);
 		row[2] = (params == null ? "-" : "" + params[1]);
 		row[3] = (params == null ? "-" : "" + params[2]);

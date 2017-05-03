@@ -242,24 +242,28 @@ public class ImageModule extends AbstractModule implements ActionListener, Mouse
 	}
 
 	private void edit() {
-		int row = table.getSelectedRow();
+		int row = table.getSelectedRow();	
 		if (row < 0)
 			return;
-		String name = table.getCell(row, 0).trim();
-		for (SignalFactory factory : SignalFactory.getAll()) {
-			if (name.equals(factory.getName().trim())) {
-				synthetic(true);
-				return;
+		String source = table.getCell(row, 1).trim().toLowerCase();
+		if (source.equals("synthetic")) {
+			String name = table.getCell(row, 0).trim();
+			for(SignalFactory factory : SignalFactory.getAll()) {
+				if (name.equals(factory.getName().trim())) {
+					synthetic(true);
+					return;
+				}
 			}
 		}
-		String filename = table.getCell(row, 1).trim();
-		File file = new File(filename);
-		if (!file.exists())
-			return;
-		if (file.isFile())
-			file(table.getCell(row, 21));
-		else
-			dir(table.getCell(row, 1));
+		else if (source.equals("directory")) {
+			dir(table.getCell(row, 2));
+		}
+		else if (source.equals("file")) {
+			file(table.getCell(row, 2));
+		}
+		else if (source.equals("platform")) {
+			platform();
+		}
 	}
 
 	private void display(boolean stack) {

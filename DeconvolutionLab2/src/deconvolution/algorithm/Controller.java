@@ -109,6 +109,8 @@ public class Controller {
 	private RealSignal			x;
 	
 	private Timer				timer;
+	
+	private String				algoName = "";
 
 	public Controller() {
 		doResidu = false;
@@ -140,6 +142,10 @@ public class Controller {
 		setOuts(new ArrayList<Output>());
 	}
 
+	public void setAlgoName(String algoName) {
+		this.algoName = algoName;
+	}
+	
 	public void setFFT(AbstractFFT fft) {
 		this.fft = fft;
 	}
@@ -248,7 +254,11 @@ public class Controller {
 		if (con || res || ref)
 			compute(iterations, x, con, res, ref);
 
-		addStats();
+		String pnsrText = doReference ? NumFormat.nice(psnr) : "n/a";
+		String snrText = doReference ? NumFormat.nice(snr) : "n/a";
+		String residuText = doResidu ? NumFormat.nice(residu) : "n/a";
+		stats.addOutput(x, algoName, NumFormat.seconds(getTimeNano()), pnsrText, snrText, residuText);
+		
 		stats.save(monitors, path);
 		
 		for (Output out : outs)
@@ -287,7 +297,6 @@ public class Controller {
 		String pnsrText = doReference ? NumFormat.nice(psnr) : "n/a";
 		String snrText = doReference ? NumFormat.nice(snr) : "n/a";
 		String residuText = doResidu ? NumFormat.nice(residu) : "n/a";
-	
 		stats.add(x, iterations, NumFormat.seconds(getTimeNano()), pnsrText, snrText, residuText);
 	}
 

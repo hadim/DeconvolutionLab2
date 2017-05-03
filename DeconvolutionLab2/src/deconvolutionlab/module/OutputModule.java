@@ -41,6 +41,7 @@ import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 
@@ -63,6 +64,7 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 	private JButton			bnOrtho;
 	private JButton			bnPlanar;
 	private JButton			bnFigure;
+	private JCheckBox			chkDisplayFinal;
 	
 	public OutputModule() {
 		super("Output", "", "Clear", "");
@@ -83,18 +85,22 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 			if (values[6].equals(""))
 				cmd += " nosave";
 		}
+		if (!chkDisplayFinal.isSelected())
+			cmd += " -display no";
 		return cmd;
 	}
 
 	public void update() {
 		setCommand(getCommand());
-		setSynopsis(table.getRowCount() + " output" + (table.getRowCount() > 1 ? "s" : ""));
+		int count = table.getRowCount() + (chkDisplayFinal.isSelected() ? 1 : 0);
+		setSynopsis(count + " output" + (count > 1 ? "s" : ""));
 		Command.command();
-		getAction1Button().setEnabled(table.getRowCount() > 0);
 	}
 
 	@Override
 	public JPanel buildExpandedPanel() {
+		chkDisplayFinal = new JCheckBox("Display the final output as 32-bit stack (default)");
+		chkDisplayFinal.setSelected(true);
 		
 		String[] dynamics = { "intact", "rescaled", "normalized", "clipped" };
 		String[] types = { "float", "short", "byte" };
@@ -134,10 +140,11 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 		pn.add(bnOrtho);
 		pn.add(bnPlanar);
 		pn.add(bnFigure);
-		
+	
 		JPanel panel = new JPanel();
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		panel.setLayout(new BorderLayout());
+		panel.add(chkDisplayFinal, BorderLayout.NORTH);
 		panel.add(pn, BorderLayout.SOUTH);
 		panel.add(table.getMinimumPane(100, 100), BorderLayout.CENTER);
 
@@ -146,9 +153,11 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 		bnMIP.addActionListener(this);
 		bnOrtho.addActionListener(this);
 		bnPlanar.addActionListener(this);
-		bnFigure.addActionListener(this);
+		bnFigure.addActionListener(this);		
+		chkDisplayFinal.addActionListener(this);
 		getAction1Button().addActionListener(this);
 		Config.registerTable(getName(), "output", table);
+		Config.register(getName(), "display", chkDisplayFinal, true);
 	
 		return panel;
 	}
@@ -179,13 +188,15 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 			Output out = dlg.getOut();
 			if (out != null)
 				table.insert(out.getAsString());
-			
-			//Lab.setVisible(new OutputPanel(view), "panel", 30, 30);
 			update();
 		}
 		
 		if (e.getSource() == getAction1Button()) {
 			table.removeRows();
+			chkDisplayFinal.setSelected(true);
+		}
+		if (e.getSource() == chkDisplayFinal) {
+			update();
 		}
 	}
 
@@ -219,6 +230,7 @@ public class OutputModule extends AbstractModule implements ActionListener, Mous
 
 	@Override
 	public void close() {
+		chkDisplayFinal.removeActionListener(this);
 		bnStack.removeActionListener(this);
 		bnSeries.removeActionListener(this);
 		bnMIP.removeActionListener(this);
