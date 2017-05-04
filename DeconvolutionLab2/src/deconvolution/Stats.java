@@ -60,19 +60,20 @@ public class Stats {
 	private Mode mode;
 	
 	private boolean embedded = false;
+	private boolean shown = false;
 	
 	public Stats(Mode mode) {
 		this.mode = mode;
 		ArrayList<CustomizedColumn> columns = new ArrayList<CustomizedColumn>();
-		columns.add(new CustomizedColumn("Iterations", String.class, 100, false));
-		columns.add(new CustomizedColumn("Mean", String.class, 100, false));
-		columns.add(new CustomizedColumn("Minimum", String.class, 100, false));
-		columns.add(new CustomizedColumn("Maximum", String.class, 100, false));
+		columns.add(new CustomizedColumn("Signal", String.class, 200, false));
+		columns.add(new CustomizedColumn("Mean", String.class, 130, false));
+		columns.add(new CustomizedColumn("Minimum", String.class, 130, false));
+		columns.add(new CustomizedColumn("Maximum", String.class, 130, false));
 		columns.add(new CustomizedColumn("Stdev", String.class, 100, false));
 		columns.add(new CustomizedColumn("Energy", String.class, 100, false));
 		columns.add(new CustomizedColumn("Time", String.class, 100, false));
 		columns.add(new CustomizedColumn("Memory", String.class, 100, false));
-		columns.add(new CustomizedColumn("Signal", String.class, 100, false));
+		columns.add(new CustomizedColumn("Allocated Signal", String.class, 100, false));
 		columns.add(new CustomizedColumn("PSNR", String.class, 100, false));
 		columns.add(new CustomizedColumn("SNR", String.class, 100, false));
 		columns.add(new CustomizedColumn("Residu", String.class, 100, false));
@@ -89,12 +90,19 @@ public class Stats {
 	public void show() {
 		if (embedded)
 			return;
+		if (shown)
+			return;
 		if (mode == Mode.SHOW || mode == Mode.SHOWSAVE) {
 			JFrame frame = new JFrame("Stats");
 			frame.getContentPane().add(getPanel());
 			frame.pack();
 			Lab.setVisible(frame);
+			shown = true;
 		}
+	}
+	
+	public boolean isShown() {
+		return shown;
 	}
 	
 	public void save(Monitors monitors, String path) {
@@ -129,11 +137,11 @@ public class Stats {
 			params = x.getStats();
 		String[] row = new String[12];
 		row[0] = iterations;
-		row[1] = (params == null ? "-" : "" + params[0]);
-		row[2] = (params == null ? "-" : "" + params[1]);
-		row[3] = (params == null ? "-" : "" + params[2]);
-		row[4] = (params == null ? "-" : "" + params[3]);
-		row[5] = (params == null ? "-" : "" + params[5]);
+		row[1] = (params == null ? "-" : "" + NumFormat.nice(params[0]));
+		row[2] = (params == null ? "-" : "" + NumFormat.nice(params[1]));
+		row[3] = (params == null ? "-" : "" + NumFormat.nice(params[2]));
+		row[4] = (params == null ? "-" : "" + NumFormat.nice(params[3]));
+		row[5] = (params == null ? "-" : "" + NumFormat.nice(params[5]));
 		row[6] = time;
 		row[7] = NumFormat.bytes(SystemUsage.getHeapUsed());
 		row[8] = SignalCollector.sumarize();
@@ -146,7 +154,7 @@ public class Stats {
 
 	public JPanel getPanel() {
 		JScrollPane scroll = new JScrollPane(table);
-		scroll.setPreferredSize(new Dimension(Constants.widthGUI, 400));
+		scroll.setPreferredSize(new Dimension(Constants.widthGUI+200, 400));
 		JPanel panel = new JPanel(new BorderLayout());
 		panel = new JPanel(new BorderLayout());
 		panel.add(scroll);

@@ -68,11 +68,14 @@ public class Simulation extends AbstractAlgorithm implements Callable<RealSignal
 		return x;
 	}
 
-	public void gaussian(RealSignal x, double mean, double sd) {	
+	public void gaussian(RealSignal x, double mean, double sd) {
+
 		for (int k = 0; k < x.nz; k++) {
 			float[] slice = x.getXY(k);
-			for (int j = 0; j < x.ny * x.nx; j++)
+			for (int j = 0; j < x.ny * x.nx; j++) {
+				double a = slice[j];
 				slice[j] += (float) rand.nextGaussian(mean, sd);
+			}
 		}
 	}
 

@@ -51,8 +51,7 @@ public class SignalCollector {
 	}
 
 	public static String sumarize() {
-		String r = "Signals: " + NumFormat.bytes(bytesReal + bytesComplex);
-		return r;
+		return "" + NumFormat.bytes(bytesReal + bytesComplex);
 	}
 
 	public static void clear() {

@@ -230,7 +230,10 @@ public class Controller {
 		boolean stopResd = doResidu && (residu <= residuMin);
 		monitors.log("@" + iterations + " Time: " + NumFormat.seconds(timeElapsed*1e9));
 
-		addStats();
+		String pnsrText = doReference ? "" + psnr : "n/a";
+		String snrText = doReference ? "" + snr : "n/a";
+		String residuText = doResidu ? "" + residu : "n/a";
+		stats.add(x, iterations, NumFormat.seconds(getTimeNano()), pnsrText, snrText, residuText);
 		
 		String prefix = "Stopped>> by ";
 		if (abort)
@@ -254,9 +257,9 @@ public class Controller {
 		if (con || res || ref)
 			compute(iterations, x, con, res, ref);
 
-		String pnsrText = doReference ? NumFormat.nice(psnr) : "n/a";
-		String snrText = doReference ? NumFormat.nice(snr) : "n/a";
-		String residuText = doResidu ? NumFormat.nice(residu) : "n/a";
+		String pnsrText = doReference ? ""+psnr : "n/a";
+		String snrText = doReference ? ""+snr : "n/a";
+		String residuText = doResidu ? "" + residu : "n/a";
 		stats.addOutput(x, algoName, NumFormat.seconds(getTimeNano()), pnsrText, snrText, residuText);
 		
 		stats.save(monitors, path);
@@ -291,13 +294,6 @@ public class Controller {
 			prevImage = x.duplicate();
 			monitors.log("@" + iterations + " Residu: " + NumFormat.nice(residu));
 		}
-	}
-
-	private void addStats() {
-		String pnsrText = doReference ? NumFormat.nice(psnr) : "n/a";
-		String snrText = doReference ? NumFormat.nice(snr) : "n/a";
-		String residuText = doResidu ? NumFormat.nice(residu) : "n/a";
-		stats.add(x, iterations, NumFormat.seconds(getTimeNano()), pnsrText, snrText, residuText);
 	}
 
 	public double getTimeNano() {

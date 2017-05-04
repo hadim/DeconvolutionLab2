@@ -630,7 +630,9 @@ public class RealSignal extends Signal implements SignalListener {
 	public RealSignal createPlanar() {
 		String n = "planar(" + name + ")";
 		int nr = (int) Math.sqrt(nz);
-		int nc = (int) Math.ceil(nz / nr) + 1;
+		int nc = (int) Math.ceil(nz / nr);
+		if (nc*nr < nz)
+			nc++;
 		int w = nx * nr;
 		int h = ny * nc;
 		RealSignal view = new RealSignal(n, w, h, 1);

@@ -359,6 +359,7 @@ public class Output {
 			Lab.save(monitors, plane, filename, type);
 	}
 
+	
 	private void figure(Monitors monitors, RealSignal signal, String title, String filename, boolean live) {
 		int cx = ox;
 		int cy = oy;
