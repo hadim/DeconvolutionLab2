@@ -83,7 +83,7 @@ public class Controller {
 	private Constraint.Mode		constraintMode;
 	private double				residuMin;
 	private double				timeLimit;
-	private String				reference;
+	private String				referenceName;
 	private Monitors			monitors;
 	private Verbose				verbose;
 	private AbstractFFT			fft;
@@ -138,7 +138,7 @@ public class Controller {
 		setConstraint(Constraint.Mode.NO);
 		setResiduMin(-1);
 		setTimeLimit(-1);
-		setReference("");
+		setReference(null);
 		setOuts(new ArrayList<Output>());
 	}
 
@@ -184,9 +184,9 @@ public class Controller {
 			Constraint.setModel(x);
 
 		if (doReference) {
-			refImage = new Deconvolution("Reference", "-image file " + reference).openImage();
+			refImage = new Deconvolution("Reference", "-image file " + referenceName).openImage();
 			if (refImage == null)
-				monitors.error("Impossible to load the reference image " + reference);
+				monitors.error("Impossible to load the reference image " + referenceName);
 			else
 				monitors.log("Reference image loaded");
 		}
@@ -562,22 +562,41 @@ public class Controller {
 	/**
 	 * @return the reference
 	 */
-	public String getReference() {
-		return reference;
+	public String getReferenceName() {
+		return referenceName;
 	}
 
 	/**
 	 * @param reference
 	 *            the reference to set
 	 */
-	public void setReference(String reference) {
+	public void setReferenceName(String referenceName) {
 		doReference = false;
-		if (reference == null)
+		if (referenceName == null)
 			return;
-		if (reference.equals(""))
+		if (referenceName.equals(""))
 			return;
 		doReference = true;
-		this.reference = reference;
+		this.referenceName = referenceName;
+	}
+
+	/**
+	 * @return the reference
+	 */
+	public RealSignal getReference() {
+		return refImage;
+	}
+
+	/**
+	 * @param reference
+	 *            the reference to set
+	 */
+	public void setReference(RealSignal refImage) {
+		doReference = false;
+		if (refImage == null)
+			return;
+		doReference = true;
+		this.refImage = refImage;
 	}
 
 	/**

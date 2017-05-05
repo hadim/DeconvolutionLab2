@@ -131,7 +131,7 @@ public class Command {
 				controller.setResiduMin(decodeResidu(token));
 
 			if (token.keyword.equalsIgnoreCase("-reference"))
-				controller.setReference(token.parameters);
+				controller.setReferenceName(token.parameters);
 
 			if (token.keyword.equalsIgnoreCase("-pad"))
 				controller.setPadding(decodePadding(token));

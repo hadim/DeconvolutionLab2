@@ -441,12 +441,12 @@ public abstract class AbstractAlgorithm implements Callable<RealSignal> {
 		return this;
 	}
 
-	public String getReference() {
+	public RealSignal getReference() {
 		return controller.getReference();
 	}
 
-	public AbstractAlgorithm setReference(String reference) {
-		controller.setReference(reference);
+	public AbstractAlgorithm setReference(RealSignal ref) {
+		controller.setReference(ref);
 		return this;
 	}
 

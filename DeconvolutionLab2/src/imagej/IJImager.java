@@ -84,7 +84,7 @@ public class IJImager extends Imager {
 		int nx = imp.getWidth();
 		int ny = imp.getHeight();
 		int nz = imp.getStackSize();
-		RealSignal signal = new RealSignal("ij-" + imp.getTitle(), nx, ny, nz);
+		RealSignal signal = new RealSignal(imp.getTitle(), nx, ny, nz);
 		for (int k = 0; k < nz; k++) {
 			ImageProcessor ip = imp.getStack().getProcessor(k + 1).convertToFloat();
 			signal.setXY(k, (float[]) ip.getPixels());
@@ -130,7 +130,8 @@ public class IJImager extends Imager {
 		}
 	}
 
-	public ContainerImage createContainer(String title) {
+	@Override
+    public ContainerImage createContainer(String title) {
 		return new ContainerImage();
 	}
 
@@ -307,7 +308,8 @@ public class IJImager extends Imager {
 			}
 		}
 
-		public String getName() {
+		@Override
+        public String getName() {
 			return name;
 		}
 

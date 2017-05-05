@@ -246,7 +246,7 @@ public class Deconvolution implements Runnable {
 			Controller controller = algo.getController();
 			features.add("Algorithm", algo.toString());
 			features.add("Stopping Criteria", controller.getStoppingCriteriaAsString(algo));
-			features.add("Reference", controller.getReference());
+			features.add("Reference", controller.getReferenceName());
 			features.add("Constraint", controller.getConstraintAsString());
 			features.add("Padding", controller.getPadding().toString());
 			features.add("Apodization", controller.getApodization().toString());
