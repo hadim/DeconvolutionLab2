@@ -39,7 +39,7 @@ import signal.RealSignal;
 import signal.SignalCollector;
 import signal.factory.complex.ComplexSignalFactory;
 
-public class TikhonovRegularizedInverseFilter extends AbstractAlgorithm implements Callable<RealSignal> {
+public class TikhonovRegularizedInverseFilter extends Algorithm implements Callable<RealSignal> {
 
 	private double lambda = 0.1;
 	
@@ -154,7 +154,7 @@ public class TikhonovRegularizedInverseFilter extends AbstractAlgorithm implemen
 	}
 	
 	@Override
-	public AbstractAlgorithm setParameters(double... params ) {
+	public Algorithm setParameters(double... params ) {
 		if (params == null)
 			return this;
 		if (params.length > 0)

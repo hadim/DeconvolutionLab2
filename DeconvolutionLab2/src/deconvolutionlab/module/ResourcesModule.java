@@ -46,7 +46,7 @@ import javax.swing.JToolBar;
 
 import bilib.component.GridPanel;
 import bilib.table.CustomizedColumn;
-import deconvolution.algorithm.Algorithm;
+import deconvolution.algorithm.AlgorithmList;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 import deconvolutionlab.system.SystemInfo;
@@ -120,7 +120,7 @@ public class ResourcesModule extends AbstractModule implements ActionListener {
 		panel.setLayout(new BorderLayout());
 		panel.add(pn, BorderLayout.CENTER);
 
-		Config.register(getName(), "fft", cmbFFT, Algorithm.getDefaultAlgorithm());
+		Config.register(getName(), "fft", cmbFFT, AlgorithmList.getDefaultAlgorithm());
 		Config.register(getName(), "epsilon", cmbEpsilon, "1E-6");
 		Config.register(getName(), "multithreading", cmbMultithreading, cmbMultithreading.getItemAt(0));
 		Config.register(getName(), "system", cmbSystem, cmbSystem.getItemAt(0));

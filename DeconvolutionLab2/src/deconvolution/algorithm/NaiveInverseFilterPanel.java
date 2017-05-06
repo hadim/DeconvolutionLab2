@@ -35,7 +35,7 @@ import javax.swing.JPanel;
 
 import bilib.component.GridPanel;
 
-public class NaiveInverseFilterPanel extends AbstractAlgorithmPanel {
+public class NaiveInverseFilterPanel extends AlgorithmPanel {
 
 	private NaiveInverseFilter algo = new NaiveInverseFilter();
 

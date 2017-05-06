@@ -45,7 +45,7 @@ import javax.swing.event.ChangeListener;
 
 import bilib.component.GridPanel;
 import deconvolution.Command;
-import deconvolution.algorithm.Algorithm;
+import deconvolution.algorithm.AlgorithmList;
 import deconvolutionlab.Config;
 import fft.FFT;
 
@@ -96,7 +96,7 @@ public class ComputationModule extends AbstractModule implements ActionListener,
 		panel.setBorder(BorderFactory.createEtchedBorder());
 		panel.add(scroll, BorderLayout.CENTER);
 
-		Config.register(getName(), "fft", cmbFFT, Algorithm.getDefaultAlgorithm());
+		Config.register(getName(), "fft", cmbFFT, AlgorithmList.getDefaultAlgorithm());
 		Config.register(getName(), "epsilon", cmbEpsilon, "1E-6");
 	
 		cmbFFT.addActionListener(this);

@@ -51,8 +51,8 @@ import bilib.component.HTMLPane;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolution.DeconvolutionDialog;
-import deconvolution.algorithm.AbstractAlgorithmPanel;
-import deconvolution.algorithm.Algorithm;
+import deconvolution.algorithm.AlgorithmPanel;
+import deconvolution.algorithm.AlgorithmList;
 import deconvolutionlab.Config;
 import deconvolutionlab.Lab;
 
@@ -65,8 +65,8 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 	
 	public AlgorithmModule() {
 		super("Algorithm", "-algorithm", "", "Check");
-		ArrayList<AbstractAlgorithmPanel> deconv = Algorithm.getAvailableAlgorithms();
-		for (AbstractAlgorithmPanel panel : deconv)
+		ArrayList<AlgorithmPanel> deconv = AlgorithmList.getAvailableAlgorithms();
+		for (AlgorithmPanel panel : deconv)
 			cmb.addItem(panel.getName());
 		cmb.addActionListener(this);
 	}
@@ -74,7 +74,7 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 	@Override
 	public String getCommand() {
 		String name = (String) cmb.getSelectedItem();
-		AbstractAlgorithmPanel algo = Algorithm.getPanel(name);
+		AlgorithmPanel algo = AlgorithmList.getPanel(name);
 		String cmd = "-algorithm " + algo.getShortnames()[0] + " " + algo.getCommand();
 		String synopsis = algo.getShortnames()[0] + " " + algo.getCommand();
 		setSynopsis(synopsis);
@@ -95,9 +95,9 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 		pnc.add(cmb);
 		doc = new HTMLPane(100, 1000);
 		cards = new JPanel(new CardLayout());
-		ArrayList<AbstractAlgorithmPanel> panels = Algorithm.getAvailableAlgorithms();
+		ArrayList<AlgorithmPanel> panels = AlgorithmList.getAvailableAlgorithms();
 		
-		for (AbstractAlgorithmPanel panel : panels) {
+		for (AlgorithmPanel panel : panels) {
 			JScrollPane scroll = new JScrollPane(panel.getPanelParameters());
 			scroll.setBorder(BorderFactory.createEmptyBorder());
 			scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -128,7 +128,7 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 		// cmb.addActionListener(this);
 		getAction2Button().setToolTipText("Human readable of the command line");
 		getAction2Button().addActionListener(this);
-		Config.register(getName(), "algorithm", cmb, Algorithm.getDefaultAlgorithm());
+		Config.register(getName(), "algorithm", cmb, AlgorithmList.getDefaultAlgorithm());
 		panel.setBorder(BorderFactory.createEtchedBorder());
 
 		return panel;
@@ -140,7 +140,7 @@ public class AlgorithmModule extends AbstractModule implements ActionListener, C
 		if (e.getSource() == cmb) {
 			doc.clear();
 			String name = (String) cmb.getSelectedItem();
-			AbstractAlgorithmPanel algo = Algorithm.getPanel(name);
+			AlgorithmPanel algo = AlgorithmList.getPanel(name);
 			doc.append(algo.getDocumentation());
 			CardLayout cl = (CardLayout) (cards.getLayout());
 			cl.show(cards, name);

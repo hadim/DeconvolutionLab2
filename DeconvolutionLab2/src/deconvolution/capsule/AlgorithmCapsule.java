@@ -40,9 +40,9 @@ import bilib.table.CustomizedTable;
 import bilib.tools.NumFormat;
 import deconvolution.Deconvolution;
 import deconvolution.Features;
-import deconvolution.algorithm.AbstractAlgorithm;
-import deconvolution.algorithm.AbstractAlgorithmPanel;
 import deconvolution.algorithm.Algorithm;
+import deconvolution.algorithm.AlgorithmPanel;
+import deconvolution.algorithm.AlgorithmList;
 import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFT;
 import fft.FFT;
@@ -96,10 +96,10 @@ public class AlgorithmCapsule extends AbstractCapsule implements Runnable {
 			features.add("Algorithm", "No valid algorithm");
 			return;
 		}
-		AbstractAlgorithm algo = deconvolution.getAlgorithm();
+		Algorithm algo = deconvolution.getAlgorithm();
 		doc.clear();
 		String name = algo.getShortnames()[0];
-		AbstractAlgorithmPanel algoPanel = Algorithm.getPanel(name);
+		AlgorithmPanel algoPanel = AlgorithmList.getPanel(name);
 		if (algoPanel != null)
 			doc.append(algoPanel.getDocumentation());
 		

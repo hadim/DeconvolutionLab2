@@ -36,7 +36,7 @@ import ij.IJ;
 import java.io.File;
 
 import bilib.tools.NumFormat;
-import deconvolution.algorithm.AbstractAlgorithm;
+import deconvolution.algorithm.Algorithm;
 import deconvolution.algorithm.Controller;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.AbstractMonitor;
@@ -61,7 +61,7 @@ public class Deconvolution implements Runnable {
 		DIE, ALIVE, KILL
 	};
 
-	private AbstractAlgorithm					algo				= null;
+	private Algorithm					algo				= null;
 	private Controller							controller 			= new Controller();
 	private String								command				= "";
 	private Features							report				= new Features();
@@ -363,11 +363,11 @@ public class Deconvolution implements Runnable {
 		return signal;
 	}
 
-	public void setAlgorithm(AbstractAlgorithm algo) {
+	public void setAlgorithm(Algorithm algo) {
 		this.algo = algo;
 	}
 
-	public AbstractAlgorithm getAlgorithm() {
+	public Algorithm getAlgorithm() {
 		return algo;
 	}
 	

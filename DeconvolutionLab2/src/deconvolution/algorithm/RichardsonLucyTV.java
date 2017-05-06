@@ -38,7 +38,7 @@ import signal.Operations;
 import signal.RealSignal;
 import signal.SignalCollector;
 
-public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<RealSignal> {
+public class RichardsonLucyTV extends Algorithm implements Callable<RealSignal> {
 
 	private double lambda = 0.1;
 
@@ -204,7 +204,7 @@ public class RichardsonLucyTV extends AbstractAlgorithm implements Callable<Real
 	}
 	
 	@Override
-	public AbstractAlgorithm setParameters(double... params) {
+	public Algorithm setParameters(double... params) {
 		if (params == null)
 			return this;
 		if (params.length > 0)

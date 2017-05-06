@@ -41,7 +41,7 @@ import bilib.component.GridPanel;
 import deconvolution.Command;
 import deconvolutionlab.Config;
 
-public class SimulationPanel extends AbstractAlgorithmPanel implements KeyListener {
+public class SimulationPanel extends AlgorithmPanel implements KeyListener {
 
 	private JTextField	txtMean;
 	private JTextField	txtStdev;

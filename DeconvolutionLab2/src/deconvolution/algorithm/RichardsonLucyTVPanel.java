@@ -47,7 +47,7 @@ import deconvolution.Command;
 import deconvolution.RegularizationPanel;
 import deconvolutionlab.Config;
 
-public class RichardsonLucyTVPanel extends AbstractAlgorithmPanel implements KeyListener, ActionListener, ChangeListener {
+public class RichardsonLucyTVPanel extends AlgorithmPanel implements KeyListener, ActionListener, ChangeListener {
 
 	private SpinnerRangeInteger	spnIter	= new SpinnerRangeInteger(10, 1, 99999, 1);
 	private RegularizationPanel	reg;

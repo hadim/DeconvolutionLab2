@@ -39,7 +39,7 @@ import signal.RealSignal;
 import signal.SignalCollector;
 import signal.factory.complex.ComplexSignalFactory;
 
-public class RegularizedInverseFilter extends AbstractAlgorithm implements Callable<RealSignal> {
+public class RegularizedInverseFilter extends Algorithm implements Callable<RealSignal> {
 
 	private double lambda = 0.001;
 
@@ -155,7 +155,7 @@ public class RegularizedInverseFilter extends AbstractAlgorithm implements Calla
 	}
 
 	@Override
-	public AbstractAlgorithm setParameters(double... params) {
+	public Algorithm setParameters(double... params) {
 		if (params == null)
 			return this;
 		if (params.length > 0)

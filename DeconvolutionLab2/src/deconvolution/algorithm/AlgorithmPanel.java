@@ -33,7 +33,13 @@ package deconvolution.algorithm;
 
 import javax.swing.JPanel;
 
-public abstract class AbstractAlgorithmPanel {
+/**
+ * This is the abstract panel class associated the algorithm.
+ * 
+ * @author Daniel Sage
+ *
+ */
+public abstract class AlgorithmPanel {
 
 	public abstract JPanel getPanelParameters();
 

@@ -49,7 +49,7 @@ import deconvolution.RegularizationPanel;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 
-public class ICTMPanel extends AbstractAlgorithmPanel implements KeyListener, ActionListener, ChangeListener {
+public class ICTMPanel extends AlgorithmPanel implements KeyListener, ActionListener, ChangeListener {
 
 	private SpinnerRangeInteger	spnIter	= new SpinnerRangeInteger(10, 1, 99999, 1, "###");
 	private SpinnerRangeDouble	spnStep	= new SpinnerRangeDouble(1, 0, 2, 0.1, "#.#");

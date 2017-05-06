@@ -35,7 +35,7 @@ import java.util.concurrent.Callable;
 
 import signal.RealSignal;
 
-public class Identity extends AbstractAlgorithm implements Callable<RealSignal> {
+public class Identity extends Algorithm implements Callable<RealSignal> {
 
 	public Identity() {
 		super();
@@ -87,7 +87,7 @@ public class Identity extends AbstractAlgorithm implements Callable<RealSignal> 
 	}
 
 	@Override
-	public AbstractAlgorithm setParameters(double... params) {
+	public Algorithm setParameters(double... params) {
 		return this;
 	}
 	

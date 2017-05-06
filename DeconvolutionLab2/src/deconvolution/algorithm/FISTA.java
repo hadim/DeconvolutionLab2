@@ -40,7 +40,7 @@ import signal.SignalCollector;
 import wavelets.AbstractWavelets;
 import wavelets.Wavelets;
 
-public class FISTA extends AbstractAlgorithm implements Callable<RealSignal> {
+public class FISTA extends Algorithm implements Callable<RealSignal> {
 
 	private double	gamma			= 1.0;
 	private double	lambda			= 0.1;
@@ -152,7 +152,7 @@ public class FISTA extends AbstractAlgorithm implements Callable<RealSignal> {
 	}
 
 	@Override
-	public AbstractAlgorithm setParameters(double... params) {
+	public Algorithm setParameters(double... params) {
 		if (params == null)
 			return this;
 		if (params.length > 0)

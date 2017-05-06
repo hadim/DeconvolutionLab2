@@ -40,7 +40,7 @@ import bilib.component.SpinnerRangeInteger;
 import deconvolution.Command;
 import deconvolutionlab.Config;
 
-public class RichardsonLucyPanel extends AbstractAlgorithmPanel implements ChangeListener {
+public class RichardsonLucyPanel extends AlgorithmPanel implements ChangeListener {
 
 	private SpinnerRangeInteger	spnIter	= new SpinnerRangeInteger(10, 1, 99999, 1);
 

@@ -38,7 +38,7 @@ import signal.Operations;
 import signal.RealSignal;
 import signal.SignalCollector;
 
-public class Convolution extends AbstractAlgorithm implements Callable<RealSignal> {
+public class Convolution extends Algorithm implements Callable<RealSignal> {
 
 	public Convolution() {
 		super();
@@ -97,7 +97,7 @@ public class Convolution extends AbstractAlgorithm implements Callable<RealSigna
 	}
 
 	@Override
-	public AbstractAlgorithm setParameters(double... params) {
+	public Algorithm setParameters(double... params) {
 		return this;
 	}
 

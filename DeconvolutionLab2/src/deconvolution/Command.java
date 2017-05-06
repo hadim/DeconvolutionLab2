@@ -40,8 +40,8 @@ import java.util.regex.Pattern;
 
 import bilib.tools.Files;
 import bilib.tools.NumFormat;
-import deconvolution.algorithm.AbstractAlgorithm;
 import deconvolution.algorithm.Algorithm;
+import deconvolution.algorithm.AlgorithmList;
 import deconvolution.algorithm.Controller;
 import deconvolutionlab.Constants;
 import deconvolutionlab.module.AbstractModule;
@@ -160,8 +160,8 @@ public class Command {
 		return controller;
 	}
 
-	public static AbstractAlgorithm decodeAlgorithm(String command) {
-		AbstractAlgorithm algo = Algorithm.getDefaultAlgorithm();
+	public static Algorithm decodeAlgorithm(String command) {
+		Algorithm algo = AlgorithmList.getDefaultAlgorithm();
 		ArrayList<Token> tokens = parse(command);
 		for (Token token : tokens) {
 			if (token.keyword.equalsIgnoreCase("-algorithm"))
@@ -246,9 +246,9 @@ public class Command {
 		return options;
 	}
 
-	public static AbstractAlgorithm decodeAlgorithm(Token token) {
+	public static Algorithm decodeAlgorithm(Token token) {
 		String option = token.option;
-		AbstractAlgorithm algo = Algorithm.createAlgorithm(option);
+		Algorithm algo = AlgorithmList.createAlgorithm(option);
 		double params[] = parseNumeric(token.parameters);
 
 		if (params != null) {

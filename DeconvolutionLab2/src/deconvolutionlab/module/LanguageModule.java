@@ -46,7 +46,7 @@ import bilib.component.HTMLPane;
 import deconvolution.Command;
 import deconvolution.Deconvolution;
 import deconvolution.Token;
-import deconvolution.algorithm.AbstractAlgorithm;
+import deconvolution.algorithm.Algorithm;
 import deconvolutionlab.Config;
 
 public class LanguageModule extends AbstractModule implements ActionListener {
@@ -146,7 +146,7 @@ public class LanguageModule extends AbstractModule implements ActionListener {
 		String cmd = Command.command();
 		Deconvolution d = new Deconvolution("Matlab", cmd);
 		String options = Command.extractOptions(cmd);
-		AbstractAlgorithm algo = d.getAlgorithm();
+		Algorithm algo = d.getAlgorithm();
 		if (algo == null)
 			return "ERROR";
 		String s = algo.getShortnames()[0];

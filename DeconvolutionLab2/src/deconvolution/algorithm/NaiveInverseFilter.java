@@ -38,7 +38,7 @@ import signal.Operations;
 import signal.RealSignal;
 import signal.SignalCollector;
 
-public class NaiveInverseFilter extends AbstractAlgorithm implements Callable<RealSignal> {
+public class NaiveInverseFilter extends Algorithm implements Callable<RealSignal> {
 
 	public NaiveInverseFilter() {
 		super();
@@ -97,7 +97,7 @@ public class NaiveInverseFilter extends AbstractAlgorithm implements Callable<Re
 	}
 
 	@Override
-	public AbstractAlgorithm setParameters(double... params) {
+	public Algorithm setParameters(double... params) {
 		return this;
 	}
 

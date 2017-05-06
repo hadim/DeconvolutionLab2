@@ -40,7 +40,7 @@ import signal.RealSignal;
 import signal.SignalCollector;
 import signal.factory.complex.ComplexSignalFactory;
 
-public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
+public class ICTM extends Algorithm implements Callable<RealSignal> {
 
 	private double	gamma	= 1.0;
 	private double	lambda	= 1.0;
@@ -120,7 +120,7 @@ public class ICTM extends AbstractAlgorithm implements Callable<RealSignal> {
 	}
 
 	@Override
-	public AbstractAlgorithm setParameters(double... params) {
+	public Algorithm setParameters(double... params) {
 		if (params == null)
 			return this;
 		if (params.length > 0)

@@ -35,7 +35,7 @@ import javax.swing.JPanel;
 
 import bilib.component.GridPanel;
 
-public class ConvolutionPanel extends AbstractAlgorithmPanel {
+public class ConvolutionPanel extends AlgorithmPanel {
 
 	private Convolution algo = new Convolution();
 

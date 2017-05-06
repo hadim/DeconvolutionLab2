@@ -44,7 +44,7 @@ import deconvolution.Command;
 import deconvolution.RegularizationPanel;
 import deconvolutionlab.Config;
 
-public class RegularizedInverseFilterPanel extends AbstractAlgorithmPanel implements KeyListener, ChangeListener {
+public class RegularizedInverseFilterPanel extends AlgorithmPanel implements KeyListener, ChangeListener {
 
 	private RegularizationPanel			reg;
 	private RegularizedInverseFilter	algo	= new RegularizedInverseFilter(0.1);

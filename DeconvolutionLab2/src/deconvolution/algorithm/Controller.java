@@ -64,6 +64,8 @@ import fft.FFT;
  * algorithm. It returns true if one the stopping criteria is true. The method
  * finish() is called when the algorithm is completely terminated.
  * 
+ * A timer is started to get the peak memory. 
+ * 
  * @author Daniel Sage
  *
  */
@@ -112,6 +114,11 @@ public class Controller {
 	
 	private String				algoName = "";
 
+	/**
+	 * Constructor.
+	 * 
+	 * One controller is always instantiated for every run of a algorithm.
+	 */
 	public Controller() {
 		doResidu = false;
 		doTime = false;
@@ -312,7 +319,7 @@ public class Controller {
 		return constraintMode.name().toLowerCase();
 	}
 
-	public String getStoppingCriteriaAsString(AbstractAlgorithm algo) {
+	public String getStoppingCriteriaAsString(Algorithm algo) {
 		String stop = algo.isIterative() ? "iterations limit=" + algo.getIterationsMax() + ", " : "direct, ";
 		stop += doTime ? ", time limit=" + NumFormat.nice(timeLimit * 1e-9) : " no time limit" + ", ";
 		stop += doResidu ? ", residu limit=" + NumFormat.nice(residuMin) : " no residu limit";

@@ -38,7 +38,7 @@ import signal.Operations;
 import signal.RealSignal;
 import signal.SignalCollector;
 
-public class NonStabilizedDivision extends AbstractAlgorithm implements Callable<RealSignal> {
+public class NonStabilizedDivision extends Algorithm implements Callable<RealSignal> {
 
 	public NonStabilizedDivision() {
 		super();
@@ -97,7 +97,7 @@ public class NonStabilizedDivision extends AbstractAlgorithm implements Callable
 	}
 
 	@Override
-	public AbstractAlgorithm setParameters(double... params) {
+	public Algorithm setParameters(double... params) {
 		return this;
 	}
 

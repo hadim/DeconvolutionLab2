@@ -52,7 +52,7 @@ import deconvolutionlab.Constants;
 import wavelets.AbstractWavelets;
 import wavelets.Wavelets;
 
-public class ISTAPanel extends AbstractAlgorithmPanel implements KeyListener, ActionListener, ChangeListener {
+public class ISTAPanel extends AlgorithmPanel implements KeyListener, ActionListener, ChangeListener {
 
 	private SpinnerRangeInteger	spnIter		= new SpinnerRangeInteger(10, 1, 99999, 1);
 	private SpinnerRangeDouble	spnStep		= new SpinnerRangeDouble(1, 0, 2, 0.1);

@@ -32,125 +32,448 @@
 package deconvolution.algorithm;
 
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-public class Algorithm {
+import signal.Constraint;
+import signal.RealSignal;
+import signal.SignalCollector;
+import signal.apodization.Apodization;
+import signal.padding.Padding;
+import bilib.tools.NumFormat;
+import deconvolution.Stats;
+import deconvolutionlab.Lab;
+import deconvolutionlab.monitor.Monitors;
+import deconvolutionlab.monitor.Verbose;
+import deconvolutionlab.output.Output;
+import deconvolutionlab.system.SystemInfo;
+import fft.AbstractFFT;
+import fft.FFT;
 
-	/** This is the static list of all available algorithms. */
-	private static ArrayList<AbstractAlgorithmPanel> list;
+/**
+ * This class is the common part of every algorithm of deconvolution.
+ * 
+ * @author Daniel Sage
+ * 
+ */
+public abstract class Algorithm implements Callable<RealSignal> {
 
-	static {
-		list = new ArrayList<AbstractAlgorithmPanel>();
-		list.add(new RegularizedInverseFilterPanel());
-		list.add(new TikhonovRegularizedInverseFilterPanel());
-		list.add(new NaiveInverseFilterPanel());
-		list.add(new FISTAPanel());
-		list.add(new ISTAPanel());
-		list.add(new LandweberPanel());
-		list.add(new LandweberPositivityPanel());
-		list.add(new StarkParkerPanel());
-		list.add(new RichardsonLucyPanel());
-		list.add(new RichardsonLucyTVPanel());
-		list.add(new TikhonovMillerPanel());
-		list.add(new ICTMPanel());
-		list.add(new VanCittertPanel());
-		list.add(new IdentityPanel());
-		list.add(new ConvolutionPanel());
-		list.add(new SimulationPanel());
-		list.add(new NonStabilizedDivisionPanel());
-	}
+	/** y is the input signal of the deconvolution. */
+	protected RealSignal			y;
 
-	public static ArrayList<AbstractAlgorithmPanel> getAvailableAlgorithms() {
-		return list;
+	/** h is the PSF signal for the deconvolution. */
+	protected RealSignal			h;
+
+	protected boolean				threaded;
+
+	/** Optimized implementation in term of memory footprint */
+	protected boolean				optimizedMemoryFootprint;
+
+	protected int iterMax = 0;
+	
+	protected AbstractFFT fft;
+	protected Controller controller;
+	
+	public Algorithm() {
+		setController(new Controller());
+		optimizedMemoryFootprint = true;
+		threaded = true;
+		fft = FFT.getFastestFFT().getDefaultFFT();
 	}
 	
-	public static AbstractAlgorithm getDefaultAlgorithm() {
-		return new Identity();
+	public Algorithm(Controller controller) {
+		this.controller = controller;
+		optimizedMemoryFootprint = true;
+		threaded = true;
+		fft = FFT.getFastestFFT().getDefaultFFT();
 	}
 
-	/** 
-	 * This static method return the algorithm specify by one of its shortname,
-	 * 
-	 * @param shortname
-	 * @return an algorithm
-	 */
-	public static AbstractAlgorithm createAlgorithm(String shortname) {
-		AbstractAlgorithm algo = getDefaultAlgorithm();
-		String n = shortname.trim().toLowerCase();
-		int i = 0;
+	public void setOptimizedMemoryFootprint(boolean optimizedMemoryFootprint) {
+		this.optimizedMemoryFootprint = optimizedMemoryFootprint;
+	}
 
-		if (list.get(i++).isNamed(n))
-			algo = new RegularizedInverseFilter(0.1);
-		else if (list.get(i++).isNamed(n))
-			algo =  new TikhonovRegularizedInverseFilter(1.0);
-		else if (list.get(i++).isNamed(n))
-			algo =  new NaiveInverseFilter();
-		else if (list.get(i++).isNamed(n))
-			algo =  new FISTA(10, 1, 1, "Haar", 3);
-		else if (list.get(i++).isNamed(n))
-			algo =  new ISTA(10, 1, 1, "Haar", 3);
-		else if (list.get(i++).isNamed(n))
-			algo =  new Landweber(10, 1);
-		else if (list.get(i++).isNamed(n))
-			algo =  new LandweberPositivity(10, 1);
-		else if (list.get(i++).isNamed(n))
-			algo =  new StarkParker(10, 1);
-		else if (list.get(i++).isNamed(n))
-			algo =  new RichardsonLucy(10);
-		else if (list.get(i++).isNamed(n))
-			algo =  new RichardsonLucyTV(10, 1);
-		else if (list.get(i++).isNamed(n))
-			algo =  new TikhonovMiller(10, 1, 0.1);
-		else if (list.get(i++).isNamed(n))
-			algo =  new ICTM(10, 1, 0.1);
-		else if (list.get(i++).isNamed(n))
-			algo =  new VanCittert(10, 1);
-		else if (list.get(i++).isNamed(n))
-			algo =  new Identity();
-		else if (list.get(i++).isNamed(n))
-			algo =  new Convolution();
-		else if (list.get(i++).isNamed(n))
-			algo =  new Simulation(0, 1, 0);
-		else if (list.get(i++).isNamed(n))
-			algo =  new NonStabilizedDivision();
-		else
-			algo =  getDefaultAlgorithm();
+	public abstract String getName();
+	public abstract String[] getShortnames();
+	public abstract double getMemoryFootprintRatio();
+	public abstract int getComplexityNumberofFFT();
+	public abstract boolean isRegularized();
+	public abstract boolean isStepControllable();
+	public abstract boolean isIterative();
+	public abstract boolean isWaveletsBased();
+	public abstract Algorithm setParameters(double... params);
+	public abstract double getRegularizationFactor();
+	public abstract double getStepFactor();
+	public abstract double[] getParameters();
+
+	public abstract double[] getDefaultParameters();
+
+	public RealSignal run(RealSignal image, RealSignal psf) {
+
+		String sn = getShortnames()[0];
+		String algoParam = sn + "(" + getParametersAsString() + ")";
+		if (controller.isSystem())
+			SystemInfo.activate();
+
+		Padding pad = controller.getPadding();
+		Apodization apo = controller.getApodization();
+		double norm = controller.getNormalizationPSF();
 		
-		return algo;
+		controller.setAlgoName(algoParam);
+		fft = controller.getFFT();
+		controller.setIterationsMax(iterMax);
+
+		if (image == null)
+			return null;
+		
+		if (psf == null)
+			return null;
+		
+		// Prepare the controller and the outputs
+
+		Monitors monitors = controller.getMonitors();
+		monitors.setVerbose(controller.getVerbose());
+		monitors.log("Path: " + controller.toStringPath());
+		monitors.log("Algorithm: " + getName());
+		
+		// Prepare the signal and the PSF
+		y = pad.pad(monitors, image);
+		y.setName("y");
+		apo.apodize(monitors, y);
+		monitors.log("Input: " + y.dimAsString());
+		h = psf.changeSizeAs(y);
+		h.setName("h");
+		h.normalize(norm);
+		monitors.log("PSF: " + h.dimAsString() + " normalized " + (norm <= 0 ? "no" : norm));
+
+		String iterations = (isIterative() ? iterMax + " iterations" : "direct");
+
+		controller.setIterationsMax(iterMax);
+		
+		monitors.log(sn + " is starting (" + iterations + ")");
+		controller.setMonitors(monitors);
+	
+		controller.start(y);
+		h.circular();
+
+		// FFT
+		fft.init(monitors, y.nx, y.ny, y.nz);
+		controller.setFFT(fft);
+		
+		monitors.log(sn + " data ready");
+		monitors.log(algoParam);
+
+		RealSignal x = null;
+
+		try {
+			if (threaded == true) {
+				ExecutorService pool = Executors.newSingleThreadExecutor();
+				Future<RealSignal> future = pool.submit(this);
+				x = future.get();
+			}
+			else {
+				x = call();
+			}
+		}
+		catch (InterruptedException ex) {
+			ex.printStackTrace();
+			x = y.duplicate();
+		}
+		catch (ExecutionException ex) {
+			ex.printStackTrace();
+			x = y.duplicate();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			x = y.duplicate();
+		}
+		SignalCollector.free(y);
+		SignalCollector.free(h);
+		x.setName("x");
+		RealSignal result = pad.crop(monitors, x);
+		
+		controller.finish(result);
+		monitors.log(getName() + " is finished");
+
+		SignalCollector.free(x);
+		
+		if (controller.isDisplayFinal())
+			Lab.show(monitors, result, "Final Display of " + sn);
+
+		result.setName("Out of " + algoParam);
+		
+		monitors.log("End of " + sn + " in " + NumFormat.seconds(controller.getTimeNano()) + " and " + controller.getMemoryAsString());
+
+		return result;
 	}
 
-	/** 
-	 * This static method return the panel associated with 
-	 * the algorithm specify by one of its shortname,
-	 * 
-	 * @param shortname
-	 * @return an algorithm's panel
-	 */
-	public static AbstractAlgorithmPanel getPanel(String shortname) {
-		for (AbstractAlgorithmPanel panel : getAvailableAlgorithms()) {
-			for(String sn : panel.getShortnames())
-				if (sn.equals(shortname.trim()))
-					return panel;
-			if (panel.getName().equals(shortname.trim()))
-				return panel;
-
-		}
-		return null;
+	public Algorithm noPopup() {
+		return this.disableDisplayFinal().disableSystem();
+	}
+	
+	public Algorithm setController(Controller controller) {
+		this.controller = controller;
+		return this;
 	}
 
-	public static ArrayList<String> getShortnames() {
-		ArrayList<String> list = new ArrayList<String>();
-		for (AbstractAlgorithmPanel algo : getAvailableAlgorithms()) {
-			for(String sn : algo.getShortnames())
-				list.add(sn);
-		}
-		return list;
+	public Controller getController() {
+		return controller;
 	}
 
-	public static String getDocumentation(String name) {
-		for (AbstractAlgorithmPanel algo : getAvailableAlgorithms()) {
-			if (name.equals(algo.getName()))
-				return algo.getDocumentation();
+	public int getIterationsMax() {
+		return iterMax;
+	}
+
+	public int getIterations() {
+		return controller.getIterations();
+	}
+
+	public double getTime() {
+		return controller.getTimeNano();
+	}
+
+	public double getMemory() {
+		return controller.getMemory();
+	}
+	
+	public double getResidu() {
+		return controller.getResidu();	
+	}
+	
+	public double getSNR() {
+		return controller.getSNR();	
+	}
+
+	public double getPSNR() {
+		return controller.getPSNR();	
+	}
+
+	public void setWavelets(String waveletsName) {
+	}
+
+	@Override
+	public String toString() {
+		String s = "";
+		s += getName();
+		s += (isIterative() ? ", " + iterMax + " iterations" : " (direct)");
+		s += (isRegularized() ? ", &lambda=" + NumFormat.nice(getRegularizationFactor()) : "");
+		s += (isStepControllable() ? ", &gamma=" + NumFormat.nice(getStepFactor()) : "");
+		return s;
+	}
+
+	public String getParametersAsString() {
+		double p[] = getParameters();
+		String param = "";
+		for (int i = 0; i < p.length; i++)
+			if (i == p.length - 1)
+				param += NumFormat.nice(p[i]);
+			else
+				param += NumFormat.nice(p[i]) + ", ";
+		return param;
+	}
+	
+
+	public AbstractFFT getFFT() {
+		return controller.getFFT();
+	}
+
+	public Algorithm setFFT(AbstractFFT fft) {
+		this.fft = fft;
+		controller.setFFT(fft);
+		return this;
+	}
+
+	public String getPath() {
+		return controller.getPath();
+	}
+
+	public Algorithm setPath(String path) {
+		controller.setPath(path);
+		return this;
+	}
+
+	public boolean isSystem() {
+		return controller.isSystem();
+	}
+
+	public Algorithm enableSystem() {
+		controller.setSystem(true);
+		return this;
+	}
+
+	public Algorithm disableSystem() {
+		controller.setSystem(false);
+		return this;
+	}
+
+	public boolean isMultithreading() {
+		return controller.isMultithreading();
+	}
+
+	public Algorithm enableMultithreading() {
+		controller.setMultithreading(true);
+		return this;
+	}
+
+	public Algorithm disableMultithreading() {
+		controller.setMultithreading(false);
+		return this;
+	}
+
+	public boolean isDisplayFinal() {
+		return controller.isDisplayFinal();
+	}
+
+	public Algorithm enableDisplayFinal() {
+		controller.setDisplayFinal(true);
+		return this;
+	}
+
+	public Algorithm disableDisplayFinal() {
+		controller.setDisplayFinal(false);
+		return this;
+	}
+
+	public double getNormalizationPSF() {
+		return controller.getNormalizationPSF();
+	}
+
+	public Algorithm setNormalizationPSF(double normalizationPSF) {
+		controller.setNormalizationPSF(normalizationPSF);
+		return this;
+	}
+
+	public double getEpsilon() {
+		return controller.getEpsilon();
+	}
+
+	public Algorithm setEpsilon(double epsilon) {
+		controller.setEpsilon(epsilon);
+		return this;
+	}
+
+	public Padding getPadding() {
+		return controller.getPadding();
+	}
+
+	public Algorithm setPadding(Padding padding) {
+		controller.setPadding(padding);
+		return this;
+	}
+
+	public Apodization getApodization() {
+		return controller.getApodization();
+	}
+
+	public Algorithm setApodization(Apodization apodization) {
+		controller.setApodization(apodization);
+		return this;
+	}
+
+	public Monitors getMonitors() {
+		return controller.getMonitors();
+	}
+
+	public Algorithm setMonitors(Monitors monitors) {
+		controller.setMonitors(monitors);
+		return this;
+	}
+
+	public Verbose getVerbose() {
+		return controller.getVerbose();
+	}
+
+	public Algorithm setVerbose(Verbose verbose) {
+		controller.setVerbose(verbose);
+		return this;
+	}
+
+	public Constraint.Mode getConstraint() {
+		return controller.getConstraint();
+	}
+
+	public Algorithm setConstraint(Constraint.Mode constraint) {
+		controller.setConstraint(constraint);
+		return this;
+	}
+
+	public Stats getStats() {
+		return controller.getStats();
+	}
+
+	public Algorithm setStats(Stats stats) {
+		controller.setStats(stats);
+		return this;
+	}
+	
+	public Algorithm showStats() {
+		controller.setStats(new Stats(Stats.Mode.SHOW));
+		return this;
+	}
+	
+	public Algorithm saveStats(Stats stats) {
+		controller.setStats(new Stats(Stats.Mode.SAVE));
+		return this;
+	}
+	
+	public Algorithm setStats() {
+		controller.setStats(new Stats(Stats.Mode.SHOWSAVE));
+		return this;
+	}
+	
+	public double getResiduMin() {
+		return controller.getResiduMin();
+	}
+
+	public Algorithm setResiduMin(double residuMin) {
+		controller.setResiduMin(residuMin);
+		return this;
+	}
+
+	public double getTimeLimit() {
+		return controller.getTimeLimit();
+	}
+
+	public Algorithm setTimeLimit(double timeLimit) {
+		controller.setTimeLimit(timeLimit);
+		return this;
+	}
+
+	public RealSignal getReference() {
+		return controller.getReference();
+	}
+
+	public Algorithm setReference(RealSignal ref) {
+		controller.setReference(ref);
+		return this;
+	}
+
+	public ArrayList<Output> getOuts() {
+		return controller.getOuts();
+	}
+
+	public Algorithm setOuts(ArrayList<Output> outs) {
+		controller.setOuts(outs);
+		return this;
+	}
+
+	public Algorithm addOutput(Output out) {
+		controller.addOutput(out);
+		return this;
+	}
+	
+	public String getParametersToString() {
+		double params[] = getParameters();
+		if (params != null) {
+			if (params.length > 0) {
+				String s = " ";
+				for (double param : params)
+					s += NumFormat.nice(param) + " ";
+				return s;
+			}
 		}
-		return "Unknown Algorithm";
+		return "parameter-free";
 	}
 }

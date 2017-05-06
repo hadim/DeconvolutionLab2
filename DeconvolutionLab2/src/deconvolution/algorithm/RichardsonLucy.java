@@ -38,7 +38,7 @@ import signal.Operations;
 import signal.RealSignal;
 import signal.SignalCollector;
 
-public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSignal> {
+public class RichardsonLucy extends Algorithm implements Callable<RealSignal> {
 
 	public RichardsonLucy(int iterMax) {
 		super();
@@ -111,7 +111,7 @@ public class RichardsonLucy extends AbstractAlgorithm implements Callable<RealSi
 	}
 
 	@Override
-	public AbstractAlgorithm setParameters(double... params) {
+	public Algorithm setParameters(double... params) {
 		if (params == null)
 			return this;
 		if (params.length > 0)

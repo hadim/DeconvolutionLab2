@@ -39,7 +39,7 @@ import signal.Operations;
 import signal.RealSignal;
 import signal.SignalCollector;
 
-public class Simulation extends AbstractAlgorithm implements Callable<RealSignal> {
+public class Simulation extends Algorithm implements Callable<RealSignal> {
 
 	private static PsRandom rand = new PsRandom(1234);
 
@@ -134,7 +134,7 @@ public class Simulation extends AbstractAlgorithm implements Callable<RealSignal
 	}
 	
 	@Override
-	public AbstractAlgorithm setParameters(double... params) {
+	public Algorithm setParameters(double... params) {
 		if (params == null)
 			return this;
 		if (params.length > 0)

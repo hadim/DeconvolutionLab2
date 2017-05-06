@@ -35,7 +35,7 @@ import javax.swing.JPanel;
 
 import bilib.component.GridPanel;
 
-public class NonStabilizedDivisionPanel extends AbstractAlgorithmPanel {
+public class NonStabilizedDivisionPanel extends AlgorithmPanel {
 
 	private NonStabilizedDivision algo = new NonStabilizedDivision();
 

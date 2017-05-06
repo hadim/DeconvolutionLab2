@@ -35,7 +35,7 @@ import javax.swing.JPanel;
 
 import bilib.component.GridPanel;
 
-public class IdentityPanel extends AbstractAlgorithmPanel {
+public class IdentityPanel extends AlgorithmPanel {
 
 	private Identity algo = new Identity();
 

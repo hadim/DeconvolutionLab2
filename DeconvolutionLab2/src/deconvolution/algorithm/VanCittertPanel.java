@@ -43,7 +43,7 @@ import deconvolution.Command;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 
-public class VanCittertPanel extends AbstractAlgorithmPanel implements ChangeListener {
+public class VanCittertPanel extends AlgorithmPanel implements ChangeListener {
 
 	private SpinnerRangeInteger	spnIter	= new SpinnerRangeInteger(10, 1, 99999, 1);
 	private SpinnerRangeDouble	spnStep	= new SpinnerRangeDouble(1, 0, 2, 0.1);
