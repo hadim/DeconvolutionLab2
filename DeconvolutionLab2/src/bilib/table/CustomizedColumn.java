@@ -29,24 +29,31 @@
 
 package bilib.table;
 
+/**
+ * This class allows to customized the columns of the CustomizedTable tables.
+ * 
+ * @author Daniel Sage
+ * 
+ */
 public class CustomizedColumn {
-	public Class<?>	classe;
-	public String	header;
-	public int		width;
-	public boolean	editable;
-	public String[]	choices;	// Combobox
-	public String	button;		// Button
-	public String	tooltip;	
 
-	public CustomizedColumn(String header, Class<?> classe, int width, boolean editable) {
-		this.classe = classe;
+	private Class<?>	columnClasse; // usually it is a String
+	private String	 	header;
+	private boolean		editable;
+	private int	     	width;
+	private String[]	choices;	  // ComboBox
+	private String	 	button;	      // Button
+	private String	 	tooltip;
+
+	public CustomizedColumn(String header, Class<?> columnClasse, int width, boolean editable) {
+		this.columnClasse = columnClasse;
 		this.header = header;
 		this.width = width;
 		this.editable = editable;
 	}
 
 	public CustomizedColumn(String header, Class<?> classe, int width, String[] choices, String tooltip) {
-		this.classe = classe;
+		this.columnClasse = classe;
 		this.header = header;
 		this.width = width;
 		this.editable = true;
@@ -54,12 +61,40 @@ public class CustomizedColumn {
 		this.tooltip = tooltip;
 	}
 
-	public CustomizedColumn(String header, Class<?> classe, int width, String button, String tooltip) {
-		this.classe = classe;
+	public CustomizedColumn(String header, Class<?> columnClasse, int width, String button, String tooltip) {
+		this.columnClasse = columnClasse;
 		this.header = header;
 		this.width = width;
 		this.editable = false;
 		this.button = button;
 		this.tooltip = tooltip;
 	}
+
+	public Class<?> getColumnClass() {
+		return columnClasse;
+	}
+	
+	public String getHeader() {
+		return header;
+	}
+	
+	public boolean isEditable() {
+		return editable;
+	}
+	
+	public int	getWidth()  {
+		return width;
+	}
+	
+	public String[] getChoices()  {
+		return choices;
+	}
+	
+	public String getButton()  {
+		return button;
+	} 
+	
+	public String getTooltip()  {
+		return tooltip;
+	} 
 }

@@ -33,11 +33,11 @@ package deconvolution.algorithm;
 
 import java.util.concurrent.Callable;
 
-import bilib.tools.PsRandom;
 import signal.ComplexSignal;
 import signal.Operations;
 import signal.RealSignal;
 import signal.SignalCollector;
+import bilib.tools.PsRandom;
 
 public class Simulation extends Algorithm implements Callable<RealSignal> {
 
@@ -73,7 +73,6 @@ public class Simulation extends Algorithm implements Callable<RealSignal> {
 		for (int k = 0; k < x.nz; k++) {
 			float[] slice = x.getXY(k);
 			for (int j = 0; j < x.ny * x.nx; j++) {
-				double a = slice[j];
 				slice[j] += (float) rand.nextGaussian(mean, sd);
 			}
 		}

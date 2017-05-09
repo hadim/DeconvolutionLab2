@@ -49,7 +49,7 @@ public class FFTMeter extends AbstractMeter {
 	}
 
 	@Override
-	public String getName() {
+	public String getMeterName() {
 		return "FFT";
 	}
 

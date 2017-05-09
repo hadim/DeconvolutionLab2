@@ -199,7 +199,17 @@ public class SyntheticDialog extends JDialog implements ActionListener, WindowLi
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == bnShow) {
 			SignalFactory factory = SignalFactory.get((String) cmbShapes.getSelectedItem());
-			double params[] = factory.getParameters();
+			int np = factory.getParameters().length;
+			double params[] = new double[np];
+			if (np >= 1)
+				params[0] = spnParameter1.get();
+			if (np >= 2)
+				params[1] = spnParameter2.get();
+			if (np >= 3)
+				params[2] = spnParameter3.get();
+			if (np >= 4)
+				params[3] = spnParameter4.get();
+	
 			factory.setParameters(params);
 			factory.intensity(spnIntensity.get());
 			factory.center(spnCenterX.get(), spnCenterY.get(), spnCenterZ.get());

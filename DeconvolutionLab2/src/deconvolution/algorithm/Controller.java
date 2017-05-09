@@ -190,7 +190,7 @@ public class Controller {
 		if (doConstraint && x != null)
 			Constraint.setModel(x);
 
-		if (doReference) {
+		if (doReference && refImage == null) {
 			refImage = new Deconvolution("Reference", "-image file " + referenceName).openImage();
 			if (refImage == null)
 				monitors.error("Impossible to load the reference image " + referenceName);

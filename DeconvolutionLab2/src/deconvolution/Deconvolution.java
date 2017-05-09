@@ -31,21 +31,18 @@
 
 package deconvolution;
 
-import ij.IJ;
-
 import java.io.File;
 
+import signal.RealSignal;
+import signal.SignalCollector;
 import bilib.tools.NumFormat;
 import deconvolution.algorithm.Algorithm;
 import deconvolution.algorithm.Controller;
 import deconvolutionlab.Lab;
 import deconvolutionlab.monitor.AbstractMonitor;
 import deconvolutionlab.monitor.Monitors;
-import deconvolutionlab.monitor.StatusMonitor;
 import deconvolutionlab.monitor.TableMonitor;
 import deconvolutionlab.output.Output;
-import signal.RealSignal;
-import signal.SignalCollector;
 
 /**
  * This class is the main class to run deconvolution with or without user interface.
@@ -62,17 +59,16 @@ public class Deconvolution implements Runnable {
 	};
 
 	private Algorithm					algo				= null;
-	private Controller							controller 			= new Controller();
-	private String								command				= "";
-	private Features							report				= new Features();
-	private String								name				= "";
-	public RealSignal							image;
-	public RealSignal							psf;
-	private RealSignal							deconvolvedImage;
-	private Finish								finish				= Finish.DIE;
-	private DeconvolutionDialog					dialog;
-	
-	private boolean embeddedStats 			=			false;
+	private Controller					controller 			= new Controller();
+	private String						command				= "";
+	private Features					report				= new Features();
+	private String						name				= "";
+	public RealSignal					image;
+	public RealSignal					psf;
+	private RealSignal					deconvolvedImage;
+	private Finish						finish				= Finish.DIE;
+	private DeconvolutionDialog			dialog;
+	private boolean 					embeddedStats 		= false;
 	
 	public Deconvolution(String name, String command) {
 		this.name = name;
@@ -232,11 +228,11 @@ public class Deconvolution implements Runnable {
 	 */
 	public Features recap() {
 		Features features = new Features();
-		Token image = Command.extract(command, "-image");
+		CommandToken image = Command.extract(command, "-image");
 		features.add("Image", image == null ? "keyword -image not found" : image.parameters);
 		double norm = controller.getNormalizationPSF();
 		String normf = (norm < 0 ? " (no normalization)" : " (normalization to " + norm + ")");
-		Token psf = Command.extract(command, "-psf");
+		CommandToken psf = Command.extract(command, "-psf");
 		features.add("PSF", psf == null ? "keyword -psf not found" : psf.parameters + " norm:" + normf);
 
 		if (algo == null) {
@@ -291,7 +287,7 @@ public class Deconvolution implements Runnable {
 	}
 
 	public RealSignal openImage() {
-		Token token = Command.extract(command, "-image");
+		CommandToken token = Command.extract(command, "-image");
 
 		if (token == null)
 			return null;
@@ -309,7 +305,7 @@ public class Deconvolution implements Runnable {
 	}
 
 	public RealSignal openPSF() {
-		Token token = Command.extract(command, "-psf");
+		CommandToken token = Command.extract(command, "-psf");
 		if (token == null)
 			return null;
 		if (token.parameters.startsWith(">>>"))

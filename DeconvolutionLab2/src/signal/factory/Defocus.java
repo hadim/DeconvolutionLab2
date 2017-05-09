@@ -87,7 +87,6 @@ public class Defocus extends SignalFactory {
 				sigmaZ += sigma * alw * (z-zc)*(z-zc);
 				
 			double K = 1.0 / (2.0*sigmaZ*sigmaZ);
-			double A = A0 / (sigmaZ * sigmaZ * 2);		
 			for(int x=0; x<nx; x++)
 			for(int y=0; y<ny; y++) {
 				double r2 = (x-xc)*(x-xc) + (y-yc)*(y-yc);

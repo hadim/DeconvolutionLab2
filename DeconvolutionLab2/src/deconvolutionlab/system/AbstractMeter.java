@@ -87,7 +87,7 @@ public abstract class AbstractMeter extends JButton {
 		return panel;
 	}
 
-	public abstract String getName();
+	public abstract String getMeterName();
 	public abstract void setDetail();
 	
 	public void update() {

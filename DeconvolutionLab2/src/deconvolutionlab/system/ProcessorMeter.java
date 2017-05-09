@@ -68,7 +68,7 @@ public class ProcessorMeter extends AbstractMeter {
  	}
 
 	@Override
-	public String getName() {
+	public String getMeterName() {
 		return "Processor";
 	}
 

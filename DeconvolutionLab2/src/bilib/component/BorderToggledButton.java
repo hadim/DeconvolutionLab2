@@ -42,6 +42,7 @@ public class BorderToggledButton extends JButton {
 		setMargin(new Insets(1, 1, 1, 1));
 	}
 
+	@Override
 	public void setSelected(boolean selected) {
 		if (selected)
 			setText("<html><b>" + text + "</b></html>");

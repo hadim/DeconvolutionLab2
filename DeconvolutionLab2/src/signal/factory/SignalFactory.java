@@ -35,9 +35,9 @@ import java.util.ArrayList;
 
 import javax.swing.SwingWorker;
 
+import signal.RealSignal;
 import bilib.tools.NumFormat;
 import deconvolution.Command;
-import signal.RealSignal;
 
 public abstract class SignalFactory {
 
@@ -261,12 +261,14 @@ public abstract class SignalFactory {
 			done = false;
 		}
 		
+		@Override
 		protected RealSignal doInBackground() throws Exception {
 			fill(signal);
 			done = true;
 			return signal;
 		}
 
+		@Override
 		protected void done() {
 			done = true;
 		}

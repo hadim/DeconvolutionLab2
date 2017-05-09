@@ -58,16 +58,23 @@
  * 
  * You should have received a copy of the GNU General Public License along with
  * DL2. If not, see <http://www.gnu.org/licenses/>.
- */package deconvolution;
+ */
 
+package deconvolution;
 
-public class Token {
+/**
+ * This class is the basic component of the command.
+ * 
+ * @author Daniel Sage
+ *
+ */
+public class CommandToken {
 	
 	public String	keyword;
 	public String	parameters	= "?";
 	public String	option  = "?";	
 
-	public Token(String keyword, String command, int begin, int end) {
+	public CommandToken(String keyword, String command, int begin, int end) {
 		this.keyword = keyword;
 		try {
 			this.parameters = command.substring(begin, end).trim();

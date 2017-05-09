@@ -33,6 +33,13 @@ import deconvolutionlab.Imager;
 import deconvolutionlab.Lab;
 import ij.plugin.PlugIn;
 
+/**
+ * This class only opens the current browser on the webpage of the Deconvoltuinlab2
+ * documentation.
+ * 
+ * @author Daniel Sage
+ *
+ */
 public class DeconvolutionLab2_Help implements PlugIn {
 
 	@Override

@@ -31,6 +31,9 @@
 
 package deconvolutionlab;
 
+import ij.gui.Plot;
+import imagej.IJImager;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -39,6 +42,12 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import plugins.sage.deconvolutionlab.IcyImager;
+import signal.ComplexComponent;
+import signal.ComplexSignal;
+import signal.RealSignal;
+import signal.factory.SignalFactory;
+import signal.factory.Sphere;
 import bilib.tools.Files;
 import bilib.tools.NumFormat;
 import bilib.tools.WebBrowser;
@@ -47,15 +56,6 @@ import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFT;
 import fft.AbstractFFTLibrary;
 import fft.FFT;
-import ij.IJ;
-import ij.gui.Plot;
-import imagej.IJImager;
-import plugins.sage.deconvolutionlab.IcyImager;
-import signal.ComplexComponent;
-import signal.ComplexSignal;
-import signal.RealSignal;
-import signal.factory.SignalFactory;
-import signal.factory.Sphere;
 
 /**
  * This class contains a collection of useful static methods to manage all the
@@ -191,6 +191,18 @@ public class Lab {
 			return;
 		}
 		imaging.show(signal, signal.name, Imager.Type.FLOAT, signal.nz / 2);
+	}
+
+	/**
+	 * Displays a real 3D signal a z-stack of images.
+	 * 
+	 * @param signal
+	 */
+	public static void show(RealSignal signal, String title) {
+		if (signal == null) {
+			return;
+		}
+		imaging.show(signal, title, Imager.Type.FLOAT, signal.nz / 2);
 	}
 
 	/**

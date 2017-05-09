@@ -33,22 +33,20 @@ package deconvolution.capsule;
 
 import javax.swing.JSplitPane;
 
-import com.esotericsoftware.minlog.Log;
-
+import signal.ComplexSignal;
+import signal.RealSignal;
+import signal.SignalCollector;
 import bilib.component.HTMLPane;
 import bilib.table.CustomizedTable;
 import bilib.tools.NumFormat;
 import deconvolution.Deconvolution;
 import deconvolution.Features;
 import deconvolution.algorithm.Algorithm;
-import deconvolution.algorithm.AlgorithmPanel;
 import deconvolution.algorithm.AlgorithmList;
+import deconvolution.algorithm.AlgorithmPanel;
 import deconvolutionlab.monitor.Monitors;
 import fft.AbstractFFT;
 import fft.FFT;
-import signal.ComplexSignal;
-import signal.RealSignal;
-import signal.SignalCollector;
 
 /**
  * This class is a information module for the algorithm.

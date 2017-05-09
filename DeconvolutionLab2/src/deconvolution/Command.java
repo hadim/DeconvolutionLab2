@@ -31,13 +31,20 @@
 
 package deconvolution;
 
-import ij.IJ;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import signal.Constraint;
+import signal.Operations;
+import signal.apodization.AbstractApodization;
+import signal.apodization.Apodization;
+import signal.apodization.UniformApodization;
+import signal.padding.AbstractPadding;
+import signal.padding.NoPadding;
+import signal.padding.Padding;
+import wavelets.Wavelets;
 import bilib.tools.Files;
 import bilib.tools.NumFormat;
 import deconvolution.algorithm.Algorithm;
@@ -53,15 +60,6 @@ import deconvolutionlab.monitor.Verbose;
 import deconvolutionlab.output.Output;
 import deconvolutionlab.output.Output.View;
 import fft.FFT;
-import signal.Constraint;
-import signal.Operations;
-import signal.apodization.AbstractApodization;
-import signal.apodization.Apodization;
-import signal.apodization.UniformApodization;
-import signal.padding.AbstractPadding;
-import signal.padding.NoPadding;
-import signal.padding.Padding;
-import wavelets.Wavelets;
 
 public class Command {
 
@@ -91,8 +89,8 @@ public class Command {
 
 		Controller controller = new Controller();
 		
-		ArrayList<Token> tokens = parse(command);
-		for (Token token : tokens) {
+		ArrayList<CommandToken> tokens = parse(command);
+		for (CommandToken token : tokens) {
 			if (token.keyword.equalsIgnoreCase("-path")) {
 				if (token.parameters.trim().equals("current"))
 					controller.setPath(Files.getWorkingDirectory());
@@ -162,8 +160,8 @@ public class Command {
 
 	public static Algorithm decodeAlgorithm(String command) {
 		Algorithm algo = AlgorithmList.getDefaultAlgorithm();
-		ArrayList<Token> tokens = parse(command);
-		for (Token token : tokens) {
+		ArrayList<CommandToken> tokens = parse(command);
+		for (CommandToken token : tokens) {
 			if (token.keyword.equalsIgnoreCase("-algorithm"))
 				algo = Command.decodeAlgorithm(token);
 		}
@@ -178,30 +176,30 @@ public class Command {
 	 *            Command line
 	 * @return the list of tokens extracted from the command line
 	 */
-	public static ArrayList<Token> parse(String command) {
+	public static ArrayList<CommandToken> parse(String command) {
 
 		ArrayList<CommandSegment> segments = new ArrayList<CommandSegment>();
 		for (String keyword : keywords)
 			segments.addAll(findSegment(command, keyword));
 		Collections.sort(segments);
 
-		ArrayList<Token> tokens = new ArrayList<Token>();
+		ArrayList<CommandToken> tokens = new ArrayList<CommandToken>();
 		for (int i = 0; i < segments.size(); i++) {
 			String keyword = segments.get(i).keyword;
 			int begin = segments.get(i).index + keyword.length() + 1;
 			int end = (i < segments.size() - 1 ? segments.get(i + 1).index : command.length());
-			Token token = new Token(keyword, command, begin, end);
+			CommandToken token = new CommandToken(keyword, command, begin, end);
 			tokens.add(token);
 		}
 		return tokens;
 	}
 
-	public static Token extract(String command, String keyword) {
-		ArrayList<Token> tokens = parse(command);
-		for (Token token : tokens)
+	public static CommandToken extract(String command, String keyword) {
+		ArrayList<CommandToken> tokens = parse(command);
+		for (CommandToken token : tokens)
 			if (token.keyword.equalsIgnoreCase(keyword))
 				return token;
-		return (Token) null;
+		return (CommandToken) null;
 	}
 
 	public static double[] parseNumeric(String line) {
@@ -246,7 +244,7 @@ public class Command {
 		return options;
 	}
 
-	public static Algorithm decodeAlgorithm(Token token) {
+	public static Algorithm decodeAlgorithm(CommandToken token) {
 		String option = token.option;
 		Algorithm algo = AlgorithmList.createAlgorithm(option);
 		double params[] = parseNumeric(token.parameters);
@@ -265,7 +263,7 @@ public class Command {
 		return algo;
 	}
 
-	public static Output decodeOut(Token token) {
+	public static Output decodeOut(CommandToken token) {
 		int freq = 0;
 		String line = token.parameters;
 		String parts[] = token.parameters.split(" ");
@@ -292,14 +290,14 @@ public class Command {
 		return out;
 	}
 
-	public static double decodeNormalization(Token token) {
+	public static double decodeNormalization(CommandToken token) {
 		if (token.parameters.toLowerCase().endsWith("no"))
 			return 0;
 		else
 			return NumFormat.parseNumber(token.parameters, 1);
 	}
 
-	public static Stats decodeStats(Token token) {
+	public static Stats decodeStats(CommandToken token) {
 		String parts[] = token.parameters.toLowerCase().split(" ");
 		int m = 0;
 		for (String p : parts) {
@@ -326,7 +324,7 @@ public class Command {
 
 	}
 
-	public static Constraint.Mode decodeConstraint(Token token) {
+	public static Constraint.Mode decodeConstraint(CommandToken token) {
 		String p = token.parameters.toLowerCase();
 		if (p.startsWith("non"))
 			return Constraint.Mode.NONNEGATIVE;
@@ -339,21 +337,21 @@ public class Command {
 		return Constraint.Mode.NO;
 	}
 
-	public static double decodeResidu(Token token) {
+	public static double decodeResidu(CommandToken token) {
 		if (token.parameters.toLowerCase().endsWith("no"))
 			return -1;
 		else
 			return NumFormat.parseNumber(token.parameters, 1);
 	}
 	
-	public static double decodeTimeLimit(Token token) {
+	public static double decodeTimeLimit(CommandToken token) {
 		if (token.parameters.toLowerCase().endsWith("no"))
 			return -1;
 		else
 			return NumFormat.parseNumber(token.parameters, 1);
 	}
 
-	public static Padding decodePadding(Token token) {
+	public static Padding decodePadding(CommandToken token) {
 		AbstractPadding padXY = new NoPadding();
 		AbstractPadding padZ = new NoPadding();
 		String param = token.parameters.trim();
@@ -373,7 +371,7 @@ public class Command {
 		return new Padding(padXY, padXY, padZ, extXY, extXY, extZ);
 	}
 
-	public static Apodization decodeApodization(Token token) {
+	public static Apodization decodeApodization(CommandToken token) {
 		AbstractApodization apoXY = new UniformApodization();
 		AbstractApodization apoZ = new UniformApodization();
 		String[] parts = token.parameters.trim().split(" ");
@@ -386,9 +384,9 @@ public class Command {
 
 	public static String getPath() {
 		command();
-		ArrayList<Token> tokens = parse(command.getCommand());
+		ArrayList<CommandToken> tokens = parse(command.getCommand());
 		String path = System.getProperty("user.dir");
-		for (Token token : tokens)
+		for (CommandToken token : tokens)
 			if (token.keyword.equalsIgnoreCase("-path") && !token.parameters.equalsIgnoreCase("current"))
 				path = token.parameters;
 		return path;

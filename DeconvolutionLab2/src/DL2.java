@@ -46,7 +46,7 @@ import signal.RealSignal;
  * 
  * A Matlab 3D variable in converted to a RealSignal and vice-versa.
  * 
- * @author sage
+ * @author Daniel Sage
  *
  */
 public class DL2 {

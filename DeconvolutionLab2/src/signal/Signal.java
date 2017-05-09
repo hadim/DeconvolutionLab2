@@ -31,13 +31,22 @@
 
 package signal;
 
-import java.util.ArrayList;
-
+/**
+ * This class is an abstract class to store a 3D signal in a float array 'data'.
+ * The data are store in a 2D array, the first index represents the z direction
+ * and the second store a 2D plane in row-major representation.
+ * 
+ * There are two implementations of this class: RealSignal to store a real volume
+ * and ComplexSignal to store a complex signal in interleaving mode.
+ * 
+ * @author Daniel Sage
+ *
+ */
 public class Signal {
 
-	public int		nx = 0;
-	public int		ny;
-	public int		nz;
+	final public int nx;
+	final public int ny;
+	final public int nz;
 	public float	data[][];
 	public String	name = "untitled";
 	

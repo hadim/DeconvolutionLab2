@@ -51,7 +51,7 @@ public class JavaMeter extends AbstractMeter {
 	}
 
 	@Override
-	public String getName() {
+	public String getMeterName() {
 		return "Java";
 	}
 

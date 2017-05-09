@@ -29,14 +29,14 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import ij.IJ;
+import ij.plugin.PlugIn;
+
 import java.io.File;
 
-import bilib.tools.Files;
 import deconvolutionlab.Imager;
 import deconvolutionlab.Lab;
 import deconvolutionlab.LabDialog;
-import ij.IJ;
-import ij.plugin.PlugIn;
 
 public class DeconvolutionLab2_Lab implements PlugIn {
 

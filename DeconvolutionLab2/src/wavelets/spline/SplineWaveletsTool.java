@@ -109,7 +109,7 @@ public class SplineWaveletsTool {
 		}
 	}
 
-	private void splitMirror(float vin[], float vout[], double h[], double g[]) {
+	static private void splitMirror(float vin[], float vout[], double h[], double g[]) {
 		int n = vin.length;
 		int n2 = n / 2;
 		int nh = h.length;

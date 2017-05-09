@@ -49,10 +49,25 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
+/**
+ * This class build a table by extending JTable. Usually the contructor expects
+ * a list of CustomizedColumn objects that defines the columns of the table.
+ * 
+ * @author Daniel Sage
+ * 
+ */
+
 public class CustomizedTable extends JTable {
 
-	private JScrollPane					pane	= null;
+	private JScrollPane	                pane	= null;
 	private ArrayList<CustomizedColumn>	columns;
+
+	public CustomizedTable(ArrayList<CustomizedColumn> columns, boolean sortable) {
+		create(columns);
+		setAutoCreateRowSorter(sortable);
+		setRowHeight(20);
+	}
+
 
 	public CustomizedTable(String headers[], boolean sortable) {
 		ArrayList<CustomizedColumn> colums = new ArrayList<CustomizedColumn>();
@@ -63,23 +78,17 @@ public class CustomizedTable extends JTable {
 		setRowHeight(20);
 	}
 
-	public CustomizedTable(ArrayList<CustomizedColumn> columns, boolean sortable) {
-		create(columns);
-		setAutoCreateRowSorter(sortable);
-		setRowHeight(20);
-	}
-
 	private void create(ArrayList<CustomizedColumn> column) {
 		columns = column;
 		DefaultTableModel model = new DefaultTableModel() {
 			@Override
 			public boolean isCellEditable(int row, int col) {
-				return columns.get(col).editable;
+				return columns.get(col).isEditable();
 			}
 
 			@Override
 			public Class<?> getColumnClass(int col) {
-				return columns.get(col).classe;
+				return columns.get(col).getColumnClass();
 			}
 		};
 
@@ -87,26 +96,26 @@ public class CustomizedTable extends JTable {
 		int n = columns.size();
 		String headers[] = new String[n];
 		for (int col = 0; col < n; col++)
-			headers[col] = columns.get(col).header;
+			headers[col] = columns.get(col).getHeader();
 
 		model.setColumnIdentifiers(headers);
 		setFillsViewportHeight(true);
 
 		for (int col = 0; col < n; col++) {
 			TableColumn tc = getColumnModel().getColumn(col);
-			tc.setPreferredWidth(columns.get(col).width);
+			tc.setPreferredWidth(columns.get(col).getWidth());
 
-			if (columns.get(col).choices != null) {
+			if (columns.get(col).getChoices() != null) {
 				JComboBox<String> cmb = new JComboBox<String>();
-				for (String p : columns.get(col).choices) {
+				for (String p : columns.get(col).getChoices()) {
 					cmb.addItem(p);
-					cmb.setToolTipText(columns.get(col).tooltip);
+					cmb.setToolTipText(columns.get(col).getTooltip());
 					tc.setCellEditor(new DefaultCellEditor(cmb));
 				}
 			}
-			if (columns.get(col).button != null) {
+			if (columns.get(col).getButton() != null) {
 				ButtonRenderer bn = new ButtonRenderer();
-				bn.setToolTipText(columns.get(col).tooltip);
+				bn.setToolTipText(columns.get(col).getTooltip());
 				tc.setCellRenderer(bn);
 			}
 		}
@@ -118,13 +127,21 @@ public class CustomizedTable extends JTable {
 			pane.setPreferredSize(new Dimension(width, height));
 	}
 
+	/**
+	 * Removes one specify row from the table.
+	 * 
+	 * @param row	Row to remove
+	 */
 	public void removeRow(int row) {
 		if (row >= 0 && row < getRowCount())
 			((DefaultTableModel) getModel()).removeRow(row);
 	}
 
+	/**
+	 * Removes all rows of the table.
+	 */
 	public void removeRows() {
-		while(getRowCount() > 0)
+		while (getRowCount() > 0)
 			((DefaultTableModel) getModel()).removeRow(0);
 	}
 
@@ -145,7 +162,7 @@ public class CustomizedTable extends JTable {
 		}
 		return "";
 	}
-	
+
 	public void setCell(int row, int col, String value) {
 		if (row >= 0 && col >= 0) {
 			getModel().setValueAt(value, row, col);
@@ -159,7 +176,7 @@ public class CustomizedTable extends JTable {
 			for (int col = 0; col < ncol - 1; col++) {
 				if ((String) getModel().getValueAt(row, col) == null)
 					items += "" + seperator;
-				else 
+				else
 					items += (String) getModel().getValueAt(row, col) + seperator;
 			}
 			if (ncol >= 1)
@@ -169,6 +186,11 @@ public class CustomizedTable extends JTable {
 		return "";
 	}
 
+	/**
+	 * Saves the table in a CSV file
+	 * 
+	 * @param filename	Complete path and filename
+	 */
 	public void saveCSV(String filename) {
 		File file = new File(filename);
 		try {
@@ -178,7 +200,7 @@ public class CustomizedTable extends JTable {
 
 			String row = "";
 			for (int c = 0; c < columns.size(); c++)
-				row += columns.get(c).header + (c == columns.size() - 1 ? "" : ", ");
+				row += columns.get(c).getHeader() + (c == columns.size() - 1 ? "" : ", ");
 			buffer.write(row + "\n");
 
 			for (int r = 0; r < nrows; r++) {
@@ -210,6 +232,11 @@ public class CustomizedTable extends JTable {
 		}
 	}
 
+	/**
+	 * Add a row at the end of the table.
+	 * 
+	 * @param row
+	 */
 	public void append(Object[] row) {
 		DefaultTableModel model = (DefaultTableModel) getModel();
 		int i = 0;
@@ -226,6 +253,11 @@ public class CustomizedTable extends JTable {
 		repaint();
 	}
 
+	/**
+	 * Add a row at the top of the table.
+	 * 
+	 * @param row
+	 */
 	public void insert(Object[] row) {
 		DefaultTableModel model = (DefaultTableModel) getModel();
 		int i = 0;
@@ -252,6 +284,11 @@ public class CustomizedTable extends JTable {
 		return row;
 	}
 
+	/**
+	 * Replaces all the content of the table by a content private as list of String[].
+	 * 
+	 * @param data
+	 */
 	public void update(ArrayList<String[]> data) {
 		DefaultTableModel model = (DefaultTableModel) getModel();
 		model.getDataVector().removeAllElements();
@@ -284,10 +321,11 @@ public class CustomizedTable extends JTable {
 		frame.setVisible(true);
 		return frame;
 	}
+
 	public class ButtonRenderer extends JButton implements TableCellRenderer {
 		@Override
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-			setText((String)value);
+			setText((String) value);
 			setMargin(new Insets(1, 1, 1, 1));
 			return this;
 		}

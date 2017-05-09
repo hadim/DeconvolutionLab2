@@ -49,7 +49,7 @@ public class SignalMeter extends AbstractMeter {
 	}
 
 	@Override
-	public String getName() {
+	public String getMeterName() {
 		return "Signals";
 	}
 

@@ -48,12 +48,12 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import signal.SignalCollector;
 import bilib.component.PanelImage;
 import bilib.tools.NumFormat;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 import fft.FFTPanel;
-import signal.SignalCollector;
 
 public class SystemPanel extends JPanel implements ActionListener, MouseListener {
 
@@ -77,7 +77,6 @@ public class SystemPanel extends JPanel implements ActionListener, MouseListener
 
 	private static SystemPanel	instance;
 	private int					rate = 0;
-	private static JFrame frame;
 	
 	private ArrayList<AbstractMeter> meters = new ArrayList<AbstractMeter>();
 	
@@ -85,8 +84,6 @@ public class SystemPanel extends JPanel implements ActionListener, MouseListener
 		if (instance == null) {
 			instance = new SystemPanel();
 		}
-		frame = parent;
-		
 		return instance;
 	}
 	
