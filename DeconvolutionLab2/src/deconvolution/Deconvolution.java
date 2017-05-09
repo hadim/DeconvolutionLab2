@@ -99,6 +99,7 @@ public class Deconvolution implements Runnable {
 	public RealSignal deconvolve(RealSignal image, RealSignal psf) {
 		this.image = image;
 		this.psf = psf;
+		
 		for(AbstractMonitor monitor : controller.getMonitors())
 			if (monitor instanceof TableMonitor)
 				Lab.setVisible(((TableMonitor)monitor).getPanel(), "Monitor of " + name, 10, 10);
@@ -153,8 +154,9 @@ public class Deconvolution implements Runnable {
 		report.add("Image", image.dimAsString());
 		monitors.log("Image: " + image.dimAsString());
 
-		psf = openPSF();
-
+		if (psf == null)
+			psf = openPSF();
+		
 		if (psf == null) {
 			monitors.error("PSF: not valid");
 			report.add("PSF", "Not valid");
@@ -305,6 +307,7 @@ public class Deconvolution implements Runnable {
 	}
 
 	public RealSignal openPSF() {
+		
 		CommandToken token = Command.extract(command, "-psf");
 		if (token == null)
 			return null;
