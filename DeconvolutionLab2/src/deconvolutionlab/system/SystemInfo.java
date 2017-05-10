@@ -144,12 +144,12 @@ public class SystemInfo extends JDialog implements WindowListener, ActionListene
 		// Panel cards, compact is visible
 		cards = new JPanel(new CardLayout());
 		cards.add("collapse", pnCompact);
-		cards.add(signal.getName(), SignalCollector.getPanel(width, 200));
-		cards.add(memory.getName(), memory.getPanel(width, 200));
-		cards.add(processor.getName(), processor.getPanel(width, 200));
-		cards.add(fft.getName(), new FFTPanel(width, 200));
-		cards.add(java.getName(), java.getPanel(width, 200));
-		cards.add(file.getName(), file.getPanel(width, 200));
+		cards.add(signal.getMeterName(), SignalCollector.getPanel(width, 200));
+		cards.add(memory.getMeterName(), memory.getPanel(width, 200));
+		cards.add(processor.getMeterName(), processor.getPanel(width, 200));
+		cards.add(fft.getMeterName(), new FFTPanel(width, 200));
+		cards.add(java.getMeterName(), java.getPanel(width, 200));
+		cards.add(file.getMeterName(), file.getPanel(width, 200));
 
 		cards.setVisible(false);
 		JPanel top = new JPanel(new BorderLayout());
@@ -232,7 +232,7 @@ public class SystemInfo extends JDialog implements WindowListener, ActionListene
 				meter.expand();
 				cards.setVisible(true);
 			}
-			((CardLayout) (cards.getLayout())).show(cards, meter.getName());
+			((CardLayout) (cards.getLayout())).show(cards, meter.getMeterName());
 			pack();
 		}
 		bnClear.setEnabled(signal.isExpanded());

@@ -47,8 +47,8 @@ import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
@@ -56,13 +56,14 @@ import bilib.component.GridPanel;
 import bilib.tools.Files;
 import deconvolution.Command;
 import deconvolutionlab.Config;
-import deconvolutionlab.system.SystemInfo;
+import deconvolutionlab.Lab;
 
 public class DirectoryModule extends AbstractModule implements ActionListener, KeyListener {
 
 	private JComboBox<String>	cmbPath;
 	private JTextField			txtPath;
 	private JButton				bnBrowse;	
+	private JLabel				platform;
 
 	public DirectoryModule() {
 		super("Path", "", "Default", "");
@@ -84,13 +85,15 @@ public class DirectoryModule extends AbstractModule implements ActionListener, K
 	public JPanel buildExpandedPanel() {
 		cmbPath = new JComboBox<String>(new String[] { "current", "home", "desktop", "specify ..."});
 		txtPath = new JTextField("", 35);
+		platform = new JLabel("Running on the platform: " + Lab.getPlatform().name().toLowerCase());
 		bnBrowse = new JButton("Browse or drag anf drop a directory");
 		GridPanel pn1 = new GridPanel(true, 3);
 		pn1.place(0, 0, 3, 1, "Working directory");
 		pn1.place(1, 0, cmbPath);
 		pn1.place(1, 1, bnBrowse);
 		pn1.place(2, 0, 3, 1, txtPath);
-		pn1.place(5, 0, 3, 1, "  ");
+		pn1.place(3, 0, 3, 1, "  ");
+		pn1.place(4, 0, 3, 1, platform);
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 		panel.add(pn1);
@@ -189,7 +192,7 @@ public class DirectoryModule extends AbstractModule implements ActionListener, K
 	}
 
 	public class LocalDropTarget extends DropTarget {
-		
+
 		@Override
 		public void drop(DropTargetDropEvent e) {
 			e.acceptDrop(DnDConstants.ACTION_COPY);

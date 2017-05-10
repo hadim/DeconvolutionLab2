@@ -43,9 +43,10 @@ import deconvolutionlab.monitor.Monitors;
 
 public class DeconvolutionLab2 {
 
-	public static String ack = Constants.name + " " + Constants.version + " " + Constants.copyright;
+	public static String	ack	= Constants.name + " " + Constants.version + " " + Constants.copyright;
 
 	public static void main(String arg[]) {
+
 		Lab.init(Platform.STANDALONE);
 		if (arg.length == 0) {
 			System.out.println("Starting lab");
@@ -85,9 +86,9 @@ public class DeconvolutionLab2 {
 				cmd += arg[i] + " ";
 			new Deconvolution("Launch", cmd, Deconvolution.Finish.KILL).launch();
 		}
-		else 
-			System.out.println("" + flag +  " command not found");
-			
+		else
+			System.out.println("" + flag + " command not found");
+
 	}
 
 	private static void lab(String arg[]) {
@@ -125,4 +126,5 @@ public class DeconvolutionLab2 {
 		Lab.init(Imager.Platform.STANDALONE, Files.getWorkingDirectory() + "DeconvolutionLab2.config");
 		new Deconvolution("CommandLine", cmd).deconvolve();
 	}
+	
 }

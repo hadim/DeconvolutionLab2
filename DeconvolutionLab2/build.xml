@@ -14,13 +14,13 @@
 		<mkdir dir="${doc}" />
 		<mkdir dir="bin" />
 		<copy todir="bin"><fileset dir="ij"></fileset></copy>
+		<copy todir="bin"><fileset dir="jtransforms"></fileset></copy>
 		<copy file="plugins.config" toDir="bin" />
 		<zip destfile="../DeconvolutionLab2-src.zip" basedir="src" />
 		<zip destfile="../DeconvolutionLab2-cls.zip" basedir="bin" />
 		<jar destfile="../DeconvolutionLab_2.jar" basedir="bin">
 			<manifest>
 				<attribute name="Main-Class" value="DeconvolutionLab2" />
-				<attribute name="Class-Path" value="ij.jar jtransforms.jar" />
 			</manifest>
 		</jar>
 		<copy toDir="${fiji}" file="../DeconvolutionLab_2.jar" />

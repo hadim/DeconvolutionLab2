@@ -30,16 +30,15 @@
  * DL2. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.File;
-
-import deconvolution.Deconvolution;
-import deconvolutionlab.Imager;
-import deconvolutionlab.Lab;
-import deconvolutionlab.LabDialog;
 import ij.ImagePlus;
 import ij.WindowManager;
 import matlab.Converter;
 import signal.RealSignal;
+import bilib.tools.Files;
+import deconvolution.Deconvolution;
+import deconvolutionlab.Imager;
+import deconvolutionlab.Lab;
+import deconvolutionlab.LabDialog;
 
 /**
  * This class allows Matlab interface for DeconvolutionLab2
@@ -52,7 +51,7 @@ import signal.RealSignal;
 public class DL2 {
 
 	public static void lab() {
-		Lab.init(Imager.Platform.MATLAB, System.getProperty("user.dir") + File.separator + "DeconvolutionLab2.config");
+		Lab.init(Imager.Platform.MATLAB, Files.getWorkingDirectory() + "DeconvolutionLab2.config");
 		LabDialog dlg = new LabDialog();
 		Lab.setVisible(dlg, false);
 	}
