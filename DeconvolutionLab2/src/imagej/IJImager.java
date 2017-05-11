@@ -105,7 +105,7 @@ public class IJImager extends Imager {
 		else
 			imp = WindowManager.getImage(name);
 		if (imp == null)
-			imp = WindowManager.getCurrentImage();
+			return null;
 		return build(imp);
 	}
 
