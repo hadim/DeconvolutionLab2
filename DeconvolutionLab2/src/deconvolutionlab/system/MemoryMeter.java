@@ -41,7 +41,11 @@ import bilib.tools.NumFormat;
 
 public class MemoryMeter extends AbstractMeter {
 	
-	private double peak;
+	private double peak = 0;
+	
+	public MemoryMeter(int width) {
+		super(width);
+	}
 	
 	public void reset() {
 		peak = 0;

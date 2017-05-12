@@ -40,6 +40,10 @@ import bilib.tools.NumFormat;
 
 public class FileMeter extends AbstractMeter {
 
+	public FileMeter(int width) {
+		super(width);
+	}
+	
 	@Override
 	public void paintComponent(Graphics g) {
 	    super.paintComponent(g);
@@ -88,4 +92,5 @@ public class FileMeter extends AbstractMeter {
 		ClassLoadingMXBean loader = ManagementFactory.getClassLoadingMXBean();
 		add(i++, new String[] { "ClassLoading", "Loaded Class", "" + loader.getLoadedClassCount() });
 	}
+	
 }

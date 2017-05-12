@@ -77,7 +77,7 @@ public class PSFCapsule extends AbstractCapsule implements Runnable {
 	}
 
 	@Override
-	public String getName() {
+	public String getID() {
 		return "PSF";
 	}
 

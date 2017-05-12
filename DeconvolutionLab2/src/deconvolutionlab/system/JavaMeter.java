@@ -39,6 +39,10 @@ import bilib.tools.NumFormat;
 
 public class JavaMeter extends AbstractMeter {
 
+	public JavaMeter(int width) {
+		super(width);
+	}
+	
 	@Override
 	public void paintComponent(Graphics g) {
 		g.setColor(colorText);

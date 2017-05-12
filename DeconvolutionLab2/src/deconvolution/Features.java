@@ -39,7 +39,6 @@ public class Features extends ArrayList<String[]>{
 		super();
 	}
 	
-
 	public void add(String feature, String value) {
 		add(new String[] {feature, value});
 	}

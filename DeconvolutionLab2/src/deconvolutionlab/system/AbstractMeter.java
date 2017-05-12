@@ -55,13 +55,12 @@ public abstract class AbstractMeter extends JButton {
 	protected String prefix = "\u25BA ";
 	protected boolean collapse = true;
 	
-	public AbstractMeter() {
-		super("");
-		int w = (int)(Constants.widthGUI/3.2);
-		int h = 25;
+	public AbstractMeter(int width) {
+		super("");;
+		int h = 28;
 		setBorder(BorderFactory.createEtchedBorder());
-		setPreferredSize(new Dimension(w, h));
-		setMinimumSize(new Dimension(w, h));
+		setPreferredSize(new Dimension(width, h));
+		setMinimumSize(new Dimension(width, h));
 		table = new CustomizedTable(new String[] {"Tool", "Feature", "Value"}, false);
 	}
 
@@ -107,13 +106,9 @@ public abstract class AbstractMeter extends JButton {
 			features.put(row[0], i);
 		}
 	}
-	
 
 	protected String split(String name) {
 		String func = name.substring(3);
 		return func.replaceAll("(\\p{Ll})(\\p{Lu})", "$1 $2");
 	}
-
-
-
 }

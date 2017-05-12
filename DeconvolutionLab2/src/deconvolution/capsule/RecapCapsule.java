@@ -31,13 +31,18 @@
 
 package deconvolution.capsule;
 
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
 import javax.swing.JSplitPane;
+import javax.swing.JViewport;
 import javax.swing.text.BadLocationException;
 
 import bilib.component.HTMLPane;
+import bilib.table.CustomizedColumn;
 import bilib.table.CustomizedTable;
 import deconvolution.Deconvolution;
 
@@ -45,24 +50,29 @@ import deconvolution.Deconvolution;
  * This class is a information module for a recapitulation of the command line.
  * 
  * @author Daniel Sage
- *
+ * 
  */
 public class RecapCapsule extends AbstractCapsule implements KeyListener {
 
-	private HTMLPane		pnCommand;
-	private CustomizedTable table;
+	private HTMLPane	    pnCommand;
+	private CustomizedTable	table;
 
 	public RecapCapsule(Deconvolution deconvolution) {
 		super(deconvolution);
 		// Panel command
-		pnCommand = new HTMLPane("Monaco", "#10FF10", "100020", 100, 100);
+		pnCommand = new HTMLPane("Monaco", "#10FF10", "100020", 80, 80);
 		pnCommand.append("p", deconvolution.getCommand());
 		pnCommand.setEditable(true);
 		pnCommand.addKeyListener(this);
-		table = new CustomizedTable(new String[] { "Features", "Values" }, false);
-		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(200, 200), pnCommand.getPane());
+
+		ArrayList<CustomizedColumn> columns = new ArrayList<CustomizedColumn>();
+		columns.add(new CustomizedColumn("Feature", String.class, 150, false));
+		columns.add(new CustomizedColumn("Value", String.class, 550, false));
+
+		table = new CustomizedTable(columns, false);
+		split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, table.getPane(200, 200), pnCommand.getPane());
 	}
-	
+
 	@Override
 	public void update() {
 		if (table == null)
@@ -71,8 +81,12 @@ public class RecapCapsule extends AbstractCapsule implements KeyListener {
 		table.removeRows();
 		for (String[] feature : deconvolution.recap())
 			table.append(feature);
+		Rectangle rect = table.getCellRect(0, 0, true);
+		Point pt = ((JViewport) table.getParent()).getViewPosition();
+		rect.setLocation(rect.x - pt.x, rect.y - pt.y);
 
-		split.setDividerLocation(0.5);
+		table.scrollRectToVisible(rect);
+		split.setDividerLocation(0.7);
 		split.repaint();
 		stopAsynchronousTimer();
 	}
@@ -80,9 +94,9 @@ public class RecapCapsule extends AbstractCapsule implements KeyListener {
 	public String getCommand() {
 		return pnCommand.getText();
 	}
-	
+
 	@Override
-	public String getName() {
+	public String getID() {
 		return "Recap";
 	}
 
@@ -108,7 +122,5 @@ public class RecapCapsule extends AbstractCapsule implements KeyListener {
 			e1.printStackTrace();
 		}
 	}
-
-
 
 }

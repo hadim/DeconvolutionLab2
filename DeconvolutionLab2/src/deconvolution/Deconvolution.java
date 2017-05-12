@@ -258,7 +258,6 @@ public class Deconvolution implements Runnable {
 		features.add("Monitor", s);
 		if (controller.getStats() != null)
 			features.add("Stats", controller.getStats().toStringStats());
-		features.add("Running", controller.toStringRunning());
 		
 		for (Output out : controller.getOuts())
 			features.add("Output " + out.getName(), out.toString());

@@ -36,6 +36,10 @@ import fft.FFT;
 
 public class FFTMeter extends AbstractMeter {
 
+	public FFTMeter(int width) {
+		super(width);
+	}
+	
 	@Override
 	public void paintComponent(Graphics g) {
 	    super.paintComponent(g);

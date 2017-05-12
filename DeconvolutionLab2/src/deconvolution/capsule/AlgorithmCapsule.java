@@ -31,7 +31,11 @@
 
 package deconvolution.capsule;
 
+import java.awt.Point;
+import java.awt.Rectangle;
+
 import javax.swing.JSplitPane;
+import javax.swing.JViewport;
 
 import signal.ComplexSignal;
 import signal.RealSignal;
@@ -61,9 +65,10 @@ public class AlgorithmCapsule extends AbstractCapsule implements Runnable {
 
 	public AlgorithmCapsule(Deconvolution deconvolution) {
 		super(deconvolution);
-		doc = new HTMLPane(100, 1000);
+		doc = new HTMLPane(100, 100);
 		table = new CustomizedTable(new String[] { "Features", "Values" }, false);
-		split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, table.getPane(200, 200), doc.getPane());
+		split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, table.getPane(100, 100), doc.getPane());
+		split.setDividerLocation(0.5);
 	}
 
 	@Override
@@ -78,11 +83,10 @@ public class AlgorithmCapsule extends AbstractCapsule implements Runnable {
 		Thread thread = new Thread(this);
 		thread.setPriority(Thread.MIN_PRIORITY);
 		thread.start();
-		split.setDividerLocation(300);
 	}
 
 	@Override
-	public String getName() {
+	public String getID() {
 		return "Algorithm";
 	}
 	
@@ -100,6 +104,10 @@ public class AlgorithmCapsule extends AbstractCapsule implements Runnable {
 		AlgorithmPanel algoPanel = AlgorithmList.getPanel(name);
 		if (algoPanel != null)
 			doc.append(algoPanel.getDocumentation());
+		
+		String p = algo.getParametersAsString();
+		features.add("<html><b>Parameters</b></html>", p.equals("") ? "Parameters free" : p);
+		features.add("Iteration", algo.isIterative()  ? "" + algo.getIterationsMax() : "Direct");
 		
 		if (deconvolution.image == null) {
 			startAsynchronousTimer("Open image", 200);
@@ -160,23 +168,29 @@ public class AlgorithmCapsule extends AbstractCapsule implements Runnable {
 			SignalCollector.free(c);
 			
 			chrono = (System.nanoTime() - chrono);
-			features.add("Small dataset", mx + "x" + my + "x" + mz);
-			features.add("Elapsed time on small dataset", NumFormat.time(chrono) );
 			
-			chrono = chrono * ratio * algo.getComplexityNumberofFFT();
+			double chronoI = chrono * ratio * algo.getComplexityNumberofFFT();
 			
-			features.add("Estimated time for input dataset", NumFormat.time(chrono) );
+			features.add("<html><b>Estimation</b></html>", "");
+			features.add("Estimated time", NumFormat.time(chronoI) );
 			features.add("Estimated number of FFTs", "" + algo.getComplexityNumberofFFT());
+			
+			features.add("<html><b>Run on tiny dataset</b></html>", mx + "x" + my + "x" + mz);
+			features.add("Elapsed time", NumFormat.time(chrono) );
 		}
 		else 
 			features.add("Estimated time", "Error" );
 		double mem = (algo.getMemoryFootprintRatio() * deconvolution.image.nx * deconvolution.image.ny * deconvolution.image.nz * 4);
-		features.add("Estimated required memory", NumFormat.bytes(mem));
-		features.add("Iterative", algo.isIterative()  ? "" + algo.getIterationsMax() : "Direct");
+		features.add("Required memory", NumFormat.bytes(mem));
 		
 		table.removeRows();
 		for (String[] feature : features)
 			table.append(feature);
+		
+		Rectangle rect = table.getCellRect(0, 0, true);
+		Point pt = ((JViewport) table.getParent()).getViewPosition();
+		rect.setLocation(rect.x - pt.x, rect.y - pt.y);
+
 		stopAsynchronousTimer();
 	}
 

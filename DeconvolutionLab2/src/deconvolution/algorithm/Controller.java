@@ -641,14 +641,6 @@ public class Controller {
 		this.stats = new Stats(mode);
 	}
 
-	public String toStringRunning() {
-		String s = "";
-		s += "system " + (system ? "shown" : "hidden ");
-		s += ", multithreading " + (multithreading ? "on" : "off ");
-		s += ", display final " + (displayFinal ? "on " : "off ");
-		return s;
-	}
-
 	public String toStringPath() {
 		File dir = new File(path);
 		if (dir.exists()) {

@@ -72,7 +72,7 @@ public class ReportCapsule extends AbstractCapsule {
 			table.append(feature);
 		RealSignal image = deconvolution.getOutput();
 		if (image == null) {
-			table.append(new String[] {"ERROR", "No open output"});
+			table.append(new String[] {"Output", "No yet run"});
 			return;
 		}
 		pnImage.setImage(image.preview());
@@ -82,7 +82,7 @@ public class ReportCapsule extends AbstractCapsule {
 	}
 
 	@Override
-	public String getName() {
+	public String getID() {
 		return "Report";
 	}
 }

@@ -114,8 +114,8 @@ public abstract class Algorithm implements Callable<RealSignal> {
 
 		String sn = getShortnames()[0];
 		String algoParam = sn + "(" + getParametersAsString() + ")";
-		if (controller.isSystem())
-			SystemInfo.activate();
+		//if (controller.isSystem())
+		//	SystemInfo.activate();
 
 		Padding pad = controller.getPadding();
 		Apodization apo = controller.getApodization();
@@ -132,7 +132,6 @@ public abstract class Algorithm implements Callable<RealSignal> {
 			return null;
 		
 		// Prepare the controller and the outputs
-
 		Monitors monitors = controller.getMonitors();
 		monitors.setVerbose(controller.getVerbose());
 		monitors.log("Path: " + controller.toStringPath());

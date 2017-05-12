@@ -60,6 +60,7 @@ import deconvolution.capsule.ImageCapsule;
 import deconvolution.capsule.PSFCapsule;
 import deconvolution.capsule.RecapCapsule;
 import deconvolution.capsule.ReportCapsule;
+import deconvolution.capsule.ResourcesCapsule;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 import deconvolutionlab.Lab;
@@ -67,6 +68,7 @@ import deconvolutionlab.monitor.AbstractMonitor;
 import deconvolutionlab.monitor.Monitors;
 import deconvolutionlab.monitor.StatusMonitor;
 import deconvolutionlab.monitor.TableMonitor;
+import deconvolutionlab.system.RuntimeInfoPanel;
 
 public class DeconvolutionDialog extends JDialog implements WindowListener, ActionListener, Runnable {
 
@@ -78,38 +80,40 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		ALL, RECAP, IMAGE, PSF, ALGO, RUN
 	};
 
-	private JButton				bnStart		= new JButton("Run");
-	private JButton				bnStop		= new JButton("Stop");
-	private JButton				bnReset		= new JButton("Reset");
-	private JButton				bnHelp		= new JButton("Help");
-	private JButton				bnQuit		= new JButton("Quit");
+	private JButton	            bnStart	    = new JButton("Run");
+	private JButton	            bnStop	    = new JButton("Stop");
+	private JButton	            bnReset	    = new JButton("Reset");
+	private JButton	            bnHelp	    = new JButton("Help");
+	private JButton	            bnQuit	    = new JButton("Quit");
 
-	private BorderToggledButton	bnRecap		= new BorderToggledButton("Recap");
-	private BorderToggledButton	bnImage		= new BorderToggledButton("Image");
-	private BorderToggledButton	bnPSF		= new BorderToggledButton("PSF");
-	private BorderToggledButton	bnAlgo		= new BorderToggledButton("Algorithm");
+	private BorderToggledButton	bnRecap	    = new BorderToggledButton("Recap");
+	private BorderToggledButton	bnResources	= new BorderToggledButton("Resources");
+	private BorderToggledButton	bnImage	    = new BorderToggledButton("Image");
+	private BorderToggledButton	bnPSF	    = new BorderToggledButton("PSF");
+	private BorderToggledButton	bnAlgo	    = new BorderToggledButton("Algorithm");
 	private BorderToggledButton	bnReport	= new BorderToggledButton("Report");
 	private BorderToggledButton	bnMonitor	= new BorderToggledButton("Monitor");
-	private BorderToggledButton	bnStats		= new BorderToggledButton("Stats");
-	JToolBar tool = new JToolBar();
+	private BorderToggledButton	bnStats	    = new BorderToggledButton("Stats");
+	private JToolBar	        tool	    = new JToolBar();
 
-	private Thread				thread		= null;
+	private Thread	            thread	    = null;
 
-	private Deconvolution		deconvolution;
-	private JProgressBar		progress	= new JProgressBar();
+	private Deconvolution	    deconvolution;
+	private JProgressBar	    progress	= new JProgressBar();
 
-	public static Point			location	= new Point(0, 0);
+	public static Point	        location	= new Point(0, 0);
 
-	private JPanel				cards		= new JPanel(new CardLayout());
+	private JPanel	            cards	    = new JPanel(new CardLayout());
 
-	private boolean				flagMonitor	= false;
-	private boolean				flagStats	= false;
+	private boolean	            flagMonitor	= false;
+	private boolean	            flagStats	= false;
 
-	private ImageCapsule		image;
-	private PSFCapsule			psf;
-	private RecapCapsule		recap;
+	private ImageCapsule	    image;
+	private PSFCapsule	        psf;
+	private RecapCapsule	    recap;
 	private AlgorithmCapsule	algorithm;
-	private ReportCapsule		report;
+	private ReportCapsule	    report;
+	private ResourcesCapsule	resources;
 
 	public DeconvolutionDialog(Module module, Deconvolution deconvolution) {
 		super(new JFrame(), deconvolution.getName());
@@ -121,7 +125,9 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		recap = new RecapCapsule(deconvolution);
 		algorithm = new AlgorithmCapsule(deconvolution);
 		report = new ReportCapsule(deconvolution);
+		resources = new ResourcesCapsule(deconvolution);
 
+		RuntimeInfoPanel info = new RuntimeInfoPanel(250);
 		// Panel status bar on bottom
 		progress.setAlignmentX(JLabel.CENTER_ALIGNMENT);
 		progress.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -129,7 +135,7 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		statusBar.setBorder(BorderFactory.createLoweredBevelBorder());
 		statusBar.setFloatable(false);
 		statusBar.setLayout(new BorderLayout());
-		statusBar.add(bnHelp, BorderLayout.WEST);
+		statusBar.add(info, BorderLayout.WEST);
 		statusBar.add(progress, BorderLayout.CENTER);
 		statusBar.add(bnQuit, BorderLayout.EAST);
 
@@ -150,11 +156,12 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		bottom.add(statusBar);
 
 		// Panel Image
-		cards.add(recap.getName(), recap.getPane());
-		cards.add(image.getName(), image.getPane());
-		cards.add(psf.getName(), psf.getPane());
-		cards.add(algorithm.getName(), algorithm.getPane());
-		cards.add(report.getName(), report.getPane());
+		cards.add(recap.getID(), recap.getPane());
+		cards.add(resources.getID(), resources.getPane());
+		cards.add(image.getID(), image.getPane());
+		cards.add(psf.getID(), psf.getPane());
+		cards.add(algorithm.getID(), algorithm.getPane());
+		cards.add(report.getID(), report.getPane());
 
 		// Panel Main
 		JPanel panel = new JPanel();
@@ -168,9 +175,10 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 			tool.setLayout(new GridLayout(1, 6));
 			tool.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 			tool.add(bnRecap);
+			tool.add(bnResources);
+			tool.add(bnAlgo);
 			tool.add(bnImage);
 			tool.add(bnPSF);
-			tool.add(bnAlgo);
 			tool.add(bnReport);
 			panel.add(tool, BorderLayout.NORTH);
 		}
@@ -183,6 +191,7 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		bnHelp.addActionListener(this);
 
 		bnImage.addActionListener(this);
+		bnResources.addActionListener(this);
 		bnPSF.addActionListener(this);
 		bnAlgo.addActionListener(this);
 		bnRecap.addActionListener(this);
@@ -206,7 +215,7 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		}
 		if (module == Module.IMAGE) {
 			toggle(bnImage);
-				image.update();
+			image.update();
 		}
 		if (module == Module.PSF) {
 			toggle(bnPSF);
@@ -224,7 +233,6 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-
 		if (e.getSource() == bnStart) {
 			if (flagMonitor)
 				toggle(bnMonitor);
@@ -241,6 +249,10 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 			toggle(bnReport);
 			if (deconvolution != null)
 				deconvolution.abort();
+		}
+		else if (e.getSource() == bnResources) {
+			toggle(bnResources);
+			resources.update();
 		}
 		else if (e.getSource() == bnImage) {
 			toggle(bnImage);
@@ -277,38 +289,30 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 			toggle(bnMonitor);
 		else if (e.getSource() == bnStats)
 			toggle(bnStats);
-		
+
 		addProgress();
 
 	}
 
 	@Override
 	public void run() {
-		//bnRecap.setEnabled(false);
-		//bnImage.setEnabled(false);
-		//bnPSF.setEnabled(false);
-		//bnAlgo.setEnabled(false);
 		bnStart.setEnabled(false);
 		bnStop.setEnabled(true);
-		
+
 		deconvolution.setCommand(recap.getCommand());
 		addProgress();
 		deconvolution.run();
 		toggle(bnReport);
-		
+
 		bnStop.setEnabled(false);
 		report.update();
-		//bnRecap.setEnabled(true);
-		//bnAlgo.setEnabled(true);
-		//bnPSF.setEnabled(true);
-		//bnImage.setEnabled(true);
 		thread = null;
 	}
 
 	private void addProgress() {
-		Monitors monitors =  deconvolution.getController().getMonitors();
+		Monitors monitors = deconvolution.getController().getMonitors();
 		boolean found = false;
-		for(AbstractMonitor monitor : monitors) {
+		for (AbstractMonitor monitor : monitors) {
 			if (monitor instanceof StatusMonitor)
 				found = true;
 		}
@@ -318,6 +322,7 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 		}
 
 	}
+
 	public void addStats(Stats stats) {
 		if (stats != null) {
 			cards.add("Stats", stats.getPanel());
@@ -326,7 +331,7 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 			bnStats.addActionListener(this);
 		}
 	}
-	
+
 	public void addMonitor(TableMonitor tableMonitor) {
 		if (tableMonitor != null) {
 			cards.add("Monitor", tableMonitor.getPanel());
@@ -343,6 +348,7 @@ public class DeconvolutionDialog extends JDialog implements WindowListener, Acti
 	private void toggle(BorderToggledButton bn) {
 		((CardLayout) (cards.getLayout())).show(cards, bn.getText());
 		bnRecap.setSelected(false);
+		bnResources.setSelected(false);
 		bnImage.setSelected(false);
 		bnPSF.setSelected(false);
 		bnAlgo.setSelected(false);

@@ -43,6 +43,10 @@ import bilib.tools.NumFormat;
 
 public class ProcessorMeter extends AbstractMeter {
 		
+	public ProcessorMeter(int width) {
+		super(width);
+	}
+	
 	@Override
 	public void update() {
 		repaint();

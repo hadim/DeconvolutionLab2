@@ -51,13 +51,12 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import bilib.component.PanelImage;
+import signal.SignalCollector;
 import bilib.tools.NumFormat;
 import deconvolutionlab.Config;
 import deconvolutionlab.Constants;
 import deconvolutionlab.Lab;
 import fft.FFTPanel;
-import signal.SignalCollector;
 
 public class SystemInfo extends JDialog implements WindowListener, ActionListener, MouseListener {
 
@@ -105,13 +104,13 @@ public class SystemInfo extends JDialog implements WindowListener, ActionListene
 
 	private SystemInfo() {
 		super(new JFrame(), "DeconvolutionLab2 System");
-
-		memory = new MemoryMeter();
-		processor = new ProcessorMeter();
-		signal = new SignalMeter();
-		fft = new FFTMeter();
-		java = new JavaMeter();
-		file = new FileMeter();
+		
+		memory = new MemoryMeter(width/3);
+		processor = new ProcessorMeter(width/3);
+		signal = new SignalMeter(width/3);
+		fft = new FFTMeter(width/3);
+		java = new JavaMeter(width/3);
+		file = new FileMeter(width/3);
 		meters.add(memory);
 		meters.add(processor);
 		meters.add(signal);
@@ -138,7 +137,7 @@ public class SystemInfo extends JDialog implements WindowListener, ActionListene
 
 
 		// Panel Compact
-		PanelImage pnCompact = new PanelImage("celegans.jpg");
+		JPanel pnCompact = new JPanel();
 		pnCompact.setPreferredSize(new Dimension(width, 20));
 
 		// Panel cards, compact is visible

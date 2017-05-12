@@ -80,7 +80,7 @@ public class ImageCapsule extends AbstractCapsule implements Runnable {
 	}
 
 	@Override
-	public String getName() {
+	public String getID() {
 		return "Image";
 	}
 	

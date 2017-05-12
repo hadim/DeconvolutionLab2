@@ -37,6 +37,10 @@ import signal.SignalCollector;
 
 public class SignalMeter extends AbstractMeter {
 
+	public SignalMeter(int width) {
+		super(width);
+	}
+	
 	@Override
 	public void paintComponent(Graphics g) {
  	    g.setColor(colorText);

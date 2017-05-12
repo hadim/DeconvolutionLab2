@@ -70,7 +70,7 @@ public abstract class AbstractCapsule {
 
 	public abstract void update();
 
-	public abstract String getName();
+	public abstract String getID();
 
 	public void stopAsynchronousTimer() {
 		if (monitors != null)
