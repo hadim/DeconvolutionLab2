@@ -90,7 +90,6 @@ public class JCuFFT extends AbstractFFT {
 		}
 		handleResult(result);
 
-		System.out.println(interleave.length);
 		result = JCufft.cufftExecC2C(plan, interleave, interleave, JCufft.CUFFT_FORWARD);
 		handleResult(result);
 

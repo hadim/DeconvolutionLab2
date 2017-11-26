@@ -116,7 +116,6 @@ public class Lab {
 	/**
 	 * Returns the platform.
 	 * 
-	 * @return
 	 */
 	public static Imager.Platform getPlatform() {
 		return imaging.getPlatform();
@@ -317,7 +316,6 @@ public class Lab {
 	/**
 	 * Return the active image.
 	 * 
-	 * @return
 	 */
 	public static RealSignal getImage() {
 		return getImager().getActiveImage();
@@ -327,7 +325,6 @@ public class Lab {
 	 * Return an image from the platform with a specified name.
 	 * 
 	 * @param name
-	 * @return
 	 */
 	public static RealSignal getImage(String name) {
 		return getImager().getImageByName(name);
@@ -338,7 +335,6 @@ public class Lab {
 	 * 
 	 * @param monitors
 	 * @param name
-	 * @return
 	 */
 	public static RealSignal getImage(Monitors monitors, String name) {
 		RealSignal signal = getImager().getImageByName(name);
@@ -353,7 +349,6 @@ public class Lab {
 	 * Open an image from the disk.
 	 * 
 	 * @param filename
-	 * @return
 	 */
 	public static RealSignal openFile(String filename) {
 		return imaging.open(filename);
@@ -364,7 +359,6 @@ public class Lab {
 	 * 
 	 * @param monitors
 	 * @param filename
-	 * @return
 	 */
 	public static RealSignal openFile(Monitors monitors, String filename) {
 		RealSignal signal = imaging.open(filename);
@@ -379,7 +373,6 @@ public class Lab {
 	 * Open a series of image from a directory.
 	 * 
 	 * @param path
-	 * @return
 	 */
 	public static RealSignal openDir(String path) {
 		return openDir(Monitors.createDefaultMonitor(), path);
@@ -390,7 +383,6 @@ public class Lab {
 	 * 
 	 * @param monitors
 	 * @param path
-	 * @return
 	 */
 	public static RealSignal openDir(Monitors monitors, String path) {
 		String parts[] = path.split(" pattern ");
