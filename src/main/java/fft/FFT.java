@@ -38,13 +38,14 @@ import fft.academic.Academic;
 import fft.academic.AcademicLibrary;
 import fft.fftw.FFTW3D;
 import fft.fftw.FFTWLibrary;
+import fft.jcufft.JCuFFTLibrary;
 import fft.jtransforms.JTransforms;
 import fft.jtransforms.JTransformsLibrary;
 
 public class FFT {
 
-	private static ArrayList<AbstractFFTLibrary>	libraries	= new ArrayList<AbstractFFTLibrary>();
-	private static ArrayList<AbstractFFTLibrary>	registers		= new ArrayList<AbstractFFTLibrary>();
+	private static ArrayList<AbstractFFTLibrary> libraries = new ArrayList<AbstractFFTLibrary>();
+	private static ArrayList<AbstractFFTLibrary> registers = new ArrayList<AbstractFFTLibrary>();
 
 	static {
 		Monitors monitors = Monitors.createDefaultMonitor();
@@ -52,8 +53,7 @@ public class FFT {
 		if (academic.isInstalled()) {
 			libraries.add(academic);
 			monitors.log("AcademicFFT Added");
-		}
-		else {
+		} else {
 			monitors.log("AcademicFFT not found");
 		}
 
@@ -61,8 +61,7 @@ public class FFT {
 		if (jtransform.isInstalled()) {
 			libraries.add(jtransform);
 			monitors.log("JTransforms Added");
-		}
-		else {
+		} else {
 			monitors.log("JTransforms not found");
 		}
 
@@ -70,13 +69,22 @@ public class FFT {
 		if (jfftw.isInstalled()) {
 			libraries.add(jfftw);
 			monitors.log("FFTW Added");
-		}
-		else {
+		} else {
 			monitors.log("FFTW not found");
-		}	
+		}
+
+		JCuFFTLibrary jcufft = new JCuFFTLibrary();
+		if (jcufft.isInstalled()) {
+			libraries.add(jcufft);
+			monitors.log("JCuFFT Added");
+		} else {
+			monitors.log("JCuFFT not found");
+		}
+
 		registers.add(academic);
 		registers.add(jtransform);
 		registers.add(jfftw);
+		registers.add(jcufft);
 
 	}
 
@@ -97,12 +105,12 @@ public class FFT {
 				return libraries.get(i);
 		return libraries.get(0);
 	}
-	
+
 	public static String[] getLibrariesAsArray() {
-		String[] libs = new String[libraries.size()+1];
+		String[] libs = new String[libraries.size() + 1];
 		libs[0] = "Fastest";
 		for (int i = 0; i < libraries.size(); i++)
-			libs[i+1] = libraries.get(i).getLibraryName();
+			libs[i + 1] = libraries.get(i).getLibraryName();
 		return libs;
 	}
 
