@@ -119,6 +119,7 @@ public class JCuFFT extends AbstractFFT {
 		handleResult(result);
 
 		x.setInterleaveXYZAtReal(interleave);
+		x.multiply(1.0/(nx*ny*nz));
 	}
 
 	@Override

@@ -10,7 +10,7 @@ public class TestRunDeconvolution {
 		String algorithm = " -algorithm RLTV 10 0.1000";
 		String parameters = "";
 		parameters += " -fft JCuFFT";
-		//parameters += " -fft JTransforms";
+		//parameters += " -fft Academic";
 		new DeconvolutionLab2(image + psf + algorithm + parameters);
 	}
 
