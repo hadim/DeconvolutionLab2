@@ -65,7 +65,7 @@ public class JCuFFTLibrary extends AbstractFFTLibrary {
 
 	@Override
 	public String getLibraryName() {
-		return "JCuFFT";
+		return "JCuFFT (GPU support)";
 	}
 
 	@Override

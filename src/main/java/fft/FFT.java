@@ -98,6 +98,9 @@ public class FFT {
 
 	public static AbstractFFTLibrary getFastestFFT() {
 		for (int i = 0; i < libraries.size(); i++)
+			if (libraries.get(i).getLibraryName().equals("JCuFFT (GPU support)"))
+				return libraries.get(i);
+		for (int i = 0; i < libraries.size(); i++)
 			if (libraries.get(i).getLibraryName().equals("FFTW2"))
 				return libraries.get(i);
 		for (int i = 0; i < libraries.size(); i++)
