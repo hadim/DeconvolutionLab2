@@ -25,9 +25,23 @@
 	</organization>
 
 	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://choosealicense.com/licenses/mit/</url>
+			<distribution>repo</distribution>
+		</license>
 	</licenses>
 
 	<developers>
+		<developer>
+			<id>hadim</id>
+			<name>Hadrien Mary</name>
+			<url>http://imagej.net/User:Hadim</url>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>-5</timezone>
+		</developer>
 	</developers>
 
 	<contributors>
@@ -39,10 +53,33 @@
 
 	<properties>
 		<package-name>DeconcolutionLab2</package-name>
+		<license.licenseName>mit</license.licenseName>
+		<license.copyrightOwners>Marco Hutter</license.copyrightOwners>
 	</properties>
 
 	<mailingLists>
+		<mailingList>
+			<name>ImageJ Forum</name>
+			<archive>http://forum.imagej.net/</archive>
+		</mailingList>
 	</mailingLists>
+
+	<ciManagement>
+		<system>Travis CI</system>
+		<url>https://travis-ci.org/fiji/DeconcolutionLab2</url>
+	</ciManagement>
+
+	<scm>
+		<connection>scm:git:git://github.com/fiji/DeconcolutionLab2</connection>
+		<developerConnection>scm:git:git@github.com:fiji/DeconcolutionLab2</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/fiji/DeconcolutionLab2</url>
+	</scm>
+
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/fiji/DeconcolutionLab2/issues</url>
+	</issueManagement>
 
 	<dependencies>
 
