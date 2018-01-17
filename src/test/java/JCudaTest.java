@@ -50,6 +50,9 @@ public class JCudaTest {
 		printArray(outputJTransforms);
 		System.out.println("FFT JCuFFT");
 		printArray(outputJCufft);
+		
+		boolean outputsEquals = Arrays.equals(outputJTransforms, outputJCufft);
+		System.out.println("Both outputs equals ? " + outputsEquals);
 	}
 
 	public static void fft1() {
@@ -78,14 +81,17 @@ public class JCudaTest {
 		printArray(outputJTransforms);
 		System.out.println("FFT JCuFFT");
 		printArray(outputJCufft);
+		
+		boolean outputsEquals = Arrays.equals(outputJTransforms, outputJCufft);
+		System.out.println("Both outputs equals ? " + outputsEquals);
 	}
 
 	private static void printArray(float[] array) {
 		System.out.println("----");
 		for (int i = 0; i < array.length; i++) {
-			System.out.println(array[i]);
+			System.out.print(array[i] + ", ");
 		}
-		System.out.println("----");
+		System.out.println("\n----");
 	}
 
 	private static void printArray(float[][] array) {
